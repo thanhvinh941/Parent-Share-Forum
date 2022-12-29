@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.se1.memberservice.domain.request.dto.MemberRegisRequestDto;
+import com.se1.memberservice.domain.request.dto.RegisMemberRequestDto;
 
 import jakarta.validation.Valid;
 
@@ -16,10 +16,7 @@ import jakarta.validation.Valid;
 public class InternalApiController {
 
 	@PostMapping("/insert")
-	public ResponseEntity<?> insertMember(@Valid @RequestBody MemberRegisRequestDto requestDto,BindingResult result){
-		if(result.hasErrors()) {
-			return null;
-		}
+	public ResponseEntity<?> insertMember(){
 		return null;
 	}
 	

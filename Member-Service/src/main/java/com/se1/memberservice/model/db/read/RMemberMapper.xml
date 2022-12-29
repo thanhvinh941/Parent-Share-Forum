@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.se1.memberservice.model.db.read.GetMemberMapper">
+<mapper namespace="com.se1.memberservice.model.db.read.RMemberMapper">
 	<resultMap type="com.se1.memberservice.domain.entity.Member" id="ResultMap">
 		<result column="member_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="memberId"/>
 		<result column="avatar_url" jdbcType="VARCHAR" javaType="java.lang.String" property="avatarUrl"/>

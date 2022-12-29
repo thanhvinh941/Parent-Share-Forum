@@ -2,6 +2,8 @@ package com.se1.memberservice.domain.request.dto;
 
 import java.util.Date;
 
+import com.se1.memberservice.domain.entity.AuthProvider;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -11,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class MemberRegisRequestDto {
+public class RegisMemberRequestDto {
 
 	@NotBlank
 	@NotNull
@@ -25,6 +27,8 @@ public class MemberRegisRequestDto {
 	private String memberEmail;
 	
 	private String memberPhoneNumber;
+	
+	private AuthProvider provider;
 	
 	@NotBlank
 	@NotEmpty
