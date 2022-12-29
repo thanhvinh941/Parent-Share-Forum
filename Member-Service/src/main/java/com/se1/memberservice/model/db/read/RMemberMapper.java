@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.se1.memberservice.domain.entity.Member;
 
 @Mapper
-public interface GetMemberMapper {
+public interface RMemberMapper {
 
 	
 	List<Member> selectWhere(@Param("where") String where);

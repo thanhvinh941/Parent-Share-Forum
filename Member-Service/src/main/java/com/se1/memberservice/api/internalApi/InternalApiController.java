@@ -13,13 +13,28 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/internal")
-public class MemberController {
+public class InternalApiController {
 
-	@PostMapping("/regis")
-	public ResponseEntity<?> regisMember(@Valid @RequestBody MemberRegisRequestDto requestDto,BindingResult result){
+	@PostMapping("/insert")
+	public ResponseEntity<?> insertMember(@Valid @RequestBody MemberRegisRequestDto requestDto,BindingResult result){
 		if(result.hasErrors()) {
 			return null;
 		}
+		return null;
+	}
+	
+	@PostMapping("/select")
+	public ResponseEntity<?> selectMember(){
+		return null;
+	}
+	
+	@PostMapping("/update")
+	public ResponseEntity<?> updateMember(){
+		return null;
+	}
+	
+	@PostMapping("/delete")
+	public ResponseEntity<?> deleteMember(){
 		return null;
 	}
 }

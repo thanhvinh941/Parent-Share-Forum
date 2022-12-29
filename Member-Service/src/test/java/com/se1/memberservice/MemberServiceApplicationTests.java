@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.se1.memberservice.domain.entity.Member;
-import com.se1.memberservice.model.db.read.GetMemberMapper;
+import com.se1.memberservice.model.db.read.RMemberMapper;
 
 @SpringBootTest
 class MemberServiceApplicationTests {
 
 	@Autowired
-	GetMemberMapper mapper;
+	RMemberMapper mapper;
 	
 	@Test
 	void contextLoads() {
