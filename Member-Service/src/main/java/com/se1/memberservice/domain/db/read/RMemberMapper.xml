@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.memberservice.domain.db.read.RMemberMapper">
+	<resultMap type="com.se1.memberservice.domain.dto.MemberResponse" id="ResultMap">
+		<result column="member_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="memberId"/>
+		<result column="avatar_url" jdbcType="VARCHAR" javaType="java.lang.String" property="avatarUrl"/>
+		<result column="backgroud_url" jdbcType="VARCHAR" javaType="java.lang.String" property="backgroudUrl"/>
+		<result column="create_dt" jdbcType="TIMESTAMP" javaType="java.lang.String" property="createDt"/>
+		<result column="provider" jdbcType="VARCHAR" javaType="java.lang.String" property="provider"/>
+		<result column="dbo_dt" jdbcType="TIMESTAMP" javaType="java.lang.String" property="dboDt"/>
+		<result column="del_flg" jdbcType="TINYINT" javaType="java.lang.Byte" property="delFlg"/>
+		<result column="display_name" jdbcType="VARCHAR" javaType="java.lang.String" property="displayName"/>
+		<result column="last_login_time" jdbcType="TIMESTAMP" javaType="java.lang.String" property="lastLoginTime"/>
+		<result column="login_id" jdbcType="VARCHAR" javaType="java.lang.String" property="loginId"/>
+		<result column="member_email" jdbcType="VARCHAR" javaType="java.lang.String" property="memberEmail"/>
+		<result column="memberfname" jdbcType="VARCHAR" javaType="java.lang.String" property="memberFName"/>
+		<result column="memberlname" jdbcType="VARCHAR" javaType="java.lang.String" property="memberLName"/>
+		<result column="member_phone_number" jdbcType="VARCHAR" javaType="java.lang.String" property="memberPhoneNumber"/>
+		<result column="status_flg" jdbcType="TINYINT" javaType="java.lang.Byte" property="statusFlg"/>
+		<result column="password" jdbcType="VARCHAR" javaType="java.lang.String" property="password"/>
+		<result column="update_dt" jdbcType="TIMESTAMP" javaType="java.lang.String" property="updateDt"/>
+		<result column="valid_flg" jdbcType="TINYINT" javaType="java.lang.Byte" property="validFlg"/>	
+	</resultMap>
+
+	<select id="selectWhere" parameterType="String" resultMap="ResultMap">
+		SELECT
+			*
+		FROM 
+			member 
+		${where}
+	</select>
+
+</mapper>

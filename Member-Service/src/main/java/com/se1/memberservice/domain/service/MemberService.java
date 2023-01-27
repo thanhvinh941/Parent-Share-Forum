@@ -1,17 +1,18 @@
 package com.se1.memberservice.domain.service;
 
 import java.util.List;
+import java.util.Map;
 
-import com.se1.memberservice.domain.request.dto.GetMemberDto;
-import com.se1.memberservice.domain.request.dto.RegisMemberRequestDto;
-import com.se1.memberservice.domain.response.dto.MemberResponse;
-
-import jakarta.validation.Valid;
+import com.se1.memberservice.domain.dto.InsertConditionDto;
+import com.se1.memberservice.domain.dto.MemberDto;
+import com.se1.memberservice.domain.entity.Member;
 
 public interface MemberService {
 
-	Boolean regisMember(@Valid RegisMemberRequestDto request);
+	List<Member> regisMember(InsertConditionDto<Member> request);
 
-	List<MemberResponse> getMemberWithConditon(@Valid GetMemberDto request);
+	List<MemberDto> getMemberWithConditonSpecifiedField(Map<String, Object> request);
+
+	List<MemberDto> getMemberWithConditonSpecifiedPattern(Map<String, Object> request);
 
 }

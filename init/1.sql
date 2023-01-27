@@ -4,6 +4,12 @@ CREATE DATABASE IF NOT EXISTS `db03`;
 CREATE DATABASE IF NOT EXISTS `db04`;
 CREATE DATABASE IF NOT EXISTS `db05`;
 
+ALTER DATABASE db01 CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE db02 CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE db03 CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE db04 CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE db05 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 -- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db05
@@ -90,25 +96,6 @@ CREATE DATABASE IF NOT EXISTS `db05`;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `db01.authorization`
---
-
-DROP TABLE IF EXISTS db01.authorization;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE db01.authorization (
-  author_id int(11) NOT NULL AUTO_INCREMENT,
-  member_id int(11) DEFAULT NULL,
-  role varchar(255) DEFAULT NULL,
-  PRIMARY KEY (author_id)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `db01.authorization`
---
 
 
 --

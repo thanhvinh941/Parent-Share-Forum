@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.forumservice.domain.db.write.WForumMapper">
+	
+	<update id="updateForum">
+		UPDATE db03.forum
+		${set} , update_at = CURRENT_TIME()
+		WHERE forum_id = #{forumId}
+	</update> 
+	
+	<update id="uDeleteForum">
+		UPDATE db03.forum
+		SET valid_flg = 0, update_at = CURRENT_TIME()
+		WHERE forum_id = #{forumId}
+	</update> 
+	
+</mapper>

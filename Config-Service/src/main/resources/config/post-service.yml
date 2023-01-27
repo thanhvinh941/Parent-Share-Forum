@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  show-sql: false
+  properties:
+    hibernate: 
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    enabled-by-default: true
+    
+lombok:
+  anyConstructor:
+    addConstructorProperties: true
+
