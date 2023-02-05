@@ -64,6 +64,18 @@ public class UserService {
 		return user;
 	}
 
+	public boolean existsByEmail(String email) throws JsonProcessingException {
+		boolean existsEmail = false;
+		
+		ApiResponseEntity<?> apiResponseEntityResult = (ApiResponseEntity<?>) restTemplateClient.existsByEmail(email);
+		if (apiResponseEntityResult.getStatus() == 1) {
+			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
+			existsEmail = objectMapper.readValue(apiResultStr, Boolean.class);
+		}
+		
+		return existsEmail;
+	}
+	
 	private boolean isSocalProvider(AuthProvider authProvider) {
 		return authProvider == AuthProvider.google || authProvider == authProvider.facebook
 				|| authProvider == AuthProvider.github;
@@ -83,4 +95,6 @@ public class UserService {
 
 		return userRequestDto;
 	}
+
+	
 }

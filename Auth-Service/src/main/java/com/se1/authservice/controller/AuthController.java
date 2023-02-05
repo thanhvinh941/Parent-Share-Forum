@@ -54,15 +54,23 @@ public class AuthController {
 
 		ApiResponseEntity<AuthResponse> apiResponseEntity = new ApiResponseEntity<>();
 		
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+		try {
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+			
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			
+			String token = tokenProvider.createToken(authentication);
+			apiResponseEntity.setData(new AuthResponse(token));
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		} catch (Exception e) {
+			//TODO:
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-
-		String token = tokenProvider.createToken(authentication);
-		apiResponseEntity.setData(new AuthResponse(token));
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
 
 		return ResponseEntity.ok(apiResponseEntity);
 	}
@@ -80,10 +88,10 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) throws JsonProcessingException {
 		ApiResponseEntity<User> apiResponseEntity = new ApiResponseEntity<>();
 
-        if(userServiceRestTemplateClient.existsByEmail(signUpRequest.getEmail())) {
+        if(service.existsByEmail(signUpRequest.getEmail())) {
         	apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of("Email address already in use."));
 			apiResponseEntity.setStatus(0);

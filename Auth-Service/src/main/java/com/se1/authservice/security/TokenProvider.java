@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.se1.authservice.config.AppProperties;
+import com.se1.authservice.payload.UserDetail;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -36,9 +37,10 @@ public class TokenProvider {
         Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
 
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
+                .claim("user-detail", new UserDetail(userPrincipal.getId(),userPrincipal.getUsername(),null))
                 .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
                 .compact();
     }

@@ -81,7 +81,7 @@ public class UserServiceRestTemplateClient {
         return restExchange.getBody();
 	}
 
-	public Boolean existsByEmail(String email) {
+	public Object existsByEmail(String email) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -95,6 +95,6 @@ public class UserServiceRestTemplateClient {
                         "http://localhost:8088/user/internal/existsByEmail",
                         request,
                         ApiResponseEntity.class);
-        return (Boolean) restExchange.getBody();
+        return restExchange.getBody();
 	}
 }
