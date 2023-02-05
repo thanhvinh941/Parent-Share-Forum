@@ -71,6 +71,7 @@ public class UserService {
 
 	private UserRequestDto convertUserToUserRequestDto(User userSave) {
 		UserRequestDto userRequestDto = new UserRequestDto();
+		userRequestDto.setId(userSave.getId() != null ? userSave.getId() : null);
 		userRequestDto.setName(userSave.getName());
 		userRequestDto.setEmail(userSave.getEmail());
 		userRequestDto.setImageUrl(userSave.getImageUrl() != null ? userRequestDto.getImageUrl() : null);

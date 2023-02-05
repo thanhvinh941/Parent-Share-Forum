@@ -120,29 +120,11 @@ public class UserController {
 	
 	private User convertUserRequestDtoToNewUserEntity(UserRequestDto userRequestDto) {
 		User user = new User();
+		user.setId(userRequestDto.getId() != null ? userRequestDto.getId() : null);
 		user.setName(userRequestDto.getName());
 		user.setEmail(userRequestDto.getEmail());
 		user.setImageUrl(userRequestDto.getImageUrl());
-		user.setBirthday(LocalDate.parse(userRequestDto.getBirthday(), localDateFormatter));
-		user.setEmailVerified(false);
-		user.setPassword(userRequestDto.getPassword());
-		user.setProvider(AuthProvider.valueOf(userRequestDto.getProvider()));
-		user.setProviderId(userRequestDto.getProviderId());
-		user.setRole(UserRole.valueOf(userRequestDto.getRole()));
-		user.setValidFlg(false);
-		user.setDelFlg(false);
-		user.setCreateAt(LocalDateTime.now());
-		user.setUpdateAt(LocalDateTime.now());
-		
-		return user;
-	}
-	
-	private User convertUserRequestDtoToUpdateUserEntity(UserRequestDto userRequestDto) {
-		User user = new User();
-		user.setName(userRequestDto.getName());
-		user.setEmail(userRequestDto.getEmail());
-		user.setImageUrl(userRequestDto.getImageUrl());
-		user.setBirthday(LocalDate.parse(userRequestDto.getBirthday(), localDateFormatter));
+		user.setBirthday(userRequestDto.getBirthday() != null ? LocalDate.parse(userRequestDto.getBirthday(), localDateFormatter) : null);
 		user.setEmailVerified(false);
 		user.setPassword(userRequestDto.getPassword());
 		user.setProvider(AuthProvider.valueOf(userRequestDto.getProvider()));

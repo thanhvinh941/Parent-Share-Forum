@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class UserRequestDto {
 
+	private Long id;
+	
     private String name;
 
     private String email;
