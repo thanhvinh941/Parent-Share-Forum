@@ -3,6 +3,7 @@ package com.se1.authservice.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,15 +48,34 @@ public class AuthController {
 	@Autowired
 	private TokenProvider tokenProvider;
 
-	@Autowired
-	private UserServiceRestTemplateClient userServiceRestTemplateClient;
-	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
+		String email = loginRequest.getEmail();
+		
 		ApiResponseEntity<AuthResponse> apiResponseEntity = new ApiResponseEntity<>();
 		
+		// TODO: confirm password
+		// TODO: authen custom
+		// !this.passwordEncoder.matches(presentedPassword, userDetails.getPassword())
 		try {
+			
+			User user = service.findByEmail(email).orElse(null);
+			if(user != null && user.getProvider() != AuthProvider.local) {
+				apiResponseEntity.setData(null);
+				apiResponseEntity.setErrorList(List.of("User not login local with email : " + email));
+				apiResponseEntity.setStatus(0);
+				
+				return ResponseEntity.ok(apiResponseEntity);
+			}
+			
+			if(user == null) {
+				apiResponseEntity.setData(null);
+				apiResponseEntity.setErrorList(List.of("User not found with email : " + email));
+				apiResponseEntity.setStatus(0);
+				
+				return ResponseEntity.ok(apiResponseEntity);
+			}
+			
 			Authentication authentication = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 			
@@ -108,6 +129,7 @@ public class AuthController {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
 		try {
+			//TODO : remove field password, provider, providerId, role, provider
 			User result = service.save(user);
 			apiResponseEntity.setData(result);
 			apiResponseEntity.setErrorList(null);

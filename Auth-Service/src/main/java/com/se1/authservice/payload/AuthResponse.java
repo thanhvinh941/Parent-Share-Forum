@@ -1,28 +1,13 @@
 package com.se1.authservice.payload;
 
+import lombok.Data;
+
+@Data
 public class AuthResponse {
-    private String accessToken;
+	private String accessToken;
+    //TODO: remove filed tokenType, add filed: expiryDate
     private String tokenType = "Bearer";
-
-    public AuthResponse(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    // Getters and Setters (Omitted for brevity)
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getTokenType() {
-        return tokenType;
-    }
-
-    public void setTokenType(String tokenType) {
-        this.tokenType = tokenType;
+    public AuthResponse(String token) {
+    	this.accessToken = token;
     }
 }
