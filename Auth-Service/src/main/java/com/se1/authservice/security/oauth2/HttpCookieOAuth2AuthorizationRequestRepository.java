@@ -1,8 +1,5 @@
 package com.se1.authservice.security.oauth2;
 
-
-
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

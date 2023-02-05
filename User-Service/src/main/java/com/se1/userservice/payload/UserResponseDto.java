@@ -1,10 +1,15 @@
-package com.se1.authservice.model;
+package com.se1.userservice.payload;
+
+
+import com.se1.userservice.model.AuthProvider;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
-public class User {
-    private Long id;
+public class UserResponseDto {
+	private Long id;
     private String name;
     private String email;
     private String imageUrl;
@@ -13,4 +18,5 @@ public class User {
     private AuthProvider provider;
     private String providerId;
     private String role;
+
 }

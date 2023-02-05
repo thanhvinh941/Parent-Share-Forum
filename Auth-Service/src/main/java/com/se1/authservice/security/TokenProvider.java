@@ -28,6 +28,7 @@ public class TokenProvider {
         this.appProperties = appProperties;
     }
 
+    //TODO: return AuthResponse(token,expiryDate)
     public String createToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
