@@ -16,7 +16,11 @@ class OAuth2RedirectHandler extends Component {
     render() {        
         const token = this.getUrlParameter('token');
         const error = this.getUrlParameter('error');
+        const userEmail = this.getUrlParameter('user_email');
+        const expiryDate = this.getUrlParameter('expiry_date');
 
+        console.log(expiryDate);
+        console.log(userEmail);
         console.log(token)
 
         if(token) {
