@@ -4,11 +4,11 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.se1.authservice.config.AppProperties;
-import com.se1.authservice.payload.UserDetail;
+import com.se1.authservice.model.User;
+import com.se1.authservice.payload.AuthResponse;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -29,30 +29,26 @@ public class TokenProvider {
         this.appProperties = appProperties;
     }
 
-    //TODO: return AuthResponse(token,expiryDate)
-    //TODO: 
-    public String createToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
+    public AuthResponse createToken(String email) {
+    	
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
-
-        return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+        String token = Jwts.builder()
+                .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .claim("user-detail", new UserDetail(userPrincipal.getId(),userPrincipal.getUsername(),null))
                 .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
                 .compact();
+        return new AuthResponse(token, expiryDate, email);
     }
 
-    public Long getUserIdFromToken(String token) {
+    public String getUserEmailFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(appProperties.getAuth().getTokenSecret())
                 .parseClaimsJws(token)
                 .getBody();
 
-        return Long.parseLong(claims.getSubject());
+        return claims.getSubject();
     }
 
     public boolean validateToken(String authToken) {

@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
 public class RouterValidator {
 
 	public static final List<String> openApiEndpoints= List.of(
-            "/auth/signup",
-            "/auth/login"
+            "/internal"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

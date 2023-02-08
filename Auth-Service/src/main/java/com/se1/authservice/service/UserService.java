@@ -28,7 +28,7 @@ public class UserService {
 
 		UserRequestDto userRequestDto = convertUserToUserRequestDto(userSave);
 
-		ApiResponseEntity<?> apiResponseEntityResult = (ApiResponseEntity<?>) restTemplateClient
+		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient
 				.saveUser(userRequestDto);
 		if (apiResponseEntityResult.getStatus() == 1) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
@@ -40,7 +40,7 @@ public class UserService {
 	public Optional<User> findByEmail(String email) throws JsonProcessingException {
 		User user = null;
 
-		ApiResponseEntity<?> apiResponseEntityResult = (ApiResponseEntity<?>) restTemplateClient.findByEmail(email);
+		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findByEmail(email);
 		if (apiResponseEntityResult.getStatus() == 1 && apiResponseEntityResult.getData() != null) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			user = objectMapper.readValue(apiResultStr, User.class);
@@ -56,7 +56,7 @@ public class UserService {
 	public User findById(Integer id) throws JsonMappingException, JsonProcessingException {
 		User user = null;
 
-		ApiResponseEntity<?> apiResponseEntityResult = (ApiResponseEntity<?>) restTemplateClient.findById(id.longValue());
+		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findById(id.longValue());
 		if (apiResponseEntityResult.getStatus() == 1) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			user = objectMapper.readValue(apiResultStr, User.class);
@@ -67,7 +67,7 @@ public class UserService {
 	public boolean existsByEmail(String email) throws JsonProcessingException {
 		boolean existsEmail = false;
 		
-		ApiResponseEntity<?> apiResponseEntityResult = (ApiResponseEntity<?>) restTemplateClient.existsByEmail(email);
+		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.existsByEmail(email);
 		if (apiResponseEntityResult.getStatus() == 1) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			existsEmail = objectMapper.readValue(apiResultStr, Boolean.class);

@@ -17,7 +17,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.se1.authservice.config.AppProperties;
 import com.se1.authservice.exception.BadRequestException;
+import com.se1.authservice.payload.AuthResponse;
+import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.security.TokenProvider;
+import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.util.CookieUtils;
 
 @Component
@@ -63,10 +66,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        String token = tokenProvider.createToken(authentication);
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail());
 
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
+                .queryParam("token", authResponse.getAccessToken())
+                .queryParam("user_email", authResponse.getEmail())
+                .queryParam("expiry_date", authResponse.getExpiryDate().getTime())
                 .build().toUriString();
     }
 

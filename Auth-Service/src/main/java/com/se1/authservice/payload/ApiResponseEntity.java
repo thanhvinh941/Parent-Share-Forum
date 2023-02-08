@@ -2,12 +2,15 @@ package com.se1.authservice.payload;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import lombok.Data;
 
 @Data
-public class ApiResponseEntity<T> {
+@Component
+public class ApiResponseEntity {
 
-	T data;
+	Object data;
 	Integer status;
 	List<String> errorList;
 }
