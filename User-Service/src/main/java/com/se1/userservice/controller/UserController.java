@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService service;
+	
 	private final UserRepository repository;
 	
 	private DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -45,7 +47,7 @@ public class UserController {
 			userSave = service.save(user);
 			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userSave);
-			return this.okResponse(userResponseDto);
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
@@ -58,17 +60,21 @@ public class UserController {
 		User userFind = null;
 		try {
 			userFind = service.findByEmail(email);
+			if(userFind == null) {
+				return this.okResponse(null, List.of("user not found"));
+			}
+			
 			if(userFind.getDelFlg()) {
-				return this.badResponse(List.of("User has been deleted"));
+				return this.okResponse(null, List.of("User has been deleted"));
 			}
 			
 			if(userFind.getEmailVerified()) {
-				return this.badResponse(List.of("User not verify thi email"));
+				return this.okResponse(null, List.of("User not verify thi email"));
 			}
 			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind);
 			
-			return this.okResponse(userResponseDto);
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
@@ -80,16 +86,20 @@ public class UserController {
 		User userFind = null;
 		try {
 			userFind = service.findById(id);
+			if(userFind == null) {
+				return this.okResponse(null, List.of("user not found"));
+			}
+			
 			if(userFind.getDelFlg()) {
-				return this.badResponse(List.of("User has been deleted"));
+				return this.okResponse(null, List.of("User has been deleted"));
 			}
 			
 			if(userFind.getEmailVerified()) {
-				return this.badResponse(List.of("User not verify thi email"));
+				return this.okResponse(null, List.of("User not verify thi email"));
 			}
 			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind);
-			return this.okResponse(userResponseDto);
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
@@ -101,7 +111,7 @@ public class UserController {
 		Boolean existsByEmail = repository.existsByEmail(email);
 	
 		try {
-			return this.okResponse(existsByEmail);
+			return this.okResponse(existsByEmail, null);
 		} catch (Exception e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
@@ -119,6 +129,8 @@ public class UserController {
 		user.setProvider(AuthProvider.valueOf(userRequestDto.getProvider()));
 		user.setProviderId(userRequestDto.getProviderId());
 		user.setRole(UserRole.valueOf(userRequestDto.getRole()));
+		user.setTopicId(UUID.randomUUID().toString());
+		user.setIsExpert(false);
 		user.setDelFlg(false);
 		user.setCreateAt(new Date());
 		user.setUpdateAt(new Date());
@@ -151,9 +163,9 @@ public class UserController {
 		return ResponseEntity.badRequest().body(apiResponseEntity);
 	}
 	
-	private ResponseEntity<?> okResponse(Object data){
+	private ResponseEntity<?> okResponse(Object data, List<String> errorMessage){
 		apiResponseEntity.setData(data);
-		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setErrorList(errorMessage);
 		apiResponseEntity.setStatus(1);
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}

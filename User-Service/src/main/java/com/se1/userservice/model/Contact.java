@@ -16,9 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "contact", uniqueConstraints = { 
-		@UniqueConstraint(columnNames = "email") 
-})
+@Table(name = "contacts")
 public class Contact {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

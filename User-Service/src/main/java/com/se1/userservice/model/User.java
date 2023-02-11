@@ -43,7 +43,6 @@ public class User {
     private Boolean emailVerified = false;
 
     @JsonIgnore
-    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -55,7 +54,7 @@ public class User {
     private AuthProvider provider;
     
     @Column(nullable = false)
-    private String chatId;
+    private String topicId;
 
     private String providerId;
     
