@@ -1,7 +1,7 @@
 package com.se1.userservice.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,24 +43,42 @@ public class User {
     private Boolean emailVerified = false;
 
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role ;
+    @Column(nullable = false)
+    private UserRole role;
     
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private AuthProvider provider;
+    
+    @Column(nullable = false)
+    private String chatId;
 
     private String providerId;
     
-    private Boolean validFlg;
+    private String phoneNumber;
+
+    private String identifyNo;
+
+    @Column(nullable = false)
+    private Boolean isExpert;
     
+    private Long licenceId;
+    
+    private String imageLicence;
+    
+    @Column(nullable = false)
     private Boolean delFlg;
     
+    @Column(nullable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createAt;
+    private Date createAt;
 
+    @Column(nullable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateAt;
+    private Date updateAt;
 
 }

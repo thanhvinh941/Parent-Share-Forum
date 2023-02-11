@@ -1,4 +1,4 @@
-package com.se1.authservice.payload;
+package com.se1.userservice.payload;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import lombok.Data;
 
 @Data
 @Component
-public class ApiResponseEntityList {
+public class ApiResponseEntity {
 
-	List<Object> data;
+	Object data;
 	Integer status;
 	List<String> errorList;
 }
