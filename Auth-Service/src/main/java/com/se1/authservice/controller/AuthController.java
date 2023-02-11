@@ -97,14 +97,14 @@ public class AuthController {
 
 	}
 
-	@GetMapping("/isTokenValid")
-	public ResponseEntity<Boolean> isTokenValid(@RequestParam("token") String token) {
-		Boolean isTokenValid = tokenProvider.validateToken(token);
-		return ResponseEntity.ok(isTokenValid);
-	}
 
 	@GetMapping("/getUserInfoByToken")
 	public ResponseEntity<?> getUserEmailByToken(@RequestParam("token") String token) {
+		Boolean isTokenValid = tokenProvider.validateToken(token);
+		if(!isTokenValid) {
+			return this.badResponse(List.of("token not valid"));
+		}
+		
 		String userEmail = tokenProvider.getUserEmailFromToken(token);
 		User user;
 		try {
