@@ -123,7 +123,6 @@ public class AuthController {
 			userResponseDto.setEmailVerified(user.getEmailVerified());
 			userResponseDto.setRole(user.getRole());
 			
-			return ResponseEntity.ok(userResponseDto);
 			return this.okResponse(userResponseDto);
 		} catch (JsonProcessingException e) {
 			return this.badResponse(List.of(e.getMessage()));
