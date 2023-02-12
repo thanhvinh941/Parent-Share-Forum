@@ -38,7 +38,7 @@ public class AuthFilters implements GatewayFilter {
 
 			final String token = this.getAuthHeader(request);
 
-			if (jwtUtil.isInvalid(token))
+			if (!jwtUtil.isInvalid(token))
 				return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
 
 			try {
@@ -68,8 +68,8 @@ public class AuthFilters implements GatewayFilter {
 	private void populateRequestWithHeaders(ServerWebExchange exchange, String token) throws JsonProcessingException {
 		Claims claims = jwtUtil.getAllClaimsFromToken(token);
 		
-		UserDetail userDetail = claims.get("user-detail", UserDetail.class);
-		exchange.getRequest().mutate().header("user_detail", objectMapper.writeValueAsString(userDetail))
+		String userDetail = claims.get("user-detail", String.class);
+		exchange.getRequest().mutate().header("user_detail", userDetail)
 				.build();
 	}
 }
