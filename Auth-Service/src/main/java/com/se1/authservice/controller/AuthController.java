@@ -24,6 +24,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,7 @@ import com.se1.authservice.payload.LoginRequest;
 import com.se1.authservice.payload.SignUpRequest;
 import com.se1.authservice.payload.SignUpResponseDto;
 import com.se1.authservice.payload.UserDetail;
+import com.se1.authservice.payload.UserResponseDto;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.service.UserService;
@@ -99,8 +101,8 @@ public class AuthController {
 	}
 
 
-	@GetMapping("/getUserInfoByToken")
-	public ResponseEntity<?> getUserEmailByToken(@RequestParam("token") String token) {
+	@PostMapping("/getUserInfoByToken")
+	public ResponseEntity<?> getUserEmailByToken(@RequestHeader("Authorization") String token) {
 		Boolean isTokenValid = tokenProvider.validateToken(token);
 		if(!isTokenValid) {
 			return this.badResponse(List.of("token not valid"));
@@ -113,10 +115,15 @@ public class AuthController {
 			if(user == null) {
 				return this.badResponse(List.of("User not found"));
 			}
+			UserResponseDto userResponseDto = new UserResponseDto();
+			userResponseDto.setEmail(user.getEmail());
+			userResponseDto.setId(user.getId());
+			userResponseDto.setName(user.getName());
+			userResponseDto.setImageUrl(user.getImageUrl());
+			userResponseDto.setEmailVerified(user.getEmailVerified());
+			userResponseDto.setRole(user.getRole());
 			
-			UserDetail userDetail = new UserDetail(user.getId(), user.getEmail(), user.getImageUrl());
-			
-			return ResponseEntity.ok(userDetail);
+			return ResponseEntity.ok(userResponseDto);
 		} catch (JsonProcessingException e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
