@@ -124,6 +124,7 @@ public class AuthController {
 			userResponseDto.setRole(user.getRole());
 			
 			return ResponseEntity.ok(userResponseDto);
+			return this.okResponse(userResponseDto);
 		} catch (JsonProcessingException e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
