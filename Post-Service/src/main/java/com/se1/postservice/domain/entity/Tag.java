@@ -14,21 +14,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "like")
-public class Like {
-
+@Table(name = "tag")
+public class Tag {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer likeId;
-	
-	private Integer postId;
-	
-	private Integer userId;
-		
-	private Byte status;
+	private Long id;
+
+	private String tagName;
 	
 	@Column(nullable = false)
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createAt;
-	
 }

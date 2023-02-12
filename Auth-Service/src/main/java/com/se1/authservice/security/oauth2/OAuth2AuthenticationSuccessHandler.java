@@ -15,13 +15,17 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.se1.authservice.config.AppProperties;
 import com.se1.authservice.exception.BadRequestException;
 import com.se1.authservice.payload.AuthResponse;
+import com.se1.authservice.payload.UserDetail;
 import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.util.CookieUtils;
+
+import io.jsonwebtoken.security.InvalidKeyException;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -67,7 +71,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail());
+        
+        UserDetail detail = new UserDetail(userPrincipal.getId(), userPrincipal.getName(), userPrincipal.getAttribute("picture"));
+        AuthResponse authResponse = null;
+		try {
+			authResponse = tokenProvider.createToken(userPrincipal.getEmail(), detail);
+		} catch (InvalidKeyException | JsonProcessingException e) {
+			e.printStackTrace();
+		}
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", authResponse.getAccessToken())

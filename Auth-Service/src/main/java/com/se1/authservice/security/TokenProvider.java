@@ -4,11 +4,15 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.authservice.config.AppProperties;
 import com.se1.authservice.model.User;
 import com.se1.authservice.payload.AuthResponse;
+import com.se1.authservice.payload.UserDetail;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,19 +21,20 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.InvalidKeyException;
 
 @Service
 public class TokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
 
+    @Autowired
     private AppProperties appProperties;
 
-    public TokenProvider(AppProperties appProperties) {
-        this.appProperties = appProperties;
-    }
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public AuthResponse createToken(String email) {
+    public AuthResponse createToken(String email, UserDetail detail) throws InvalidKeyException, JsonProcessingException {
     	
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
@@ -37,6 +42,7 @@ public class TokenProvider {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
+                .claim("user-detail", objectMapper.writeValueAsString(detail))
                 .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
                 .compact();
         return new AuthResponse(token, expiryDate, email);

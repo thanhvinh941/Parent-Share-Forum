@@ -10,6 +10,9 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.jsonwebtoken.Claims;
 import reactor.core.publisher.Mono;
 
@@ -18,15 +21,19 @@ import reactor.core.publisher.Mono;
 public class AuthFilters implements GatewayFilter {
 	@Autowired
 	private RouterValidator routerValidator;
+	
 	@Autowired
 	private JwtUtil jwtUtil;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 		ServerHttpRequest request = exchange.getRequest();
-		if (routerValidator.isSecured.test(request)) {
-			if (!this.isAuthMissing(request))
+		if (!routerValidator.isSecured.test(request)) {
+			if (this.isAuthMissing(request))
 				return this.onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
 
 			final String token = this.getAuthHeader(request);
@@ -34,7 +41,11 @@ public class AuthFilters implements GatewayFilter {
 			if (jwtUtil.isInvalid(token))
 				return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
 
-			this.populateRequestWithHeaders(exchange, token);
+			try {
+				this.populateRequestWithHeaders(exchange, token);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 		}
 		return chain.filter(exchange);
 	}
@@ -54,11 +65,11 @@ public class AuthFilters implements GatewayFilter {
 		return !request.getHeaders().containsKey("Authorization");
 	}
 
-	private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
+	private void populateRequestWithHeaders(ServerWebExchange exchange, String token) throws JsonProcessingException {
 		Claims claims = jwtUtil.getAllClaimsFromToken(token);
 		
 		UserDetail userDetail = claims.get("user-detail", UserDetail.class);
-		exchange.getRequest().mutate().header("user_id", Long.toString(userDetail.getId()))
+		exchange.getRequest().mutate().header("user_detail", objectMapper.writeValueAsString(userDetail))
 				.build();
 	}
 }

@@ -1,4 +1,4 @@
-package com.se1.authservice.payload;
+package com.se1.userservice.payload;
 
 import java.util.List;
 

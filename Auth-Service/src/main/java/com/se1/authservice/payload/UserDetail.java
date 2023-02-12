@@ -8,7 +8,7 @@ import lombok.Data;
 public class UserDetail {
 	
 	private Long id;
-	private String email;
+	private String name;
 	private String imageUrl;
 	
 }

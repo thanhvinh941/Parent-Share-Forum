@@ -1,9 +1,10 @@
 package com.se1.userservice.controller;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.se1.userservice.ApiResponseEntity;
 import com.se1.userservice.model.AuthProvider;
 import com.se1.userservice.model.User;
 import com.se1.userservice.model.UserRole;
+import com.se1.userservice.payload.ApiResponseEntity;
 import com.se1.userservice.payload.UserRequestDto;
 import com.se1.userservice.payload.UserResponseDto;
 import com.se1.userservice.repository.UserRepository;
@@ -29,13 +30,15 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserService service;
+	
 	private final UserRepository repository;
 	
 	private DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	
+	private final ApiResponseEntity apiResponseEntity;
+	
 	@PostMapping("/save")
 	public ResponseEntity<?> save(@RequestBody UserRequestDto userRequestDto){
-		ApiResponseEntity<UserResponseDto> apiResponseEntity = new ApiResponseEntity<>();
 		
 		User user = convertUserRequestDtoToNewUserEntity(userRequestDto);
 		
@@ -44,78 +47,74 @@ public class UserController {
 			userSave = service.save(user);
 			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userSave);
-			apiResponseEntity.setData(userResponseDto);
-			apiResponseEntity.setErrorList(null);
-			apiResponseEntity.setStatus(1);
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
+			return this.badResponse(List.of(e.getMessage()));
 		}
-		
-		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
 	
 	@PostMapping("/findByEmail")
 	public ResponseEntity<?> findByEmail(@RequestParam("email") String email) throws Exception{
-		ApiResponseEntity<UserResponseDto> apiResponseEntity = new ApiResponseEntity<>();
 
 		User userFind = null;
 		try {
 			userFind = service.findByEmail(email);
+			if(userFind == null) {
+				return this.okResponse(null, List.of("user not found"));
+			}
+			
+			if(userFind.getDelFlg()) {
+				return this.okResponse(null, List.of("User has been deleted"));
+			}
+			
+			if(userFind.getEmailVerified()) {
+				return this.okResponse(null, List.of("User not verify thi email"));
+			}
+			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind);
-			apiResponseEntity.setData(userResponseDto);
-			apiResponseEntity.setErrorList(null);
-			apiResponseEntity.setStatus(1);
+			
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
+			return this.badResponse(List.of(e.getMessage()));
 		}
-		
-		return ResponseEntity.ok(apiResponseEntity);
-
 	}
 	
 	@PostMapping("/findById")
 	public ResponseEntity<?> findById(@RequestParam("Id") Long id) throws Exception{
-		ApiResponseEntity<UserResponseDto> apiResponseEntity = new ApiResponseEntity<>();
 
 		User userFind = null;
 		try {
 			userFind = service.findById(id);
+			if(userFind == null) {
+				return this.okResponse(null, List.of("user not found"));
+			}
+			
+			if(userFind.getDelFlg()) {
+				return this.okResponse(null, List.of("User has been deleted"));
+			}
+			
+			if(userFind.getEmailVerified()) {
+				return this.okResponse(null, List.of("User not verify thi email"));
+			}
+			
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind);
-			apiResponseEntity.setData(userResponseDto);
-			apiResponseEntity.setErrorList(null);
-			apiResponseEntity.setStatus(1);
+			return this.okResponse(userResponseDto, null);
 		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
+			return this.badResponse(List.of(e.getMessage()));
 		}
-		
-		return ResponseEntity.ok(apiResponseEntity);
-
 	}
 	
 	@PostMapping("/existsByEmail")
 	public ResponseEntity<?> existsByEmail(@RequestParam("email") String email){
-		ApiResponseEntity<Boolean> apiResponseEntity = new ApiResponseEntity<>();
 
 		Boolean existsByEmail = repository.existsByEmail(email);
 	
 		try {
-			apiResponseEntity.setData(existsByEmail);
-			apiResponseEntity.setErrorList(null);
-			apiResponseEntity.setStatus(1);
+			return this.okResponse(existsByEmail, null);
 		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
+			return this.badResponse(List.of(e.getMessage()));
 		}
-		
-		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
 	private User convertUserRequestDtoToNewUserEntity(UserRequestDto userRequestDto) {
@@ -130,10 +129,11 @@ public class UserController {
 		user.setProvider(AuthProvider.valueOf(userRequestDto.getProvider()));
 		user.setProviderId(userRequestDto.getProviderId());
 		user.setRole(UserRole.valueOf(userRequestDto.getRole()));
-		user.setValidFlg(false);
+		user.setTopicId(UUID.randomUUID().toString());
+		user.setIsExpert(false);
 		user.setDelFlg(false);
-		user.setCreateAt(LocalDateTime.now());
-		user.setUpdateAt(LocalDateTime.now());
+		user.setCreateAt(new Date());
+		user.setUpdateAt(new Date());
 		
 		return user;
 	}
@@ -154,5 +154,19 @@ public class UserController {
 		}
 		
 		return userResponseDto;
+	}
+	
+	private ResponseEntity<?> badResponse(List<String> errorMessage){
+		apiResponseEntity.setData(null);
+		apiResponseEntity.setErrorList(errorMessage);
+		apiResponseEntity.setStatus(0);
+		return ResponseEntity.badRequest().body(apiResponseEntity);
+	}
+	
+	private ResponseEntity<?> okResponse(Object data, List<String> errorMessage){
+		apiResponseEntity.setData(data);
+		apiResponseEntity.setErrorList(errorMessage);
+		apiResponseEntity.setStatus(1);
+		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 }
