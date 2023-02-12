@@ -86,7 +86,8 @@ public class AuthController {
 				
 				UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 				
-				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail());
+				UserDetail userDetail = new UserDetail(user.getId(), user.getName(), user.getImageUrl());
+				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail(),userDetail);
 				return this.okResponse(authResponse);
 			} catch (Exception e) {
 				return this.badResponse(List.of("Password not correst"));
@@ -173,7 +174,7 @@ public class AuthController {
 		//TODO check name
 		//TODO chech password
 		
-		if(signUpRequest.getPassword() != signUpRequest.getConfirmPassword()) {
+		if(!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
 			errors.add("ConfirmPassword not work");
 		}
 		
