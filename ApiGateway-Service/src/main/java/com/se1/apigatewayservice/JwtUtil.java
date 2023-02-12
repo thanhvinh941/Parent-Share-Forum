@@ -35,7 +35,7 @@ public class JwtUtil {
 	}
 
     public boolean isInvalid(String token) {
-    	return this.isInvalid(token);
+    	return this.validateToken(token);
 	}
     
     public boolean validateToken(String authToken) {
