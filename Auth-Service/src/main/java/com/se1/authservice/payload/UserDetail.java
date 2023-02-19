@@ -10,5 +10,5 @@ public class UserDetail {
 	private Long id;
 	private String name;
 	private String imageUrl;
-	
+	private String role;
 }

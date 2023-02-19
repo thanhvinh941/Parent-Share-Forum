@@ -88,7 +88,7 @@ public class AuthController {
 				
 				UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 				
-				UserDetail userDetail = new UserDetail(user.getId(), user.getName(), user.getImageUrl());
+				UserDetail userDetail = new UserDetail(user.getId(), user.getName(), user.getImageUrl(), user.getRole());
 				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail(),userDetail);
 				return this.okResponse(authResponse);
 			} catch (Exception e) {
