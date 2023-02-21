@@ -48,4 +48,10 @@ public class Licence {
 
 	@Column(nullable = false)
 	private String scopeActivities;
+	
+	@Column(nullable = false)
+	private String imageLicence;
+	
+	@Column(nullable = false)
+	private Byte validFlg;
 }
