@@ -3,14 +3,16 @@ package com.se1.postservice.domain.entity;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Data
@@ -22,10 +24,10 @@ public class Post {
 	private Integer id;
 	
 	@Column(nullable = false)
-	private Integer memberId;
+	private Integer userId;
 	
 	@Column(nullable = false)
-	private String memberName;
+	private String userName;
 	
 	@Column(nullable = false)
 	private String title;
@@ -39,18 +41,22 @@ public class Post {
 	private String summary;
 		
 	@Column(nullable = false)
-	private Byte validFlag;
+	private Boolean validFlag;
 	
 	@Lob
 	@Column(nullable = false)
 	private String context;
 
 	@Column(nullable = false)
-	private Long likeCount;
+	private long likeCount;
+	
+	@ElementCollection
+	private List<String> imageList;
 	
 	private String hashTag;
 	
-	private List<Integer> tagIds;
+	@Column(nullable = false)
+	private Integer topicTagId;
 	
 	@Column(nullable = false)
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
