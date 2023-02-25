@@ -24,143 +24,81 @@ public class PostExternalController {
 	private final ObjectMapper mapper;
 	
 	String postDummy1 = "{\r\n"
-			+ "    \"id\" : 1,\r\n"
-			+ "    \"title\" : \"How to Take Care of Young Children\",\r\n"
-			+ "    \"metaTitle\" : \"how-to-take-care-of-young-children\",\r\n"
-			+ "    \"slug\" : \"how-to-take-care-of-young-children\",\r\n"
-			+ "    \"summary\" : \"How to Take Care of Young Children\",\r\n"
-			+ "    \"context\" : \"\",\r\n"
-			+ "    \"likeCount\" : 1000,\r\n"
-			+ "    \"hashTag\" : \"#how-to-take-care-of-young-children\",\r\n"
-			+ "    \"topicTag\" : {\r\n"
-			+ "      \"id\" : 1,\r\n"
-			+ "      \"name\" : \"How to Take Care\"\r\n"
+			+ "  \"id\": 1,\r\n"
+			+ "  \"title\": \"Mạng xã hội và những tác động tới trẻ em\",\r\n"
+			+ "  \"metaTitle\": \"mang xa hoi va nhung tac dong toi tre em\",\r\n"
+			+ "  \"slug\": \"mang-xa-hoi-va-nhung-tac-dong-toi-tre-em\",\r\n"
+			+ "  \"summary\": \"Mạng xã hội và những tác động tới trẻ em\",\r\n"
+			+ "  \"context\": \"STO - Cùng với sự phát triển mạnh mẽ của internet và các thiết bị thông minh, nhiều người dễ dàng tiếp cận với mạng xã hội (MXH), trong đó có cả trẻ em. Bên cạnh mặt tích cực, mạng xã hội còn tồn tại những mặt trái có thể ảnh hưởng đến sự phát triển và tâm lý của trẻ.\\r\\n\\r\\nSự phát triển của công nghệ và mạng internet đang ảnh hưởng mạnh mẽ và làm thay đổi thói quen sinh hoạt của nhiều người, trong đó có những tác động to lớn đối với trẻ em. Ngày nay, nhiều trẻ em được tiếp xúc với mạng internet ngay từ khi đi học mẫu giáo, thông qua các thiết bị điện tử thông minh, trẻ em có thể học nhiều điều hay từ internet, song môi trường trên mạng cũng mang lại rất nhiều rủi ro, bởi lẽ trên mạng internet, nhất là các trang mạng xã hội hay nền tảng chia sẻ video đang có nhiều hình ảnh, video được đăng tải có không ít nội dung có thể tác động trực tiếp đến tâm lý, hành vi và nhân cách của trẻ em.Nổi bật trong các ứng dụng được nhiều người cài đặt và sử dụng gần đây là TikTok. Đây là nền tảng chia sẻ video có nguồn gốc từ Trung Quốc, bằng những video âm nhạc ngắn được chia sẻ trên nền tảng này mà TikTok thu hút hàng triệu người dùng. Một mạng xã hội chia sẻ video khác được rất nhiều người sử dụng là YouTube, hiện đang được dùng ở mọi lứa tuổi, đặc biệt là giới trẻ, truy cập và sử dụng hàng ngày. Thông qua các video được đăng tải trên các ứng dụng này, nhiều người có thể giải trí, học tập hay truyền tải thông tin của cá nhân mình, thậm chí nếu tận dụng tốt các ứng dụng còn trở thành công cụ kiếm tiền. Tuy nhiên, trên các ứng dụng này cũng tồn tại nhiều video có nội dung phản cảm, không phù hợp với trẻ nhỏ.\\r\\n\\r\\nChị Trần Thị Thu Hương, ở huyện Cù Lao Dung cho biết: “Ở quê ít có tụ điểm vui chơi cho trẻ nhỏ nên khi thằng con tôi học bài xong thì tôi đưa điện thoại để nó chơi game hay coi video giải trí. Điều đáng lo là gần đây tôi phát hiện trên YouTube hay TikTok có một số video khiến tôi giật mình, bởi các video này có nội dung “khoe thân” của các bạn trẻ hay những clip có nội dung gây sốc để câu like (lượt thích) hay câu view (lượt xem)”.\\r\\n\\r\\nNhững video có lượt xem nhiều, thích nhiều thì sẽ tự xuất hiện trên mục “Thịnh hành” ở YouTube hay mục “Xu hướng” trên TikTok. Do đó nếu trẻ em truy cập các ứng dụng này sẽ vô thức truy cập vào những nội dung đó. Đáng lo ngại hơn khi hiện nay xuất hiện trường hợp trẻ em học theo các video trên mạng để quay clip câu view theo phong trào. Anh Trịnh Thành Được, ở huyện Long Phú ngỡ ngàng kể lại: “Hồi tuần rồi, thằng con tôi chỉ mới học lớp 5 mà nó dám rủ mấy đứa bạn trong xóm bắt con chó nhỏ để thảy xuống sông trước nhà để quay clip. Hỏi ra mới biết là nó muốn tải lên ứng dụng TikTok để được nhiều người tương tác”.\\r\\n\\r\\nKhông phải phụ huynh nào cũng nhận biết rõ những ảnh hưởng của việc tiếp xúc sớm với mạng xã hội vì công nghệ ngày càng phát triển trong khi các bậc phụ huynh lại quá bận bịu với nhiều công việc, nếu không tiếp cận thường xuyên sẽ không biết về những mặt trái này. Điều đáng lo ngại hơn cả là có nhiều em nhỏ lại bị cuốn hút với những video nguy hiểm, có nội dung bạo lực… Trong khi, nhiều bậc phụ huynh chưa có biện pháp hiệu quả để kiểm soát việc con em mình tiếp cận với các nội dung này. Một số phụ huynh còn lợi dụng các thiết bị điện tử thông minh để “dụ” trẻ ăn cơm hoặc chọn là phần thưởng khi trẻ đạt thành tích cao trong học tập, vô hình trung làm nhiều trẻ nghiện sử dụng các thiết bị này.\\r\\n\\r\\nTrong khi các biện pháp kiểm soát, ngăn chặn các nội dung xấu trên không gian mạng vẫn còn hạn chế thì các bậc phụ huynh phải tăng cường quản lý nội dung mà trẻ em truy cập trên các nền tảng chia sẻ video nói riêng hay các trang mạng xã hội nói chung. Thực tế đã có nhiều trường hợp trẻ em bị nghiện điện thoại và có không ít hậu quả đáng tiếc đã xảy ra. Thế nên, để giúp con mình tránh được các hiểm họa từ môi trường mạng, thì các bậc phụ huynh cần kiểm soát, định hướng chặt chẽ để giúp con em chọn lọc được thông tin phù hợp, hữu ích với lứa tuổi.\",\r\n"
+			+ "  \"likeCount\": 1000,\r\n"
+			+ "  \"disLikeCount\": 100,\r\n"
+			+ "  \"commentCount\": 100,\r\n"
+			+ "  \"shareCount\": 50,\r\n"
+			+ "  \"hashTag\": null,\r\n"
+			+ "  \"imageList\": [\r\n"
+			+ "    \"https://www.baosoctrang.org.vn/uploads/image/2020/11/25/Dien%20thoai.jpg\"\r\n"
+			+ "  ],\r\n"
+			+ "  \"topicTag\": {\r\n"
+			+ "    \"id\": 1,\r\n"
+			+ "    \"name\": \"Mạng xã hội\"\r\n"
+			+ "  },\r\n"
+			+ "  \"user\": {\r\n"
+			+ "    \"id\": 1,\r\n"
+			+ "    \"name\": \"Thanh Vinh Expert\",\r\n"
+			+ "    \"email\": \"thanhvinhexpert@gmail.com\",\r\n"
+			+ "    \"imageUrl\": \"https://i.pinimg.com/236x/d9/23/1d/d9231dd1faf237fc69a6e4d5f6723d05.jpg\",\r\n"
+			+ "    \"isExpert\": true,\r\n"
+			+ "    \"ratingCount\": 4.5,\r\n"
+			+ "    \"topicId\": \"c155b4ea-b4ba-4d95-a037-6f10adae35c4\"\r\n"
+			+ "  },\r\n"
+			+ "  \"publishAt\": \"2023-02-23 06:11:09.034\",\r\n"
+			+ "  \"comment\": [\r\n"
+			+ "    {\r\n"
+			+ "      \"id\": 1,\r\n"
+			+ "      \"text\": \"... comment 1\",\r\n"
+			+ "      \"likeCount\": 5,\r\n"
+			+ "      \"disLikeCount\": 1,\r\n"
+			+ "      \"commentChildCount\": 2,\r\n"
+			+ "      \"createAt\": \"2023-02-23 06:11:09.034\",\r\n"
+			+ "      \"user\": {\r\n"
+			+ "        \"id\": 2,\r\n"
+			+ "        \"name\": \"Thanh Vinh User1\",\r\n"
+			+ "        \"email\": \"thanhvinhuser1@gmail.com\",\r\n"
+			+ "        \"imageUrl\": \"https://i.pinimg.com/236x/d9/23/1d/d9231dd1faf237fc69a6e4d5f6723d05.jpg\",\r\n"
+			+ "        \"isExpert\": false,\r\n"
+			+ "        \"ratingCount\": null,\r\n"
+			+ "        \"topicId\": \"dc5de767-1e43-4625-9269-b52bc4bc098f\"\r\n"
+			+ "      }\r\n"
 			+ "    },\r\n"
-			+ "    \"user\" : {\r\n"
-			+ "      \"id\" : 1,\r\n"
-			+ "      \"name\" : \"Thanh Vinh\",\r\n"
-			+ "      \"email\" : \"vinh@gmail.com\",\r\n"
-			+ "      \"imageUrl\" : \"\",\r\n"
-			+ "      \"isExpert\" : false,\r\n"
-			+ "      \"licenceId\" : null,\r\n"
-			+ "      \"ratingCount\" : null,\r\n"
-			+ "      \"topicId\" : \"47ba41fa-b1e9-11ed-afa1-0242ac120002\"\r\n"
+			+ "    {\r\n"
+			+ "      \"id\": 2,\r\n"
+			+ "      \"text\": \"... comment 2\",\r\n"
+			+ "      \"likeCount\": 5,\r\n"
+			+ "      \"disLikeCount\": 1,\r\n"
+			+ "      \"commentChildCount\": 2,\r\n"
+			+ "      \"createAt\": \"2023-02-23 06:11:09.034\",\r\n"
+			+ "      \"user\": {\r\n"
+			+ "        \"id\": 3,\r\n"
+			+ "        \"name\": \"Thanh Vinh User2\",\r\n"
+			+ "        \"email\": \"thanhvinhuser2@gmail.com\",\r\n"
+			+ "        \"imageUrl\": \"https://i.pinimg.com/236x/d9/23/1d/d9231dd1faf237fc69a6e4d5f6723d05.jpg\",\r\n"
+			+ "        \"isExpert\": false,\r\n"
+			+ "        \"ratingCount\": null,\r\n"
+			+ "        \"topicId\": \"6893aa83-51e5-441c-bdb3-aeb2266a643e\"\r\n"
+			+ "      }\r\n"
 			+ "    }\r\n"
-			+ "  }";
+			+ "  ]\r\n"
+			+ "}";
 	
-	private String contextDummy1 = "Young children, ranging from toddlers to those who have just started school, are all different in their own way. That's why you as a parent, guardian, relative, or babysitter play a crucial part in their development. Not only are you helping their fine, gross, and motor skills develop, you're shaping their perspective of life and their surroundings each and every time you are with them. Taking care of a young child might seem challenging at first, especially with all of the tantrums and crying, but by the end of the day you'll be a pro. Read on to discover how you can take care of young children!<h1>1</h1><div><b>Wake the children up at a set time every day.</b> This can easily be adjusted when necessary, but start with a time such as seven thirty or eight in the morning. You can have an alarm go off for the children to wake up to, such as a favorite children's song or a soft bell. Avoid something too loud, such as a rooster crowing or rock music. If they don't wake up right away, you can gently tap them and say something such as, 'Hey, it's time to get up, sleepyhead'. Once they are awake, you can start getting them ready for the day by getting them dressed, doing their hair, and brushing their teeth.<ul><li>Let the kids feel responsible and a part of their routine by giving them options. You can lay out two shirts and let them choose a shirt, let them choose to wash their face or brush their teeth first, or allow them to either help you set the table or get you the food you need from the refrigerator.</li></ul><a href=\"https://www.wikihow.com/Take-Care-of-Young-Children\">link tham khao</a> ";
-	
-	
-	String postDummy2 = "{\r\n"
-			+ "    \"id\" : 2,\r\n"
-			+ "    \"title\" : \"How to Be a Good Child\",\r\n"
-			+ "    \"metaTitle\" : \"how to be a good child\",\r\n"
-			+ "    \"slug\" : \"how-to-be-a-good-child\",\r\n"
-			+ "    \"summary\" : \"How to Be a Good Child\",\r\n"
-			+ "    \"context\" : \"\",\r\n"
-			+ "    \"likeCount\" : 1000000,\r\n"
-			+ "    \"hashTag\" : \"#how-to-be-a-good-child\",\r\n"
-			+ "    \"topicTag\" : {\r\n"
-			+ "      \"id\" : 3,\r\n"
-			+ "      \"name\" : \"How to Be\"\r\n"
-			+ "    },\r\n"
-			+ "    \"user\" : {\r\n"
-			+ "      \"id\" : 2,\r\n"
-			+ "      \"name\" : \"Bao Huynh\",\r\n"
-			+ "      \"email\" : \"baohuynh@gmail.com\",\r\n"
-			+ "      \"imageUrl\" : \"\",\r\n"
-			+ "      \"isExpert\" : true,\r\n"
-			+ "      \"licenceId\" : 1,\r\n"
-			+ "      \"ratingCount\" : 4.6,\r\n"
-			+ "      \"topicId\" : \"47ba466e-b1e9-11ed-afa1-0242ac120002\"\r\n"
-			+ "    }\r\n"
-			+ "  }";
-	
-	String contextDummy2 = "1\r\n"
-			+ "Accept your responsibilities. It is easy to say that a good child listens to their parents (and other authority figures) and does what they are told. While this is normally true, it is more important that children learn to take responsibility for what they need to do. As a child who strives to be your best, you need to accept that there are things you have to do, for the benefit of yourself and others.[2]\r\n"
-			+ "The goal of being a good child is not really about giving your parents a little less grief (though they will welcome that). Good children learn qualities that will help them become happy, successful, “good” adults.\r\n"
-			+ "For example, you need to take responsibility for doing your homework and completing your chores, without constant reminders or resistance. This will help you to become more self-motivated, self-sufficient, and successful in work and life as an adult.";
-	
-	String postDummy3 = "{\r\n"
-			+ "    \"id\" : 3,\r\n"
-			+ "    \"title\" : \"How to Develop a Child Care Philosophy\",\r\n"
-			+ "    \"metaTitle\" : \"how to develop a child care philosophy\",\r\n"
-			+ "    \"slug\" : \"how-to-develop-a-child-care-philosophy\",\r\n"
-			+ "    \"summary\" : \"How to Develop a Child Care Philosophy\",\r\n"
-			+ "    \"context\" : \"\",\r\n"
-			+ "    \"likeCount\" : 100000,\r\n"
-			+ "    \"hashTag\" : \"#how-to-develop-a-child-care-philosophy\",\r\n"
-			+ "    \"topicTag\" : {\r\n"
-			+ "      \"id\" : 2,\r\n"
-			+ "      \"name\" : \"How to Develop\"\r\n"
-			+ "    },\r\n"
-			+ "    \"user\" : {\r\n"
-			+ "      \"id\" : 3,\r\n"
-			+ "      \"name\" : \"Vinh Truong\",\r\n"
-			+ "      \"email\" : \"vinhtruong@gmail.com\",\r\n"
-			+ "      \"imageUrl\" : \"\",\r\n"
-			+ "      \"isExpert\" : true,\r\n"
-			+ "      \"licenceId\" : 2,\r\n"
-			+ "      \"ratingCount\" : 4.5,\r\n"
-			+ "      \"topicId\" : \"47ba47b8-b1e9-11ed-afa1-0242ac120002\"\r\n"
-			+ "    }\r\n"
-			+ "  }";
-	
-	String contextDummy3 = "1\r\n"
-			+ "Ask yourself about your child care beliefs.[2] As a care provider, how do you think about children's child care and development? It will help to define clearly what you believe about a child's developmental strengths and needs in order to develop a philosophy of child care.[3]\r\n"
-			+ "If you are partnering with others to develop your child care philosophy, this will give you an opportunity to better articulate your individual experiences and to learn about the perspective of others.\r\n"
-			+ "Considering the role that you believe play, art, dramatic and academic activities should have in a child's life will help you think about your beliefs.\r\n"
-			+ "An example of a statement regarding a program's beliefs regarding child care might be: \"We are committed to providing safe, affordable, high-quality service for children living in the South Lake community that is based in hands-on experiential learning.\"";
-	
-	String postDummy4 = "{\r\n"
-			+ "    \"id\" : 4,\r\n"
-			+ "    \"title\" : \"How to Care for a Sick Child\",\r\n"
-			+ "    \"metaTitle\" : \"how to care for a sick child\",\r\n"
-			+ "    \"slug\" : \"how-to-care-for-a-sick-child\",\r\n"
-			+ "    \"summary\" : \"How to Care for a Sick Child\",\r\n"
-			+ "    \"context\" : \"\",\r\n"
-			+ "    \"likeCount\" : 100000,\r\n"
-			+ "    \"hashTag\" : \"#how-to-care-for-a-sick-child\",\r\n"
-			+ "    \"topicTag\" : {\r\n"
-			+ "      \"id\" : 1,\r\n"
-			+ "      \"name\" : \"How to Take Care\"\r\n"
-			+ "    },\r\n"
-			+ "    \"user\" : {\r\n"
-			+ "      \"id\" : 4,\r\n"
-			+ "      \"name\" : \"Quoc Bao\",\r\n"
-			+ "      \"email\" : \"quocbao@gmail.com\",\r\n"
-			+ "      \"imageUrl\" : \"\",\r\n"
-			+ "      \"isExpert\" : false,\r\n"
-			+ "      \"licenceId\" : null,\r\n"
-			+ "      \"ratingCount\" : null,\r\n"
-			+ "      \"topicId\" : \"47ba48da-b1e9-11ed-afa1-0242ac120002\"\r\n"
-			+ "    }\r\n"
-			+ "  }";
-	
-	String contextDummy4 = "5\r\n"
-			+ "Keep your home at a comfortable temperature. Your child may feel hot or cold depending on the illness, so adjusting the temperature in your home may help your child to feel more comfortable. It may be helpful to keep your home between 65 and 70 degrees, but you can also adjust this temperature if your child is too hot or too cold.[4]\r\n"
-			+ "For example, if your child is complaining that he or she is too cold, then turn up the heat a bit. If your child complains that he or she is hot, then turn on an air conditioner or fan.";
+	String context = "STO - Cùng với sự phát triển mạnh mẽ của internet và các thiết bị thông minh, nhiều người dễ dàng tiếp cận với mạng xã hội (MXH), trong đó có cả trẻ em. Bên cạnh mặt tích cực, mạng xã hội còn tồn tại những mặt trái có thể ảnh hưởng đến sự phát triển và tâm lý của trẻ.\\r\\n\\r\\nSự phát triển của công nghệ và mạng internet đang ảnh hưởng mạnh mẽ và làm thay đổi thói quen sinh hoạt của nhiều người, trong đó có những tác động to lớn đối với trẻ em. Ngày nay, nhiều trẻ em được tiếp xúc với mạng internet ngay từ khi đi học mẫu giáo, thông qua các thiết bị điện tử thông minh, trẻ em có thể học nhiều điều hay từ internet, song môi trường trên mạng cũng mang lại rất nhiều rủi ro, bởi lẽ trên mạng internet, nhất là các trang mạng xã hội hay nền tảng chia sẻ video đang có nhiều hình ảnh, video được đăng tải có không ít nội dung có thể tác động trực tiếp đến tâm lý, hành vi và nhân cách của trẻ em.Nổi bật trong các ứng dụng được nhiều người cài đặt và sử dụng gần đây là TikTok. Đây là nền tảng chia sẻ video có nguồn gốc từ Trung Quốc, bằng những video âm nhạc ngắn được chia sẻ trên nền tảng này mà TikTok thu hút hàng triệu người dùng. Một mạng xã hội chia sẻ video khác được rất nhiều người sử dụng là YouTube, hiện đang được dùng ở mọi lứa tuổi, đặc biệt là giới trẻ, truy cập và sử dụng hàng ngày. Thông qua các video được đăng tải trên các ứng dụng này, nhiều người có thể giải trí, học tập hay truyền tải thông tin của cá nhân mình, thậm chí nếu tận dụng tốt các ứng dụng còn trở thành công cụ kiếm tiền. Tuy nhiên, trên các ứng dụng này cũng tồn tại nhiều video có nội dung phản cảm, không phù hợp với trẻ nhỏ.\\r\\n\\r\\nChị Trần Thị Thu Hương, ở huyện Cù Lao Dung cho biết: “Ở quê ít có tụ điểm vui chơi cho trẻ nhỏ nên khi thằng con tôi học bài xong thì tôi đưa điện thoại để nó chơi game hay coi video giải trí. Điều đáng lo là gần đây tôi phát hiện trên YouTube hay TikTok có một số video khiến tôi giật mình, bởi các video này có nội dung “khoe thân” của các bạn trẻ hay những clip có nội dung gây sốc để câu like (lượt thích) hay câu view (lượt xem)”.\\r\\n\\r\\nNhững video có lượt xem nhiều, thích nhiều thì sẽ tự xuất hiện trên mục “Thịnh hành” ở YouTube hay mục “Xu hướng” trên TikTok. Do đó nếu trẻ em truy cập các ứng dụng này sẽ vô thức truy cập vào những nội dung đó. Đáng lo ngại hơn khi hiện nay xuất hiện trường hợp trẻ em học theo các video trên mạng để quay clip câu view theo phong trào. Anh Trịnh Thành Được, ở huyện Long Phú ngỡ ngàng kể lại: “Hồi tuần rồi, thằng con tôi chỉ mới học lớp 5 mà nó dám rủ mấy đứa bạn trong xóm bắt con chó nhỏ để thảy xuống sông trước nhà để quay clip. Hỏi ra mới biết là nó muốn tải lên ứng dụng TikTok để được nhiều người tương tác”.\\r\\n\\r\\nKhông phải phụ huynh nào cũng nhận biết rõ những ảnh hưởng của việc tiếp xúc sớm với mạng xã hội vì công nghệ ngày càng phát triển trong khi các bậc phụ huynh lại quá bận bịu với nhiều công việc, nếu không tiếp cận thường xuyên sẽ không biết về những mặt trái này. Điều đáng lo ngại hơn cả là có nhiều em nhỏ lại bị cuốn hút với những video nguy hiểm, có nội dung bạo lực… Trong khi, nhiều bậc phụ huynh chưa có biện pháp hiệu quả để kiểm soát việc con em mình tiếp cận với các nội dung này. Một số phụ huynh còn lợi dụng các thiết bị điện tử thông minh để “dụ” trẻ ăn cơm hoặc chọn là phần thưởng khi trẻ đạt thành tích cao trong học tập, vô hình trung làm nhiều trẻ nghiện sử dụng các thiết bị này.\\r\\n\\r\\nTrong khi các biện pháp kiểm soát, ngăn chặn các nội dung xấu trên không gian mạng vẫn còn hạn chế thì các bậc phụ huynh phải tăng cường quản lý nội dung mà trẻ em truy cập trên các nền tảng chia sẻ video nói riêng hay các trang mạng xã hội nói chung. Thực tế đã có nhiều trường hợp trẻ em bị nghiện điện thoại và có không ít hậu quả đáng tiếc đã xảy ra. Thế nên, để giúp con mình tránh được các hiểm họa từ môi trường mạng, thì các bậc phụ huynh cần kiểm soát, định hướng chặt chẽ để giúp con em chọn lọc được thông tin phù hợp, hữu ích với lứa tuổi.";
 	
 	@GetMapping("/findAllPost")
 	public ResponseEntity<?> findAll() throws JsonMappingException, JsonProcessingException{
 
-		GetPostResponseDto getPostResponseDto = mapper.readValue(postDummy1, GetPostResponseDto.class);
-		getPostResponseDto.setContext(contextDummy1);
-		getPostResponseDto.setImageList(List.of("https://www.wikihow.com/images/thumb/9/9f/Develop-a-Child-Care-Philosophy-Step-2-Version-2.jpg/aid2409989-v4-728px-Develop-a-Child-Care-Philosophy-Step-2-Version-2.jpg.webp"));
+//		GetPostResponseDto getPostResponseDto = mapper.readValue(postDummy1, GetPostResponseDto.class);
+//		getPostResponseDto.setContext(context);
 		
-		GetPostResponseDto getPostResponseDto1 = mapper.readValue(postDummy2, GetPostResponseDto.class);
-		getPostResponseDto1.setContext(contextDummy2);
-		getPostResponseDto.setImageList(List.of("https://www.wikihow.com/Develop-a-Child-Care-Philosophy#/Image:Develop-a-Child-Care-Philosophy-Step-3-Version-2.jpg"));
-		
-		GetPostResponseDto getPostResponseDto2 = mapper.readValue(postDummy3, GetPostResponseDto.class);
-		getPostResponseDto2.setContext(contextDummy3);
-		getPostResponseDto.setImageList(List.of("https://www.wikihow.com/images/thumb/1/11/Develop-a-Child-Care-Philosophy-Step-4-Version-2.jpg/aid2409989-v4-728px-Develop-a-Child-Care-Philosophy-Step-4-Version-2.jpg.webp"));
-		
-		GetPostResponseDto getPostResponseDto3 = mapper.readValue(postDummy4, GetPostResponseDto.class);
-		getPostResponseDto3.setContext(contextDummy4);
-		getPostResponseDto.setImageList(List.of("https://www.wikihow.com/images/thumb/8/8c/Develop-a-Child-Care-Philosophy-Step-5-Version-2.jpg/aid2409989-v4-728px-Develop-a-Child-Care-Philosophy-Step-5-Version-2.jpg.webp","https://www.wikihow.com/images/thumb/9/96/Develop-a-Child-Care-Philosophy-Step-6-Version-2.jpg/aid2409989-v4-728px-Develop-a-Child-Care-Philosophy-Step-6-Version-2.jpg.webp"));
-		
-		return this.okResponse(List.of(getPostResponseDto,getPostResponseDto1,getPostResponseDto2,getPostResponseDto3), null);
+		return this.okResponse(mapper.readValue(postDummy1, Object.class), null);
 	}
 	
 	private ResponseEntity<?> okResponse(Object data, List<String> errorMessage){
