@@ -56,6 +56,9 @@ public class User {
     @Column(nullable = false)
     private String topicId;
 
+    @Column(nullable = false)
+	private Byte status; // 1: online, 2 offline
+    
     private String providerId;
     
     private String phoneNumber;

@@ -29,8 +29,11 @@ public class Contact {
 	private Long userSenderId;
 	
     @Column(nullable = false)
-	private Byte status; // 0 : chua ket ban, 1 : dang cho ket ban, 2 : da ket ban
+	private Byte status; // 0 : Not Friend, 1 : Request Friend, 2 : Friend
 	
+    @Column(nullable = false)
+    private String topicId;
+    
 	@Column(nullable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
