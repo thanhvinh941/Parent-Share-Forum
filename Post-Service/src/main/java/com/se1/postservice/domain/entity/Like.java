@@ -29,7 +29,7 @@ public class Like {
 	private Integer userId;
 		
 	@Column(nullable = false)
-	private Byte status;
+	private Byte status; // 1: like, 2: dislike
 	
 	@Column(nullable = false)
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

@@ -5,11 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 public class GetPostResponseDto {
@@ -30,7 +26,7 @@ public class GetPostResponseDto {
 	private User user;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Date publishAt;
-	private Comment comment;
+	private List<Comment> comment;
 	
 	@Data
 	public class TopicTag {
