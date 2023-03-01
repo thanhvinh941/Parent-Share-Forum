@@ -187,8 +187,9 @@ public class UserService {
 		query += " WHERE ";
 		
 		String[] nameArray = name.trim().split(" ");
-		String nameQuery = String.join("|", nameArray);
+		String nameQuery = "('" + String.join("|", nameArray) + "')";
 		query += " name REGEXP " + nameQuery;
+		query += " OR ";
 		query += " email REGEXP " + nameQuery;
 		return query;
 	}
