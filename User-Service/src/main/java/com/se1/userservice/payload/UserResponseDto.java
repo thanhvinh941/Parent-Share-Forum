@@ -18,5 +18,5 @@ public class UserResponseDto {
     private AuthProvider provider;
     private String providerId;
     private String role;
-
+    private int status;
 }

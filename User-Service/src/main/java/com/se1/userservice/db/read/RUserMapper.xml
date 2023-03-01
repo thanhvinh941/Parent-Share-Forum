@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.userservice.db.read.RUserMapper">
+
+	<resultMap type="com.se1.userservice.model.User" id="ResultMap">
+		<result column="id" jdbcType="BIGINT" javaType="java.lang.Long" property="id"/>
+		<result column="name" jdbcType="VARCHAR" javaType="java.lang.String" property="name"/>
+		<result column="email" jdbcType="VARCHAR" javaType="java.lang.String" property="email"/>
+		<result column="image_url" jdbcType="VARCHAR" javaType="java.lang.String" property="imageUrl"/>
+		<result column="birthday" jdbcType="DATE" javaType="java.time.LocalDate" property="birthday"/>
+		<result column="email_verified" jdbcType="TINYINT" javaType="java.lang.Boolean" property="emailVerified"/>
+		<result column="role" jdbcType="VARCHAR" javaType="com.se1.userservice.model.UserRole" property="role"/>
+		<result column="provider" jdbcType="VARCHAR" javaType="com.se1.userservice.model.AuthProvider" property="provider"/>
+		<result column="topic_id" jdbcType="VARCHAR" javaType="java.lang.String" property="topicId"/>
+		<result column="status" jdbcType="TINYINT" javaType="java.lang.Byte" property="status"/>
+		<result column="phone_number" jdbcType="VARCHAR" javaType="java.lang.String" property="phoneNumber"/>
+		<result column="identify_no" jdbcType="VARCHAR" javaType="java.lang.String" property="identifyNo"/>
+		<result column="is_expert" jdbcType="TINYINT" javaType="java.lang.Boolean" property="isExpert"/>
+		<result column="licence_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="licenceId"/>
+		<result column="image_licence" jdbcType="VARCHAR" javaType="java.lang.String" property="imageLicence"/>
+		<result column="del_flg" jdbcType="TINYINT" javaType="java.lang.Boolean" property="delFlg"/>
+		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt"/>
+		<result column="update_at" jdbcType="DATE" javaType="java.util.Date" property="updateAt"/>	
+	</resultMap>
+	
+	<select id="find" parameterType="String" resultMap="ResultMap">
+		SELECT
+			*
+		FROM 
+			db04.users
+			
+		${query}
+		
+	</select>
+
+</mapper>
