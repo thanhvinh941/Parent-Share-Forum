@@ -129,20 +129,10 @@ public class UserController {
 	}
 	
 	@PostMapping("/findByName")
-	public ResponseEntity<?> findByName(@RequestBody FindRequest findRequest){
-		String findRequestStr;
-		try {
-			findRequestStr = objectMapper.writeValueAsString(findRequest);
-			Map<String, Object> findRequestMap = objectMapper.readValue(findRequestStr, Map.class);
-			List<UserDto> userDtos = null;
-			userDtos = service.find(findRequestMap);
-
-			return this.okResponse(userDtos, null);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return this.okResponse(findRequest, null);
+	public ResponseEntity<?> findByName(@RequestParam("name") String name){
+		List<UserDto> userDtos = null;
+		userDtos = service.findByName(name);
+		return this.okResponse(userDtos, null);
 	}
 	
 	@PostMapping("/existsByEmail")
