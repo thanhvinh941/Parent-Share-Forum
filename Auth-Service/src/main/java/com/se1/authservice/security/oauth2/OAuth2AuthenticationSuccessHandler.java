@@ -2,7 +2,9 @@ package com.se1.authservice.security.oauth2;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -20,7 +22,6 @@ import com.se1.authservice.config.AppProperties;
 import com.se1.authservice.exception.BadRequestException;
 import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.payload.UserDetail;
-import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.util.CookieUtils;
@@ -71,8 +72,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        
-        UserDetail detail = new UserDetail(userPrincipal.getId(), userPrincipal.getName(), userPrincipal.getAttribute("picture"));
+        List<String> roles = userPrincipal.getAuthorities().stream()
+        	     .map(r -> r.getAuthority()).collect(Collectors.toList());
+        UserDetail detail = new UserDetail(userPrincipal.getId(), userPrincipal.getName(), userPrincipal.getAttribute("picture"), roles.get(0));
         AuthResponse authResponse = null;
 		try {
 			authResponse = tokenProvider.createToken(userPrincipal.getEmail(), detail);

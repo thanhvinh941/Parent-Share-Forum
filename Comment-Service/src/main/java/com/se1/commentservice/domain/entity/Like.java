@@ -1,4 +1,4 @@
-package com.se1.postservice.domain.entity;
+package com.se1.commentservice.domain.entity;
 
 import java.util.Date;
 
@@ -15,7 +15,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="post_like")
+@Table(name="comment_like")
 public class Like {
 
 	@Id

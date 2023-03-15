@@ -22,7 +22,7 @@ public class WebsocketService {
 	private final String CONTACT_TOPIC = "/topic/contact";
 	private final String COMMENT_TOPIC = "/topic/comment";
 	private final String NOTIFY_TOPIC = "/topic/notify";
-	
+	private final String USER_TOPIC = "/topic/user";
 	public void sendMessageChat(String topicId, ChatRequest chatRequest) {
 		ChatDto chatDto = new ChatDto();
 		chatDto.setContent(chatRequest.getContent());
@@ -35,8 +35,11 @@ public class WebsocketService {
 		
 	}
 	
-	public void sendContact(String topicId, ContactRequest request) {
-		
+	public void sendContact(String topicId, ChatRequest request) {
+		ChatDto chatDto = new ChatDto();
+		chatDto.setContent(request.getContent());
+		chatDto.setCreateAt(new Date());
+		simpMessagingTemplate.convertAndSend(USER_TOPIC + topicId , chatDto);
 	}
 	
 	public void sendNotify(String topicId, NotifyRequest request) {

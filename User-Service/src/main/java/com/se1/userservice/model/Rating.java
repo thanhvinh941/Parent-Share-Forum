@@ -22,9 +22,9 @@ public class Rating {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private Long userRatedId; // user đc rating
+	private Long userRatedId;
 	
-	private Long userRatingId; // user đi rating
+	private Long userRatingId;
 	
 	private int rating;
 	
