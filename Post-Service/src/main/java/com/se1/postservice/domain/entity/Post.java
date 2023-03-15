@@ -24,10 +24,7 @@ public class Post {
 	private Integer id;
 	
 	@Column(nullable = false)
-	private Integer userId;
-	
-	@Column(nullable = false)
-	private String userName;
+	private long userId;
 	
 	@Column(nullable = false)
 	private String title;

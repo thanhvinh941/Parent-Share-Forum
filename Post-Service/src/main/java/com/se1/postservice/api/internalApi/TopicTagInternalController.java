@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -34,14 +36,15 @@ public class TopicTagInternalController {
 	private final ObjectMapper objectMapper;
 	
 	@RequestMapping("/save")
-	public ResponseEntity<?> savePropertyTag(@RequestHeader("user_detail") String userDetail, @RequestBody TopicTagRequest propertyTagRequest) throws JsonMappingException, JsonProcessingException{
+	public ResponseEntity<?> savePropertyTag(
+			@RequestParam(value = "topicTag", required = false) TopicTagRequest propertyTagRequest, @RequestParam("file") MultipartFile multipartFile) throws JsonMappingException, JsonProcessingException{
 		List<String> errorList = propertyTagService.validation(propertyTagRequest);
 		
 		if(errorList.size() > 0) {
 			return this.badResponse(errorList);
 		}
 		
-		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+//		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 //		if(!detail.getRole().equals("admin")) {
 //			return this.forbidenResponse(List.of("admin"));
 //		}

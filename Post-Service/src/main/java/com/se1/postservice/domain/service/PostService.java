@@ -3,7 +3,7 @@ package com.se1.postservice.domain.service;
 import java.util.List;
 
 import com.se1.postservice.domain.entity.Post;
-import com.se1.postservice.domain.payload.PostDto.PostTopicTagDto;
+import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.PostRequest;
 import com.se1.postservice.domain.payload.UserDetail;
 
@@ -13,8 +13,8 @@ public interface PostService {
 
 	Post save(Post post);
 
-	List<String> validation(PostRequest postRequest);
+	void processSavePost(PostRequest postRequest, UserDetail detail, ApiResponseEntity apiResponseEntity) throws Exception;
 
-	PostTopicTagDto getPostTopicTagDtoById(Integer topicTagId);
+	void processFindUserPost(Long id, ApiResponseEntity apiResponseEntity);
 
 }

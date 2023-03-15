@@ -16,7 +16,7 @@
 		<result column="phone_number" jdbcType="VARCHAR" javaType="java.lang.String" property="phoneNumber"/>
 		<result column="identify_no" jdbcType="VARCHAR" javaType="java.lang.String" property="identifyNo"/>
 		<result column="is_expert" jdbcType="TINYINT" javaType="java.lang.Boolean" property="isExpert"/>
-		<result column="licence_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="licenceId"/>
+		<result column="licence_id" jdbcType="BIGINT" javaType="java.lang.Long" property="licenceId"/>
 		<result column="image_licence" jdbcType="VARCHAR" javaType="java.lang.String" property="imageLicence"/>
 		<result column="del_flg" jdbcType="TINYINT" javaType="java.lang.Boolean" property="delFlg"/>
 		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt"/>

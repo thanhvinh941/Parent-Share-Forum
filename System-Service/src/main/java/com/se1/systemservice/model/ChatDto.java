@@ -9,4 +9,5 @@ public class ChatDto {
 	private Long userId;
 	private String content;
 	private Date createAt;
+	private String topicId;
 }

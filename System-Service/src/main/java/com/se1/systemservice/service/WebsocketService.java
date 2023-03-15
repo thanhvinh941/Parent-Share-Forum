@@ -25,6 +25,7 @@ public class WebsocketService {
 	private final String USER_TOPIC = "/topic/user";
 	public void sendMessageChat(String topicId, ChatRequest chatRequest) {
 		ChatDto chatDto = new ChatDto();
+		chatDto.setTopicId(topicId);
 		chatDto.setContent(chatRequest.getContent());
 		chatDto.setCreateAt(new Date());
 		

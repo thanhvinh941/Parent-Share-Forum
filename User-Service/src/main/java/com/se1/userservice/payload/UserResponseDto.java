@@ -4,8 +4,6 @@ package com.se1.userservice.payload;
 import com.se1.userservice.model.AuthProvider;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class UserResponseDto {
@@ -19,4 +17,7 @@ public class UserResponseDto {
     private String providerId;
     private String role;
     private int status;
+    private Boolean isExpert;
+    private String topicId;
+	private Double rating;
 }

@@ -29,7 +29,21 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        
+
+  rabbitmq:
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3s
+          max-attempts: 6
+          max-interval: 10s
+          multiplier: 2
+    host: localhost
+    port: 5672
+    username: admin
+    password: Zaq12wsx1234
+
 management:
   endpoints:
     web:

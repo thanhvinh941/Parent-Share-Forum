@@ -1,6 +1,6 @@
 package com.se1.userservice.model;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +16,10 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "contacts")
+@Table(name = "contacts", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "userReciverId"),
+        @UniqueConstraint(columnNames = "userSenderId")
+})
 public class Contact {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +32,12 @@ public class Contact {
 	private Long userSenderId;
 	
     @Column(nullable = false)
-	private Byte status; // 0 : Not Friend, 1 : Request Friend, 2 : Friend
+	private int status; // 0 : Not Friend, 1 : Request Friend, 2 : Friend
 	
     @Column(nullable = false)
     private String topicId;
     
 	@Column(nullable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createAt;
+    private Date createAt;
 }
