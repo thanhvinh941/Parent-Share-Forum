@@ -26,6 +26,15 @@ public class GatewayConfig {
                 .route("post-service", r -> r.path("/post/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://post-service"))
+                .route("system-service", r -> r.path("/system/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://system-service"))
+                .route("comment-service", r -> r.path("/comments/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://comment-service"))
+                .route("chat-service", r -> r.path("/chat/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://chat-service"))
                 .build();
     }
 

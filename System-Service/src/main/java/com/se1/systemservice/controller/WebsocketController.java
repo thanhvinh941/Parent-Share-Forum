@@ -3,7 +3,10 @@ package com.se1.systemservice.controller;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,7 +15,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.systemservice.common.utils.CommonUtils;
+import com.se1.systemservice.config.MqConfig;
+import com.se1.systemservice.config.SCMConstant;
+import com.se1.systemservice.payload.ChatMqRequest;
 import com.se1.systemservice.payload.ChatRequest;
 import com.se1.systemservice.service.CommonService;
 import com.se1.systemservice.service.UserContactService;
@@ -31,11 +38,17 @@ public class WebsocketController {
 	@Autowired
 	private CommonService commonService;
 
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	@MessageMapping("/chat/{topicId}")
 	public void sendChat(@RequestHeader(required = false, name = "user_detail") String userDetail,
 			@DestinationVariable String topicId, ChatRequest request) throws Exception {
 		String content = request.getContent();
-
+		String contentToMQ = content;
 		if (request.isFile()) {
 			String[] contentArray = content.split(",");
 
@@ -43,8 +56,21 @@ public class WebsocketController {
 			byte[] imageByte = Base64.getDecoder().decode(contentArray[1].trim());
 			InputStream inputStream = new ByteArrayInputStream(imageByte);
 
+			contentToMQ = imageName;
 			commonService.saveFile("/chat", imageName, inputStream);
 		}
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("content", contentToMQ);
+		map.put("topicId", topicId);
+		map.put("chatParent", null);
+		
+		
+		ChatMqRequest mqRequest = new ChatMqRequest();
+		mqRequest.setAction(SCMConstant.MQ_REQUEST_CHAT_ACTION_CREATE);
+		mqRequest.setRecord(map);
+		
+		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY, mqRequest);
 
 		websocketService.sendMessageChat(topicId, request);
 	}
