@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <form
+        id="loginForm"
+        style="
+          width: 200px;
+          margin: 10px;
+          padding: 10px;
+          border-radius: 4px;
+          border: 1px solid black;
+        "
+        action="javascript:void(0);"
+      >
+        <div class="mb-3">
+          <label class="form-label" for="username">username</label>
+          <input class="form-control" type="text" id="email" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="password">password</label>
+          <input class="form-control" type="password" id="password" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      $("#loginForm").submit(() => {
+        var email = $("#email").val();
+        var password = $("#password").val();
+        var loginDto = new Object();
+        loginDto.email = email;
+        loginDto.password = password;
+        loginDto.confirmpassword = password;
+        $.ajax({
+          url: "localhost:8080/auth/login",
+          method: "POST",
+          crossDomain: true,
+          dataType: "json",
+          data: JSON.stringify(loginDto),
+          headers: {
+            accept: "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+          success: function (result, status, jqXHR) {
+            console.log(result);
+          },
+          error(jqXHR, textStatus, errorThrown) {},
+        });
+      });
+    });
+  </script>
+</html>
