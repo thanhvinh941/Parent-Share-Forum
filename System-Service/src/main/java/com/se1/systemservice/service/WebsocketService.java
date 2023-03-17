@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.se1.systemservice.model.ChatDto;
 import com.se1.systemservice.payload.ChatRequest;
 import com.se1.systemservice.payload.CommentRequest;
-import com.se1.systemservice.payload.ContactRequest;
 import com.se1.systemservice.payload.NotifyRequest;
 
 @Service
