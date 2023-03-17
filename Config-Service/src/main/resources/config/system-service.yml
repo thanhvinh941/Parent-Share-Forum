@@ -43,6 +43,17 @@ spring:
     port: 5672
     username: admin
     password: Zaq12wsx1234
+  mail:
+    host: smtp.gmail.com
+    port: 578
+    username: thanhvinhse94@gmail.com
+    password: ufvyhnljytcdwaxu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls: 
+            enable: true
 
 management:
   endpoints:
