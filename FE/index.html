@@ -11,12 +11,27 @@
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
     />
     <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="asset/js/jquery-3.6.4.min.js"></script>
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
   <body>
     <div class="container">
+      <!-- Image and text -->
+      <nav id="navbar" class="navbar navbar-light bg-light">
+        <a id="navbar-container" class="navbar-brand" href="#">
+          <img
+            id="navbar-image"
+            src="/docs/4.0/assets/brand/bootstrap-solid.svg"
+            width="30"
+            height="30"
+            class="d-inline-block align-top"
+            alt=""
+          />
+          Bootstrap
+        </a>
+      </nav>
+
       <form
         id="loginForm"
         style="
@@ -42,8 +57,13 @@
     </div>
   </body>
   <script>
+    var username;
+    var image;
     $(document).ready(function () {
-      $("#loginForm").submit(() => {
+      $("#navbar").hide();
+      var loginForm = $("#loginForm");
+
+      loginForm.submit(() => {
         var email = $("#email").val();
         var password = $("#password").val();
         var loginDto = new Object();
@@ -51,21 +71,53 @@
         loginDto.password = password;
         loginDto.confirmpassword = password;
         $.ajax({
-          url: "localhost:8080/auth/login",
+          url: "http://localhost:8080/auth/login",
           method: "POST",
           crossDomain: true,
           dataType: "json",
-          data: JSON.stringify(loginDto),
-          headers: {
-            accept: "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
+          data: JSON.stringify({
+            email,
+            password,
+            confirmpassword: password,
+          }),
+          contentType: "application/json",
           success: function (result, status, jqXHR) {
             console.log(result);
+            setuplogin(result);
           },
           error(jqXHR, textStatus, errorThrown) {},
         });
       });
+
+      function setuplogin(data) {
+        localStorage.setItem("accessTokent", data.data.accessToken);
+        loginForm.hide();
+        $.ajax({
+          url: "http://localhost:8080/auth/getUserInfoByToken",
+          method: "POST",
+          crossDomain: true,
+          dataType: "json",
+          headers: {
+            Authorization: data.data.accessToken,
+          },
+          contentType: "application/json",
+          success: function (result, status, jqXHR) {
+            console.log(result);
+            username = result.data.name;
+            image = result.data.imageUrl;
+
+            loadNavbar(username, image);
+          },
+          error(jqXHR, textStatus, errorThrown) {},
+        });
+      }
+
+      function loadNavbar(username, image) {
+        $("#navbar").show();
+        $("#navbar-container").text(username);
+        $("#navbar-image").attr("src", image);
+      }
     });
   </script>
+  <!-- "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --profile-directory="Profile 22" --disable-web-security --disable-gpu --user-data-dir="D:\chromeTemp" -->
 </html>

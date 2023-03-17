@@ -13,6 +13,7 @@ import com.se1.userservice.model.Contact;
 import com.se1.userservice.model.User;
 import com.se1.userservice.payload.ApiResponseEntity;
 import com.se1.userservice.payload.NotifycationDto;
+import com.se1.userservice.payload.UserDetail;
 import com.se1.userservice.repository.ContactRepository;
 import com.se1.userservice.repository.UserRepository;
 
@@ -129,6 +130,11 @@ public class ContactService {
 		if (statusOld == 0 && statusUpdate != 1) {
 			throw new Exception("Thao tác không hợp lệ");
 		}
+	}
+
+	public void processGetListFriend(UserDetail userDetail) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

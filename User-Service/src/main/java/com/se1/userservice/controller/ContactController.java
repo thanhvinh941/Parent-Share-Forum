@@ -93,4 +93,21 @@ public class ContactController {
 
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
+	
+	
+	@PostMapping("/getListFriend")
+	public ResponseEntity<?> getListFriend(@RequestHeader("user_detail") String userDetailHeader){
+		UserDetail userDetail;
+		try {
+			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+			contactService.processGetListFriend(userDetail);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
 }
