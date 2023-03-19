@@ -12,6 +12,8 @@
     />
     <!-- jQuery library -->
     <script src="asset/js/jquery-3.6.4.min.js"></script>
+    <script src="asset/js/sockjs.min.js"></script>
+    <script src="asset/js/stomp.min.js"></script>
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
@@ -31,7 +33,18 @@
           Bootstrap
         </a>
       </nav>
-
+      <div style="display: flex">
+        <ul class="list-group" id="list-friend" style="width: 300px">
+          <li class="list-group-item" id="2145e6e7-1776-43df-8d0a-d6b8165c6270">
+            An item
+          </li>
+          <!-- <li class="list-group-item">A second item</li>
+          <li class="list-group-item">A third item</li>
+          <li class="list-group-item">A fourth item</li>
+          <li class="list-group-item">And a fifth one</li> -->
+        </ul>
+        <div class="" style="flex: 1"></div>
+      </div>
       <form
         id="loginForm"
         style="
@@ -59,7 +72,26 @@
   <script>
     var username;
     var image;
+    var topicId;
+    var stompClient = null;
     $(document).ready(function () {
+      $(".list-group-item").click(function () {
+        console.log("vo");
+        var token = localStorage.getItem("accessToken");
+        var topicContactId = this.id;
+        stompClient.connect(
+          { Authorization: token, userId: userId },
+          function (frame) {
+            console.log("Connected: " + frame);
+          }
+        );
+        stompClient.subscribe(
+          "/ws/topic/chat/" + topicContactId,
+          function (chat) {
+            loadChat(chat);
+          }
+        );
+      });
       $("#navbar").hide();
       var loginForm = $("#loginForm");
 
@@ -82,17 +114,16 @@
           }),
           contentType: "application/json",
           success: function (result, status, jqXHR) {
-            console.log(result);
             setuplogin(result);
           },
           error(jqXHR, textStatus, errorThrown) {},
         });
       });
 
-      function setuplogin(data) {
-        localStorage.setItem("accessTokent", data.data.accessToken);
+      async function setuplogin(data) {
+        localStorage.setItem("accessToken", data.data.accessToken);
         loginForm.hide();
-        $.ajax({
+        await $.ajax({
           url: "http://localhost:8080/auth/getUserInfoByToken",
           method: "POST",
           crossDomain: true,
@@ -102,10 +133,12 @@
           },
           contentType: "application/json",
           success: function (result, status, jqXHR) {
-            console.log(result);
             username = result.data.name;
             image = result.data.imageUrl;
+            topicId = result.data.topicId;
+            userId = result.data.id;
 
+            connect();
             loadNavbar(username, image);
           },
           error(jqXHR, textStatus, errorThrown) {},
@@ -116,8 +149,47 @@
         $("#navbar").show();
         $("#navbar-container").text(username);
         $("#navbar-image").attr("src", image);
+        loadFriendUser();
+      }
+
+      async function loadFriendUser() {
+        var token = localStorage.getItem("accessToken");
+        var friendList;
+        var html = "";
+        await $.ajax({
+          url: "http://localhost:8080/users/internal/contact/getListFriend",
+          method: "POST",
+          crossDomain: true,
+          dataType: "json",
+          headers: {
+            Authorization: token,
+          },
+          contentType: "application/json",
+          success: function (result, status, jqXHR) {
+            friendList = result.data["2"];
+          },
+          error(jqXHR, textStatus, errorThrown) {},
+        });
+        console.log(friendList);
+        friendList.forEach((element) => {
+          html += ` <li class="list-group-item" id="${element.topicContactId}">${element.userFriend.name}</li> `;
+        });
+
+        $("#list-friend").append(html);
       }
     });
+
+    function connect() {
+      var token = localStorage.getItem("accessToken");
+      var socket = new SockJS("http://localhost:8081/system/ws");
+      stompClient = Stomp.over(socket);
+      stompClient.connect(
+        { Authorization: token, userId: userId },
+        function (frame) {
+          console.log("Connected: " + frame);
+        }
+      );
+    }
   </script>
   <!-- "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --profile-directory="Profile 22" --disable-web-security --disable-gpu --user-data-dir="D:\chromeTemp" -->
 </html>

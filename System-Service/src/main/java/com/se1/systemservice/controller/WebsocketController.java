@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.systemservice.common.utils.CommonUtils;
 import com.se1.systemservice.config.MqConfig;
 import com.se1.systemservice.config.SCMConstant;
+import com.se1.systemservice.config.WebSocketSessionListener;
 import com.se1.systemservice.payload.ChatMqRequest;
 import com.se1.systemservice.payload.ChatRequest;
 import com.se1.systemservice.service.CommonService;
@@ -26,7 +27,6 @@ import com.se1.systemservice.service.UserContactService;
 import com.se1.systemservice.service.WebsocketService;
 
 @Controller
-@RequestMapping("/system/ws")
 public class WebsocketController {
 
 	@Autowired
@@ -44,9 +44,14 @@ public class WebsocketController {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
+	@Autowired
+	private WebSocketSessionListener webSocketSessionListener;
+	
 	@MessageMapping("/chat/{topicId}")
 	public void sendChat(@RequestHeader(required = false, name = "user_detail") String userDetail,
 			@DestinationVariable String topicId, ChatRequest request) throws Exception {
+		
+		String userId = webSocketSessionListener.getConnectedClientId().get(0);
 		String content = request.getContent();
 		String contentToMQ = content;
 		if (request.isFile()) {
@@ -70,7 +75,7 @@ public class WebsocketController {
 		mqRequest.setAction(SCMConstant.MQ_REQUEST_CHAT_ACTION_CREATE);
 		mqRequest.setRecord(map);
 		
-		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY, mqRequest);
+		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
 
 		websocketService.sendMessageChat(topicId, request);
 	}

@@ -17,16 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.se1.userservice.model.AuthProvider;
-import com.se1.userservice.model.User;
-import com.se1.userservice.model.UserRole;
-import com.se1.userservice.payload.ApiResponseEntity;
-import com.se1.userservice.payload.FindRequest;
-import com.se1.userservice.payload.UserDto;
-import com.se1.userservice.payload.UserRequestDto;
-import com.se1.userservice.payload.UserResponseDto;
-import com.se1.userservice.repository.UserRepository;
-import com.se1.userservice.service.UserService;
+import com.se1.userservice.domain.model.AuthProvider;
+import com.se1.userservice.domain.model.User;
+import com.se1.userservice.domain.model.UserRole;
+import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.FindRequest;
+import com.se1.userservice.domain.payload.UserDto;
+import com.se1.userservice.domain.payload.UserRequestDto;
+import com.se1.userservice.domain.payload.UserResponseDto;
+import com.se1.userservice.domain.repository.UserRepository;
+import com.se1.userservice.domain.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
