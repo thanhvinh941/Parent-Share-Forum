@@ -47,7 +47,6 @@ public class MqConfig {
 	public Binding bindingsChatUpdate() {
 		return BindingBuilder.bind(queueChatUpdate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_UPDATE);
 	}
-	//-- CHAT ---
 
 	//-- USER ---
 	@Bean
@@ -63,6 +62,22 @@ public class MqConfig {
 	@Bean
 	public Binding bindingsUser() {
 		return BindingBuilder.bind(queueUser()).to(exchangeUser()).with(USER_ROUTING_KEY);
+	}
+
+	//-- NOTIFY ---
+	@Bean
+	public TopicExchange exchangeNotify() {
+		return new TopicExchange(NOTIFY_EXCHANGE);
+	}
+	
+	@Bean
+	public Queue queueNotify() {
+		return new Queue(NOTIFY_QUEUE);
+	}
+	
+	@Bean
+	public Binding bindingsNotify() {
+		return BindingBuilder.bind(queueNotify()).to(exchangeNotify()).with(NOTIFY_ROUTING_KEY);
 	}
 
 	@Bean
