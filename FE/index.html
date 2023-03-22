@@ -10,6 +10,7 @@
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
     />
+    <link rel="stylesheet" href="asset/css/app.css">
     <!-- jQuery library -->
     <script src="asset/js/jquery-3.6.4.min.js"></script>
     <script src="asset/js/sockjs.min.js"></script>
@@ -19,32 +20,40 @@
   </head>
   <body>
     <div class="container">
-      <!-- Image and text -->
-      <nav id="navbar" class="navbar navbar-light bg-light">
-        <a id="navbar-container" class="navbar-brand" href="#">
-          <img
-            id="navbar-image"
-            src="/docs/4.0/assets/brand/bootstrap-solid.svg"
-            width="30"
-            height="30"
-            class="d-inline-block align-top"
-            alt=""
-          />
-          Bootstrap
-        </a>
-      </nav>
-      <div style="display: flex">
-        <ul class="list-group" id="list-friend" style="width: 300px">
-          <li class="list-group-item" id="2145e6e7-1776-43df-8d0a-d6b8165c6270">
-            An item
-          </li>
-          <!-- <li class="list-group-item">A second item</li>
-          <li class="list-group-item">A third item</li>
-          <li class="list-group-item">A fourth item</li>
-          <li class="list-group-item">And a fifth one</li> -->
-        </ul>
-        <div class="" style="flex: 1"></div>
-      </div>
+      <div class="messaging">
+        <div class="inbox_msg">
+          <div class="inbox_people">
+            <div class="headind_srch">
+              <div class="recent_heading">
+                <h4>Recent</h4>
+              </div>
+              <div class="srch_bar">
+                <div class="stylish-input-group">
+                  <input type="text" class="search-bar"  placeholder="Search" >
+                  <span class="input-group-addon">
+                  <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                  </span> </div>
+              </div>
+            </div>
+            <div class="inbox_chat">
+            </div>
+          </div>
+          <div class="mesgs">
+            <div class="msg_history">
+              
+            </div>
+            <div class="type_msg">
+              <div class="input_msg_write">
+                <input type="text" class="write_msg" placeholder="Type a message" />
+                <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <p class="text-center top_spac"> Design by <a target="_blank" href="https://www.linkedin.com/in/sunil-rajput-nattho-singh/">Sunil Rajput</a></p>
+        
+      </div></div>
       <form
         id="loginForm"
         style="
@@ -74,11 +83,101 @@
     var image;
     var topicId;
     var stompClient = null;
-    $(document).ready(function () {
-      $(".list-group-item").click(function () {
+    var topicChatActive;
+
+    $("#loginForm").submit(() => {
+      var email = $("#email").val();
+      var password = $("#password").val();
+      var loginDto = new Object();
+      loginDto.email = email;
+      loginDto.password = password;
+      loginDto.confirmpassword = password;
+      $.ajax({
+        url: "http://localhost:8080/auth/login",
+        method: "POST",
+        crossDomain: true,
+        dataType: "json",
+        data: JSON.stringify({
+          email,
+          password,
+          confirmpassword: password,
+        }),
+        contentType: "application/json",
+        success: function (result, status, jqXHR) {
+          setuplogin(result);
+        },
+        error(jqXHR, textStatus, errorThrown) {},
+      });
+    });
+
+    async function setuplogin(data) {
+      localStorage.setItem("accessToken", data.data.accessToken);
+      $("#loginForm").hide();
+      await $.ajax({
+        url: "http://localhost:8080/auth/getUserInfoByToken",
+        method: "POST",
+        crossDomain: true,
+        dataType: "json",
+        headers: {
+          Authorization: data.data.accessToken,
+        },
+        contentType: "application/json",
+        success: function (result, status, jqXHR) {
+          username = result.data.name;
+          image = result.data.imageUrl;
+          topicId = result.data.topicId;
+          userId = result.data.id;
+
+          connect();
+          loadFriendUser();
+        },
+        error(jqXHR, textStatus, errorThrown) {},
+      });
+    }
+
+    async function loadFriendUser() {
+      var token = localStorage.getItem("accessToken");
+      var friendList;
+      var html = "";
+      await $.ajax({
+        url: "http://localhost:8080/users/internal/contact/getListFriend",
+        method: "POST",
+        crossDomain: true,
+        dataType: "json",
+        headers: {
+          Authorization: token,
+        },
+        contentType: "application/json",
+        success: function (result, status, jqXHR) {
+          friendList = result.data["2"];
+        },
+        error(jqXHR, textStatus, errorThrown) {},
+      });
+      console.log(friendList);
+      friendList.forEach((element) => {
+        html += `<div class="chat_list" id="${element.topicContactId}">
+              <div class="chat_people">
+                <div class="chat_img"> <img src="${element.imageUrl}" alt="sunil"> </div>
+                <div class="chat_ib">
+                  <h5>${element.userFriend.name}<span class="chat_date">Dec 25</span></h5>
+                  <p>Test, which is a new approach to have all solutions 
+                    astrology under one roof.</p>
+                </div>
+              </div>
+            </div>`;
+      });
+
+      $(".inbox_chat").append(html);
+    }
+
+    $(document).ready( function() {
+      $(".inbox_chat").on('click', '.chat_list', function(){
+        $(".chat_list").removeClass('active_chat')
+        var topicContactId = this.id;
+        $(`#${topicContactId}`).addClass('active_chat')
+        topicChatActive = topicContactId;
         console.log("vo");
         var token = localStorage.getItem("accessToken");
-        var topicContactId = this.id;
         stompClient.connect(
           { Authorization: token, userId: userId },
           function (frame) {
@@ -91,94 +190,14 @@
             loadChat(chat);
           }
         );
+      })
+
+      $('.msg_send_btn').click(function(){
+        var content = $('.write_msg').val();
+        console.log("message: " + content);
+        stompClient.send("/app/chat/" + topicChatActive, {}, JSON.stringify({"content" : content , "chatParent" : null, "isFile" : false}))
       });
-      $("#navbar").hide();
-      var loginForm = $("#loginForm");
-
-      loginForm.submit(() => {
-        var email = $("#email").val();
-        var password = $("#password").val();
-        var loginDto = new Object();
-        loginDto.email = email;
-        loginDto.password = password;
-        loginDto.confirmpassword = password;
-        $.ajax({
-          url: "http://localhost:8080/auth/login",
-          method: "POST",
-          crossDomain: true,
-          dataType: "json",
-          data: JSON.stringify({
-            email,
-            password,
-            confirmpassword: password,
-          }),
-          contentType: "application/json",
-          success: function (result, status, jqXHR) {
-            setuplogin(result);
-          },
-          error(jqXHR, textStatus, errorThrown) {},
-        });
-      });
-
-      async function setuplogin(data) {
-        localStorage.setItem("accessToken", data.data.accessToken);
-        loginForm.hide();
-        await $.ajax({
-          url: "http://localhost:8080/auth/getUserInfoByToken",
-          method: "POST",
-          crossDomain: true,
-          dataType: "json",
-          headers: {
-            Authorization: data.data.accessToken,
-          },
-          contentType: "application/json",
-          success: function (result, status, jqXHR) {
-            username = result.data.name;
-            image = result.data.imageUrl;
-            topicId = result.data.topicId;
-            userId = result.data.id;
-
-            connect();
-            loadNavbar(username, image);
-          },
-          error(jqXHR, textStatus, errorThrown) {},
-        });
-      }
-
-      function loadNavbar(username, image) {
-        $("#navbar").show();
-        $("#navbar-container").text(username);
-        $("#navbar-image").attr("src", image);
-        loadFriendUser();
-      }
-
-      async function loadFriendUser() {
-        var token = localStorage.getItem("accessToken");
-        var friendList;
-        var html = "";
-        await $.ajax({
-          url: "http://localhost:8080/users/internal/contact/getListFriend",
-          method: "POST",
-          crossDomain: true,
-          dataType: "json",
-          headers: {
-            Authorization: token,
-          },
-          contentType: "application/json",
-          success: function (result, status, jqXHR) {
-            friendList = result.data["2"];
-          },
-          error(jqXHR, textStatus, errorThrown) {},
-        });
-        console.log(friendList);
-        friendList.forEach((element) => {
-          html += ` <li class="list-group-item" id="${element.topicContactId}">${element.userFriend.name}</li> `;
-        });
-
-        $("#list-friend").append(html);
-      }
     });
-
     function connect() {
       var token = localStorage.getItem("accessToken");
       var socket = new SockJS("http://localhost:8081/system/ws");

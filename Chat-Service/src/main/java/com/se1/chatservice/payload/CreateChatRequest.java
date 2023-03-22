@@ -1,9 +1,10 @@
-package com.se1.systemservice.payload;
+package com.se1.chatservice.payload;
 
 import lombok.Data;
 
 @Data
-public class ChatMqRequest {
+public class CreateChatRequest {
+
 	private String content;
 	private long userId;
 	private String topicId;

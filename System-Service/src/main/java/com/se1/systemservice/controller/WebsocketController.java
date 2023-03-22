@@ -72,8 +72,10 @@ public class WebsocketController {
 		
 		
 		ChatMqRequest mqRequest = new ChatMqRequest();
-		mqRequest.setAction(SCMConstant.MQ_REQUEST_CHAT_ACTION_CREATE);
-		mqRequest.setRecord(map);
+		mqRequest.setChatParentId(request.getChatParent());
+		mqRequest.setContent(contentToMQ);
+		mqRequest.setUserId(Long.getLong(userId));
+		mqRequest.setTopicId(topicId);
 		
 		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
 

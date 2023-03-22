@@ -19,7 +19,7 @@ public class MqConfig {
 	public static final String CHAT_ROUTING_KEY_CREATE = "Chat-Routing-Key-Create";
 	public static final String CHAT_ROUTING_KEY_UPDATE = "Chat-Routing-Key-Update";
 	public static final String USER_EXCHANGE = "User-Exchange";
-	public static final String USER_QUEUE_UPDATE = "User-Queue";
+	public static final String USER_QUEUE = "User-Queue";
 	public static final String USER_ROUTING_KEY = "User-Routing-Key";
 
 	//-- CHAT ---
@@ -57,7 +57,7 @@ public class MqConfig {
 	
 	@Bean
 	public Queue queueUser() {
-		return new Queue(USER_QUEUE_UPDATE);
+		return new Queue(USER_QUEUE);
 	}
 	
 	@Bean

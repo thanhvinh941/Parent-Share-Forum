@@ -10,37 +10,48 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MqConfig {
-    public static final String CHAT_QUEUE = "Chat-Queue";
-    public static final String CHAT_EXCHANGE = "Chat-Exchange";
-    public static final String CHAT_ROUTING_KEY  = "Chat-Routing-Key";
+	public static final String CHAT_QUEUE_CREATE = "Chat-Queue-Create";
+	public static final String CHAT_QUEUE_UPDATE = "Chat-Queue-Create";
+	public static final String CHAT_EXCHANGE = "Chat-Exchange";
+	public static final String CHAT_ROUTING_KEY_CREATE = "Chat-Routing-Key-Create";
+	public static final String CHAT_ROUTING_KEY_UPDATE = "Chat-Routing-Key-Update";
 
-    @Bean
-    public Queue queue() {
-        return new Queue(CHAT_QUEUE);
-    }
+	// -- CHAT ---
+	@Bean
+	public TopicExchange exchangeChat() {
+		return new TopicExchange(CHAT_EXCHANGE);
+	}
 
-    @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(CHAT_EXCHANGE);
-    }
+	@Bean
+	public Queue queueChatCreate() {
+		return new Queue(CHAT_QUEUE_CREATE);
+	}
 
-    @Bean
-    public Binding bindings(Queue queue, TopicExchange topicExchange) {
-        return BindingBuilder
-                .bind(queue)
-                .to(topicExchange)
-                .with(CHAT_ROUTING_KEY);
-    }
+	@Bean
+	public Queue queueChatUpdate() {
+		return new Queue(CHAT_QUEUE_UPDATE);
+	}
 
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
+	@Bean
+	public Binding bindingsChatCreate() {
+		return BindingBuilder.bind(queueChatUpdate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_CREATE);
+	}
 
-    @Bean
-    public AmqpTemplate notificationRabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jsonMessageConverter());
-        return template;
-    }
+	@Bean
+	public Binding bindingsChatUpdate() {
+		return BindingBuilder.bind(queueChatUpdate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_UPDATE);
+	}
+	// -- CHAT ---
+
+	@Bean
+	public MessageConverter jsonMessageConverter() {
+		return new Jackson2JsonMessageConverter();
+	}
+
+	@Bean
+	public AmqpTemplate notificationRabbitTemplate(ConnectionFactory connectionFactory) {
+		final RabbitTemplate template = new RabbitTemplate(connectionFactory);
+		template.setMessageConverter(jsonMessageConverter());
+		return template;
+	}
 }

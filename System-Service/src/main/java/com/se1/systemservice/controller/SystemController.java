@@ -25,6 +25,6 @@ public class SystemController {
 		List<UserContactDto> list = contactService.getContactDto();
 		
 		model.addAttribute("userContacts", list);
-		return "index";
+		return "callVideo";
 	}
 }
