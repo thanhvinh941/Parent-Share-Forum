@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -82,8 +83,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		} catch (JsonProcessingException e1) {
 			e1.printStackTrace();
 		}
-		UserDetail userDetail = new UserDetail(user.getId(), user.getEmail(), user.getName(), user.getImageUrl(),
-				user.getRole(), user.getIsExpert(), user.getRating(), user.getStatus());
+		UserDetail userDetail = new UserDetail();
+		BeanUtils.copyProperties(user, userDetail);
 		AuthResponse authResponse = null;
 		try {
 			authResponse = tokenProvider.createToken(userPrincipal.getEmail(), userDetail);

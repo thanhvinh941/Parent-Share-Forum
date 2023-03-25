@@ -178,14 +178,8 @@
         topicChatActive = topicContactId;
         console.log("vo");
         var token = localStorage.getItem("accessToken");
-        stompClient.connect(
-          { Authorization: token, userId: userId },
-          function (frame) {
-            console.log("Connected: " + frame);
-          }
-        );
         stompClient.subscribe(
-          "/ws/topic/chat/" + topicContactId,
+          "/topic/chat/" + topicContactId,
           function (chat) {
             loadChat(chat);
           }
@@ -197,7 +191,12 @@
         console.log("message: " + content);
         stompClient.send("/app/chat/" + topicChatActive, {}, JSON.stringify({"content" : content , "chatParent" : null, "isFile" : false}))
       });
+
     });
+    function loadChat(chat){
+      console.log(chat);
+      $('.msg_history').append("<br>" + JSON.parse(chat.body).content + "/" + JSON.parse(chat.body).createAt)
+    }
     function connect() {
       var token = localStorage.getItem("accessToken");
       var socket = new SockJS("http://localhost:8081/system/ws");

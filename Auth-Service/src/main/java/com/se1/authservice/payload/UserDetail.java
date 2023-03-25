@@ -14,7 +14,8 @@ public class UserDetail {
 	private String name;
 	private String imageUrl;
 	private String role;
-	private boolean isExpert;
+	private Boolean isExpert;
 	private Double rating;
 	private int status;
+	private String topicId;
 }

@@ -23,11 +23,12 @@ public class WebsocketService {
 	private final String NOTIFY_TOPIC = "/topic/notify";
 	private final String USER_TOPIC = "/topic/user";
 	
-	public void sendMessageChat(String topicId, ChatRequest chatRequest) {
+	public void sendMessageChat(String topicId, ChatRequest chatRequest, Long userId) {
 		ChatDto chatDto = new ChatDto();
 		chatDto.setTopicId(topicId);
 		chatDto.setContent(chatRequest.getContent());
 		chatDto.setCreateAt(new Date());
+		chatDto.setUserId(userId);
 		
 		simpMessagingTemplate.convertAndSend(CHAT_TOPIC + topicId , chatDto);
 	}

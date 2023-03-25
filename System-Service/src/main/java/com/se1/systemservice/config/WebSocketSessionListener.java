@@ -28,7 +28,7 @@ public class WebSocketSessionListener {
         GenericMessage<?> generic = (GenericMessage<?>) accessor.getHeader(SimpMessageHeaderAccessor.CONNECT_MESSAGE_HEADER);
         SimpMessageHeaderAccessor nativeAccessor = SimpMessageHeaderAccessor.wrap(generic);
         String userIdValue = nativeAccessor.getNativeHeader("userId").get(0);
-
+        //TODO Authen
 //        String princ =  (String) msgHeaders.get("user_detail");
 //        StompHeaderAccessor sha = StompHeaderAccessor.wrap(sce.getMessage());
 //        List<String> nativeHeaders = sha.getNativeHeader("Authorization");

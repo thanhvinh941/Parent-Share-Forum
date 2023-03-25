@@ -26,7 +26,10 @@ import com.se1.systemservice.service.CommonService;
 import com.se1.systemservice.service.UserContactService;
 import com.se1.systemservice.service.WebsocketService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Controller
+@Slf4j
 public class WebsocketController {
 
 	@Autowired
@@ -74,12 +77,12 @@ public class WebsocketController {
 		ChatMqRequest mqRequest = new ChatMqRequest();
 		mqRequest.setChatParentId(request.getChatParent());
 		mqRequest.setContent(contentToMQ);
-		mqRequest.setUserId(Long.getLong(userId));
+		mqRequest.setUserId(Long.parseLong(userId));
 		mqRequest.setTopicId(topicId);
 		
 		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
 
-		websocketService.sendMessageChat(topicId, request);
+		websocketService.sendMessageChat(topicId, request, Long.parseLong(userId));
 	}
 
 	@MessageMapping("/comment/{topicId}")
@@ -103,10 +106,5 @@ public class WebsocketController {
 		boolean isChoose = action.equals("CONNECT");
 		System.out.println(userId + "/" + action);
 		contactService.updateUserChoose(userId, isChoose);
-	}
-	@MessageMapping("/user/54f2e54b-f4fb-4f1e-8358-624a2f4017d7")
-	public void sendPrivateUser(@Payload ChatRequest request) {
-		System.out.println(request);
-		websocketService.sendMessageChat("54f2e54b-f4fb-4f1e-8358-624a2f4017d7", request);
 	}
 }

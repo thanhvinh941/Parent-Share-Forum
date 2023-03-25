@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -86,8 +87,8 @@ public class AuthController {
 
 				UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-				UserDetail userDetail = new UserDetail(user.getId(), user.getEmail(), user.getName(),
-						user.getImageUrl(), user.getRole(), user.getIsExpert(), user.getRating(), user.getStatus());
+				UserDetail userDetail = new UserDetail();
+				BeanUtils.copyProperties(user, userDetail);
 				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail(), userDetail);
 				return this.okResponse(authResponse);
 			} catch (Exception e) {
@@ -113,9 +114,8 @@ public class AuthController {
 			if (user == null) {
 				return this.badResponse(List.of("User not found"));
 			}
-			UserDetail userDetail = new UserDetail(user.getId(), user.getEmail(), user.getName(),
-					user.getImageUrl(), user.getRole(), user.getIsExpert (), user.getRating(), user.getStatus());
-
+			UserDetail userDetail = new UserDetail();
+			BeanUtils.copyProperties(user, userDetail);
 			return this.okResponse(userDetail);
 		} catch (JsonProcessingException e) {
 			return this.badResponse(List.of(e.getMessage()));
