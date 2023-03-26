@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.common.SCMConstant;
-import com.se1.userservice.model.Contact;
-import com.se1.userservice.payload.ApiResponseEntity;
-import com.se1.userservice.payload.UserDetail;
-import com.se1.userservice.service.ContactService;
+import com.se1.userservice.domain.model.Contact;
+import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.UserDetail;
+import com.se1.userservice.domain.service.ContactService;
 
 @RestController
 @RequestMapping("/users/internal/contact")

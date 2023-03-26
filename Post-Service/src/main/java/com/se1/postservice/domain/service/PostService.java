@@ -1,6 +1,7 @@
 package com.se1.postservice.domain.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
@@ -16,5 +17,7 @@ public interface PostService {
 	void processSavePost(PostRequest postRequest, UserDetail detail, ApiResponseEntity apiResponseEntity) throws Exception;
 
 	void processFindUserPost(Long id, ApiResponseEntity apiResponseEntity);
+
+	void processFindPost(Map<String, Object> response);
 
 }

@@ -5,24 +5,24 @@ import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.se1.systemservice.model.MailDetail;
-import com.se1.systemservice.service.MailService;
+import com.se1.systemservice.domain.payload.MailDetail;
+import com.se1.systemservice.domain.payload.request.MailRequest;
+import com.se1.systemservice.domain.service.MailService;
 
 @RestController
+@RequestMapping("/system/send-mail")
 public class MailController {
 	@Autowired private MailService emailService;
 	 
     // Sending a simple Email
-    @PostMapping("/sendMail")
-    public String
-    sendMail(@RequestBody MailDetail details)
+    @PostMapping
+    public void sendMail(@RequestBody MailRequest mailRequest)
     {
-        String status
-            = emailService.sendSimpleMail(details);
+        emailService.sendSimpleMail(mailRequest);
  
-        return status;
     }
  
     // Sending email with attachment

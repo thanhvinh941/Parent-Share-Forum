@@ -80,6 +80,28 @@ public class MqConfig {
 		return BindingBuilder.bind(queueNotify()).to(exchangeNotify()).with(NOTIFY_ROUTING_KEY);
 	}
 
+	//SYSTEM
+	public static final String SYSTEM_EXCHANGE = "System-Exchange";
+	public static final String SYSTEM_QUEUE = "System-Queue";
+	public static final String SYSTEM_ROUTING_KEY = "System-Routing-Key";
+    @Bean
+    public Queue queueSystem() {
+        return new Queue(SYSTEM_QUEUE);
+    }
+
+    @Bean
+    public TopicExchange exchangeSystem() {
+        return new TopicExchange(SYSTEM_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingsSystem() {
+        return BindingBuilder
+                .bind(queueSystem())
+                .to(exchangeSystem())
+                .with(SYSTEM_EXCHANGE);
+    }
+	
 	@Bean
 	public MessageConverter jsonMessageConverter() {
 		return new Jackson2JsonMessageConverter();

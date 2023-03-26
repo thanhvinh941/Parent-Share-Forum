@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: notify-service
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://localhost:8071
+

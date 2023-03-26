@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.se1.systemservice.model.UserContactDto;
-import com.se1.systemservice.service.UserContactService;
+import com.se1.systemservice.domain.payload.UserContactDto;
+import com.se1.systemservice.domain.service.UserContactService;
 
 @Controller
 @RequestMapping("/system")

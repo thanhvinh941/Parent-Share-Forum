@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.se1.systemservice.common.utils.CommonUtils;
-import com.se1.systemservice.service.CommonService;
+import com.se1.systemservice.domain.common.utils.CommonUtils;
+import com.se1.systemservice.domain.service.CommonService;
 
 @RestController
 @RequestMapping("/system")

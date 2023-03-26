@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.se1.systemservice.common.utils.CommonUtils;
 import com.se1.systemservice.config.MqConfig;
 import com.se1.systemservice.config.SCMConstant;
 import com.se1.systemservice.config.WebSocketSessionListener;
-import com.se1.systemservice.payload.ChatMqRequest;
-import com.se1.systemservice.payload.ChatRequest;
-import com.se1.systemservice.service.CommonService;
-import com.se1.systemservice.service.UserContactService;
-import com.se1.systemservice.service.WebsocketService;
+import com.se1.systemservice.domain.common.utils.CommonUtils;
+import com.se1.systemservice.domain.payload.ChatMqRequest;
+import com.se1.systemservice.domain.payload.ChatRequest;
+import com.se1.systemservice.domain.service.CommonService;
+import com.se1.systemservice.domain.service.UserContactService;
+import com.se1.systemservice.domain.service.WebsocketService;
 
 import lombok.extern.slf4j.Slf4j;
 

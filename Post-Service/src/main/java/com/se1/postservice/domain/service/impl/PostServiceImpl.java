@@ -1,13 +1,19 @@
 package com.se1.postservice.domain.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.se1.postservice.common.SCMConstant;
+import com.se1.postservice.domain.db.read.RPostMapper;
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.entity.TopicTag;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
@@ -19,6 +25,7 @@ import com.se1.postservice.domain.payload.UserDetail;
 import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.TopicTagRepository;
 import com.se1.postservice.domain.service.PostService;
+import com.se1.postservice.domain.util.CommonUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +38,9 @@ public class PostServiceImpl implements PostService {
 	private final TopicTagService topicTagService;
 	private final TopicTagRepository topicTagRepository;
 	private final ObjectMapper mapper;
+	private final RPostMapper rPostMapper;
+	
+	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 	
 	@Override
 	public List<Post> saveAll(List<Post> records) {
@@ -73,12 +83,9 @@ public class PostServiceImpl implements PostService {
 		Post post = new Post();
 		post.setUserId(userId);
 		post.setTitle(request.getTitle());
-		post.setMetaTitle(request.getMetaTitle());
 		post.setSlug(request.getSlug());
 		post.setSummary(request.getSummary());
-		post.setValidFlag(true);
 		post.setContext(request.getContext());
-		post.setLikeCount(0);
 		post.setHashTag(request.getHashTag());
 		post.setTopicTagId(request.getTopicTagId());
 		post.setCreateAt(new Date());
@@ -91,14 +98,11 @@ public class PostServiceImpl implements PostService {
 	PostDto convertPostEntityToPostDto(Post post, PostUser postUser, PostTopicTag postTopicTag) {
 
 		PostDto postDto = new PostDto();
-		postDto.setId(post.getId());
 		postDto.setUser(postUser);
 		postDto.setTitle(post.getTitle());
-		postDto.setMetaTitle(post.getMetaTitle());
 		postDto.setSlug(post.getSlug());
 		postDto.setSummary(post.getSummary());
 		postDto.setContext(post.getContext());
-		postDto.setLikeCount(post.getLikeCount());
 		postDto.setHashTag(post.getHashTag());
 		postDto.setImageList(post.getImageList());
 		postDto.setTopic(postTopicTag);
@@ -111,4 +115,40 @@ public class PostServiceImpl implements PostService {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void processFindPost(Map<String, Object> response) {
+		String queryStr = generatorQueryAbsolute(response);
+		Object post = rPostMapper.findPost(queryStr);
+		
+	}
+
+	private String generatorQueryAbsolute(Map<String, Object> response) {
+		String query = "";
+		
+		List<String> queryList = response.entrySet().stream().map(res ->{
+			String key = CommonUtil.camelToSnake(res.getKey());
+			Object value = res.getValue();
+			String valueStr = null;
+			String result = null;
+			
+			if(value instanceof List) {
+				List<String> valueInstanceofList = (List<String>) ((List) value).stream().map(v -> CommonUtil.convertObjectToValueSql(v)
+				).collect(Collectors.toList());
+				valueStr += "(";
+				valueStr = String.join(", ", valueInstanceofList);
+				valueStr += ")";
+				result = String.format(" %s in %s ", key, valueStr);
+			}else {
+				valueStr = CommonUtil.convertObjectToValueSql(value);
+				result = String.format(" %s = %s ", key, valueStr);
+			}
+			
+			return result;
+		}).collect(Collectors.toList());
+		
+		query = String.join(" AND ", queryList);
+		return query;
+	}
+
 }

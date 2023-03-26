@@ -16,8 +16,12 @@ public class MqConfig {
     public static final String USER_EXCHANGE = "User-Exchange";
 	public static final String USER_QUEUE = "User-Queue";
 	public static final String USER_ROUTING_KEY = "User-Routing-Key";
-
-    @Bean
+	public static final String SYSTEM_EXCHANGE = "System-Exchange";
+	public static final String SYSTEM_QUEUE = "System-Queue";
+	public static final String SYSTEM_ROUTING_KEY = "System-Routing-Key";
+    
+	// Notification
+	@Bean
     public Queue queueNotification() {
         return new Queue(Notification_QUEUE);
     }
@@ -35,6 +39,7 @@ public class MqConfig {
                 .with(Notification_ROUTING_KEY);
     }
     
+    //USER
     @Bean
     public Queue queueUser() {
         return new Queue(USER_QUEUE);
@@ -51,6 +56,25 @@ public class MqConfig {
                 .bind(queueUser())
                 .to(exchangeUser())
                 .with(USER_ROUTING_KEY);
+    }
+    
+    //SYSTEM
+    @Bean
+    public Queue queueSystem() {
+        return new Queue(SYSTEM_QUEUE);
+    }
+
+    @Bean
+    public TopicExchange exchangeSystem() {
+        return new TopicExchange(SYSTEM_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingsSystem() {
+        return BindingBuilder
+                .bind(queueSystem())
+                .to(exchangeSystem())
+                .with(SYSTEM_EXCHANGE);
     }
 
     @Bean

@@ -21,15 +21,13 @@ public class Post {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 	
 	@Column(nullable = false)
-	private long userId;
+	private Long userId;
 	
 	@Column(nullable = false)
 	private String title;
-	
-	private String metaTitle;
 	
 	@Column(nullable = false)
 	private String slug;
@@ -38,14 +36,11 @@ public class Post {
 	private String summary;
 		
 	@Column(nullable = false)
-	private Boolean validFlag;
+	private Byte status;
 	
 	@Lob
 	@Column(nullable = false)
 	private String context;
-
-	@Column(nullable = false)
-	private long likeCount;
 	
 	@ElementCollection
 	private List<String> imageList;

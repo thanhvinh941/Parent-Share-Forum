@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.se1.systemservice.model.UserContactDto;
-import com.se1.systemservice.service.UserContactService;
+import com.se1.systemservice.domain.payload.UserContactDto;
+import com.se1.systemservice.domain.service.UserContactService;
 
 @RestController
 public class UserContactController {
