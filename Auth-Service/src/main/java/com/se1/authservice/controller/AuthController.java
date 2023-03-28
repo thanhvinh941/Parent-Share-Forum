@@ -1,5 +1,6 @@
 package com.se1.authservice.controller;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import javax.validation.constraints.Email;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +40,7 @@ import com.se1.authservice.model.User;
 import com.se1.authservice.payload.ApiResponseEntity;
 import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.payload.LoginRequest;
+import com.se1.authservice.payload.MailRequest;
 import com.se1.authservice.payload.SignUpRequest;
 import com.se1.authservice.payload.SignUpResponseDto;
 import com.se1.authservice.payload.UserDetail;
@@ -65,6 +69,11 @@ public class AuthController {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	private 
+	
+	@Value("front-end.url.login")
+	String urlFronEnd;
+	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		String email = loginRequest.getEmail();
@@ -100,6 +109,11 @@ public class AuthController {
 
 	}
 
+	@GetMapping("/verify-email")
+	public ResponseEntity<?> verifyEmail(@RequestParam("token") String token){
+		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(urlFronEnd)).build();
+	}
+	
 	@PostMapping("/getUserInfoByToken")
 	public ResponseEntity<?> getUserEmailByToken(@RequestHeader("Authorization") String token) {
 		Boolean isTokenValid = tokenProvider.validateToken(token);
@@ -151,7 +165,10 @@ public class AuthController {
 
 			SignUpResponseDto signUpResponseDto = new SignUpResponseDto();
 			if (result != null) {
-				// TODO SEND verifyEmail
+				MailRequest mailRequest = new MailRequest();
+				mailRequest.setMailTemplate("signup-template");
+				mailRequest.setTo(result.getEmail());
+				
 				signUpResponseDto.setMessage(List.of("Please check your email to login"));
 				signUpResponseDto.setSignUp(true);
 			} else {

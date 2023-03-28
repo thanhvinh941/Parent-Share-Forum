@@ -16,7 +16,7 @@ public class Verification {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer verifiId;
+	private Long id;
 	
 	private Integer userId;
 	

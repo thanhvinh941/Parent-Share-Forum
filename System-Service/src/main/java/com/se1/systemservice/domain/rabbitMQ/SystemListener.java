@@ -9,9 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.systemservice.config.MqConfig;
 import com.se1.systemservice.config.SCMConstant;
-import com.se1.systemservice.domain.payload.NotifycationDto;
-import com.se1.systemservice.domain.payload.RabbitRequest;
 import com.se1.systemservice.domain.payload.dto.ContactDto;
+import com.se1.systemservice.domain.payload.dto.NotifyDto;
+import com.se1.systemservice.domain.rabbitMQ.dto.RabbitRequest;
 import com.se1.systemservice.domain.service.SystemListenerService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +38,10 @@ public class SystemListener {
 			systemListenerService.processActionSystemContact(contactDto);
 			break;
 
+		case SCMConstant.SYSTEM_NOTIFY:
+			NotifyDto notifyDto = new NotifyDto();
+			BeanUtils.copyProperties(rabbitRequest.getData(), notifyDto);
+			systemListenerService.processActionSystemNotify(notifyDto);
 		default:
 			break;
 		}

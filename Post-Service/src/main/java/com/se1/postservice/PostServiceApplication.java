@@ -12,8 +12,4 @@ public class PostServiceApplication {
 		SpringApplication.run(PostServiceApplication.class, args);
 	}
 
-	@Bean
-	RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
 }

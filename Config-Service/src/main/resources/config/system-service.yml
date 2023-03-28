@@ -44,16 +44,27 @@ spring:
     username: admin
     password: Zaq12wsx1234
   mail:
-    host: smtp.gmail.com
-    port: 578
-    username: thanhvinhse94@gmail.com
-    password: ufvyhnljytcdwaxu
+    host: sandbox.smtp.mailtrap.io
+    port: 25
+    username: cd801e2407963a
+    password: 50982137a9c6f2
     properties:
       mail:
         smtp:
           auth: true
           starttls: 
             enable: true
+#  mail:
+#    host: smtp.gmail.com
+#    port: 578
+#    username: thanhvinhse94@gmail.com
+#    password: ufvyhnljytcdwaxu
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls: 
+#            enable: true
 
 management:
   endpoints:

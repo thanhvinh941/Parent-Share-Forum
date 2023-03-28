@@ -10,9 +10,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MqConfig {
-	public static final String Notification_QUEUE = "Notification-Queue";
-    public static final String Notification_EXCHANGE = "Notification-Exchange";
-    public static final String Notification_ROUTING_KEY = "Notification-Routing-Key";
+	public static final String NOTIFY_QUEUE = "Notification-Queue";
+    public static final String NOTIFY_EXCHANGE = "Notification-Exchange";
+    public static final String NOTIFY_ROUTING_KEY = "Notification-Routing-Key";
+    public static final String NOTIFY_CREATE_QUEUE = "Notification-Create-Queue";
+    public static final String NOTIFY_CREATE_ROUTING_KEY = "Notification-Create-Routing-Key";
     public static final String USER_EXCHANGE = "User-Exchange";
 	public static final String USER_QUEUE = "User-Queue";
 	public static final String USER_ROUTING_KEY = "User-Routing-Key";
@@ -20,23 +22,36 @@ public class MqConfig {
 	public static final String SYSTEM_QUEUE = "System-Queue";
 	public static final String SYSTEM_ROUTING_KEY = "System-Routing-Key";
     
-	// Notification
+	// NOTIFY
 	@Bean
-    public Queue queueNotification() {
-        return new Queue(Notification_QUEUE);
+    public Queue queueNOTIFY() {
+        return new Queue(NOTIFY_QUEUE);
     }
 
     @Bean
-    public TopicExchange exchangeNotification() {
-        return new TopicExchange(Notification_EXCHANGE);
+    public TopicExchange exchangeNOTIFY() {
+        return new TopicExchange(NOTIFY_EXCHANGE);
     }
 
     @Bean
-    public Binding bindingsNotification() {
+    public Binding bindingsNOTIFY() {
         return BindingBuilder
-                .bind(queueNotification())
-                .to(exchangeNotification())
-                .with(Notification_ROUTING_KEY);
+                .bind(queueNOTIFY())
+                .to(exchangeNOTIFY())
+                .with(NOTIFY_ROUTING_KEY);
+    }
+    
+    @Bean
+    public Queue queueCreateNotify() {
+        return new Queue(NOTIFY_CREATE_QUEUE);
+    }
+    
+    @Bean
+    public Binding bindingsCreateNotify() {
+        return BindingBuilder
+                .bind(queueCreateNotify())
+                .to(exchangeNOTIFY())
+                .with(NOTIFY_CREATE_ROUTING_KEY);
     }
     
     //USER
@@ -83,7 +98,7 @@ public class MqConfig {
     }
 
     @Bean
-    public AmqpTemplate notificationRabbitTemplate(ConnectionFactory connectionFactory) {
+    public AmqpTemplate notifyRabbitTemplate(ConnectionFactory connectionFactory) {
         final RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter());
         return template;

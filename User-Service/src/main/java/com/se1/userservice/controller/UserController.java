@@ -58,6 +58,7 @@ public class UserController {
 			return this.badResponse(List.of(e.getMessage()));
 		}
 	}
+
 	@PostMapping("/findByEmail")
 	public ResponseEntity<?> findByEmail(@RequestParam("email") String email) throws Exception {
 

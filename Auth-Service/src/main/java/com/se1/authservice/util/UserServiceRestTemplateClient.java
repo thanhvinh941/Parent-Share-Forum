@@ -1,12 +1,8 @@
 package com.se1.authservice.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -39,7 +35,7 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "http://localhost:8088/user/internal/save",
+                        "lb://user-service/user/internal/save",
                         entity,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -57,7 +53,7 @@ public class UserServiceRestTemplateClient {
 
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "http://localhost:8088/user/internal/findByEmail",
+                        "lb://user-service/user/internal/findByEmail",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -75,7 +71,7 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "http://localhost:8088/user/internal/findById",
+                        "lb://user-service/user/internal/findById",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -92,7 +88,7 @@ public class UserServiceRestTemplateClient {
 
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "http://localhost:8088/user/internal/existsByEmail",
+                        "lb://user-service/user/internal/existsByEmail",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

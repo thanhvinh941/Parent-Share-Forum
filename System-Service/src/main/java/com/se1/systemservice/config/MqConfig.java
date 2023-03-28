@@ -13,6 +13,8 @@ public class MqConfig {
 	public static final String NOTIFY_QUEUE = "Notification-Queue";
 	public static final String NOTIFY_EXCHANGE = "Notification-Exchange";
 	public static final String NOTIFY_ROUTING_KEY = "Notification-Routing-Key";
+    public static final String NOTIFY_CREATE_QUEUE = "Notification-Create-Queue";
+    public static final String NOTIFY_CREATE_ROUTING_KEY = "Notification-Create-Routing-Key";
 	public static final String CHAT_QUEUE_CREATE = "Chat-Queue-Create";
 	public static final String CHAT_QUEUE_UPDATE = "Chat-Queue-Create";
 	public static final String CHAT_EXCHANGE = "Chat-Exchange";
@@ -79,7 +81,20 @@ public class MqConfig {
 	public Binding bindingsNotify() {
 		return BindingBuilder.bind(queueNotify()).to(exchangeNotify()).with(NOTIFY_ROUTING_KEY);
 	}
-
+	
+	@Bean
+    public Queue queueCreateNotify() {
+        return new Queue(NOTIFY_CREATE_QUEUE);
+    }
+    
+    @Bean
+    public Binding bindingsCreateNotify() {
+        return BindingBuilder
+                .bind(queueCreateNotify())
+                .to(exchangeNotify())
+                .with(NOTIFY_CREATE_ROUTING_KEY);
+    }
+	
 	//SYSTEM
 	public static final String SYSTEM_EXCHANGE = "System-Exchange";
 	public static final String SYSTEM_QUEUE = "System-Queue";

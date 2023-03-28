@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.se1.systemservice.domain.payload.ChatDto;
 import com.se1.systemservice.domain.payload.ChatRequest;
 import com.se1.systemservice.domain.payload.CommentRequest;
-import com.se1.systemservice.domain.payload.NotifyRequest;
 
 @Service
 public class WebsocketService {
@@ -42,10 +41,6 @@ public class WebsocketService {
 		chatDto.setContent(request.getContent());
 		chatDto.setCreateAt(new Date());
 		simpMessagingTemplate.convertAndSend(USER_TOPIC + topicId , chatDto);
-	}
-	
-	public void sendNotify(String topicId, NotifyRequest request) {
-		
 	}
 	
 	public void sendUser(String topicId, Object request) {

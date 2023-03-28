@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.notifyservice.config.MqConfig;
 import com.se1.notifyservice.config.SCMConstant;
-import com.se1.notifyservice.domain.dto.NotifyDto;
+import com.se1.notifyservice.domain.rabbitMQ.dto.NotifyDtoRequest;
 import com.se1.notifyservice.domain.rabbitMQ.dto.RabbitRequest;
 import com.se1.notifyservice.domain.service.NotifyListenerService;
 
@@ -25,12 +25,12 @@ public class NotifyListener {
 	@Autowired
 	private NotifyListenerService notifyListenerService;
 	
-	@RabbitListener(queues = MqConfig.Notification_QUEUE)
+	@RabbitListener(queues = MqConfig.NOTIFY_QUEUE)
 	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException {
 		log.info("SYSTEM_QUEUE listener message:  {}", objectMapper.writeValueAsString(rabbitRequest));
 		
 		String action = rabbitRequest.getAction();
-		com.se1.notifyservice.domain.rabbitMQ.dto.NotifyDto notifyDto = new com.se1.notifyservice.domain.rabbitMQ.dto.NotifyDto();
+		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		String type = "";
 		switch (action) {
 		case SCMConstant.NOTIFY_CONTACT:
