@@ -11,6 +11,7 @@ import com.se1.systemservice.config.SCMConstant;
 import com.se1.systemservice.domain.payload.dto.ContactDto;
 import com.se1.systemservice.domain.payload.dto.NotifyDto;
 import com.se1.systemservice.domain.payload.dto.UserDetail;
+import com.se1.systemservice.domain.rabbitMQ.dto.ChatDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.NotifyDtoRequest;
 
 @Service
@@ -65,5 +66,9 @@ public class SystemListenerService {
 
 	public void processActionSystemNotify(NotifyDto notifyDto) throws JsonProcessingException {
 		websocketService.sendUser(notifyDto.getUser().getTopicId(), notifyDto);
+	}
+
+	public void processActionSystemChat(ChatDto chatDto) {
+		websocketService.sendMessageChat(chatDto.getTopicId(), chatDto);
 	}
 }

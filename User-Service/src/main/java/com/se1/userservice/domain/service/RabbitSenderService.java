@@ -17,8 +17,8 @@ public class RabbitSenderService {
 		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 	}
 	
-	public void convertAndSendNotify(Object request) {
-		rabbitTemplate.convertAndSend(MqConfig.Notification_EXCHANGE, MqConfig.Notification_ROUTING_KEY, request);
-	}
+//	public void convertAndSendNotify(Object request) {
+//		rabbitTemplate.convertAndSend(MqConfig.Notification_EXCHANGE, MqConfig.Notification_ROUTING_KEY, request);
+//	}
 	
 }

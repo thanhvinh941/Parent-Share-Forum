@@ -47,18 +47,20 @@ public class NotifyListenerService {
 		Long notifyId = mapper.insertNotify(notifyDto);
 		Notify notify = notifyRepository.findById(notifyId).get();
 		
-		RabbitRequest rabbitRequest = new RabbitRequest();
-		rabbitRequest.setAction(SCMConstant.SYSTEM_NOTIFY);
-		rabbitRequest.setData(notify);
-		
+		NotifyResponse notifyResponse = new NotifyResponse();
+		BeanUtils.copyProperties(notify, notifyResponse);
 		NotifyResponse.User user = new User();
 		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findById(notify.getUserId());
 		if (apiResponseEntityResult.getStatus() == 1) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			user = objectMapper.readValue(apiResultStr, NotifyResponse.User.class);
 		}
+		notifyResponse.setUser(user);
 		
-		rabbitTemplate.convertAndSend(MqConfig.NOTIFY_EXCHANGE ,MqConfig.NOTIFY_CREATE_ROUTING_KEY, rabbitRequest);
+		RabbitRequest rabbitRequest = new RabbitRequest();
+		rabbitRequest.setAction(SCMConstant.SYSTEM_NOTIFY);
+		rabbitRequest.setData(notifyResponse);
+		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE ,MqConfig.SYSTEM_ROUTING_KEY, rabbitRequest);
 	}
 
 }

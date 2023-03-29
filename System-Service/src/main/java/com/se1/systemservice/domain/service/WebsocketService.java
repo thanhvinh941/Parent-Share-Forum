@@ -22,14 +22,9 @@ public class WebsocketService {
 	private final String NOTIFY_TOPIC = "/topic/notify";
 	private final String USER_TOPIC = "/topic/user";
 	
-	public void sendMessageChat(String topicId, ChatRequest chatRequest, Long userId) {
-		ChatDto chatDto = new ChatDto();
-		chatDto.setTopicId(topicId);
-		chatDto.setContent(chatRequest.getContent());
-		chatDto.setCreateAt(new Date());
-		chatDto.setUserId(userId);
+	public void sendMessageChat(String topicId, Object request) {
 		
-		simpMessagingTemplate.convertAndSend(CHAT_TOPIC + topicId , chatDto);
+		simpMessagingTemplate.convertAndSend(CHAT_TOPIC + topicId , request);
 	}
 
 	public void sendComment(String topic, CommentRequest commentRequest) {
@@ -44,6 +39,6 @@ public class WebsocketService {
 	}
 	
 	public void sendUser(String topicId, Object request) {
-		
+		simpMessagingTemplate.convertAndSend(USER_TOPIC + topicId , request);
 	}
 }

@@ -1,4 +1,4 @@
-package com.se1.systemservice.config;
+package com.se1.chatservice.config;
 
 public interface SCMConstant {
 

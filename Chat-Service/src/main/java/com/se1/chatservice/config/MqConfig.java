@@ -15,7 +15,10 @@ public class MqConfig {
 	public static final String CHAT_EXCHANGE = "Chat-Exchange";
 	public static final String CHAT_ROUTING_KEY_CREATE = "Chat-Routing-Key-Create";
 	public static final String CHAT_ROUTING_KEY_UPDATE = "Chat-Routing-Key-Update";
-
+	public static final String SYSTEM_EXCHANGE = "System-Exchange";
+	public static final String SYSTEM_QUEUE = "System-Queue";
+	public static final String SYSTEM_ROUTING_KEY = "System-Routing-Key";
+	
 	// -- CHAT ---
 	@Bean
 	public TopicExchange exchangeChat() {
@@ -43,6 +46,24 @@ public class MqConfig {
 	}
 	// -- CHAT ---
 
+	//SYSTEM
+    @Bean
+    public Queue queueSystem() {
+        return new Queue(SYSTEM_QUEUE);
+    }
+
+    @Bean
+    public TopicExchange exchangeSystem() {
+        return new TopicExchange(SYSTEM_EXCHANGE);
+    }
+
+    @Bean
+    public Binding bindingsSystem() {
+        return BindingBuilder
+                .bind(queueSystem())
+                .to(exchangeSystem())
+                .with(SYSTEM_EXCHANGE);
+    }
 	@Bean
 	public MessageConverter jsonMessageConverter() {
 		return new Jackson2JsonMessageConverter();

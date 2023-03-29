@@ -50,7 +50,7 @@ public class WebsocketController {
 	@Autowired
 	private WebSocketSessionListener webSocketSessionListener;
 	
-	@MessageMapping("/chat/{topicId}")
+//	@MessageMapping("/chat/{topicId}")
 	public void sendChat(@RequestHeader(required = false, name = "user_detail") String userDetail,
 			@DestinationVariable String topicId, ChatRequest request) throws Exception {
 		
@@ -82,7 +82,7 @@ public class WebsocketController {
 		
 		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
 
-		websocketService.sendMessageChat(topicId, request, Long.parseLong(userId));
+//		websocketService.sendMessageChat(topicId, request, Long.parseLong(userId));
 	}
 
 	@MessageMapping("/comment/{topicId}")

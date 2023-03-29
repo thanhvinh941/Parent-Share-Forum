@@ -11,6 +11,7 @@ import com.se1.systemservice.config.MqConfig;
 import com.se1.systemservice.config.SCMConstant;
 import com.se1.systemservice.domain.payload.dto.ContactDto;
 import com.se1.systemservice.domain.payload.dto.NotifyDto;
+import com.se1.systemservice.domain.rabbitMQ.dto.ChatDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.RabbitRequest;
 import com.se1.systemservice.domain.service.SystemListenerService;
 
@@ -42,6 +43,15 @@ public class SystemListener {
 			NotifyDto notifyDto = new NotifyDto();
 			BeanUtils.copyProperties(rabbitRequest.getData(), notifyDto);
 			systemListenerService.processActionSystemNotify(notifyDto);
+			break;
+		
+		case SCMConstant.SYSTEM_CHAT:
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(rabbitRequest.getData(), chatDto);
+			systemListenerService.processActionSystemChat(chatDto);
+			break;
+		case SCMConstant.SYSTEM_CHAT_STATUS:
+			break;
 		default:
 			break;
 		}
