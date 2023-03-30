@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class ChatDto {
     private Long id;
-	private User userId;
+	private User user;
 	private String content;
 	private int status;
 	private String topicId;
-	private Long chatParent;
+	private ChatDto chatParent;
 	private Date createAt;
 	private Long userDeleteId;
 	

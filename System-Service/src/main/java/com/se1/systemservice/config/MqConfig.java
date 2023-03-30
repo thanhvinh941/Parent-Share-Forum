@@ -42,7 +42,7 @@ public class MqConfig {
 	
 	@Bean
 	public Binding bindingsChatCreate() {
-		return BindingBuilder.bind(queueChatUpdate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_CREATE);
+		return BindingBuilder.bind(queueChatCreate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_CREATE);
 	}
 	
 	@Bean

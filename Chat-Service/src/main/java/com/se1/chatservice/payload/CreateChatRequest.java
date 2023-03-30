@@ -4,10 +4,8 @@ import lombok.Data;
 
 @Data
 public class CreateChatRequest {
-
 	private String content;
 	private long userId;
 	private String topicId;
 	private Long chatParentId;
-	private boolean isFile;
 }

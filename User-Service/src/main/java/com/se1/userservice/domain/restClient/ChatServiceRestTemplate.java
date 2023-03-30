@@ -1,4 +1,4 @@
-package com.se1.systemservice.domain.restClient;
+package com.se1.userservice.domain.restClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -11,10 +11,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.se1.systemservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.ApiResponseEntity;
 
 @Component
-public class UserServiceRestTemplateClient {
+public class ChatServiceRestTemplate {
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -23,38 +23,37 @@ public class UserServiceRestTemplateClient {
 	ObjectMapper mapper;
 	
 	
-	public Object findById(Long id) {
+	public Object existChat(String topicId) {
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		MultiValueMap<String, Long> map= new LinkedMultiValueMap<String, Long>();
-		map.add("id", id);
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("topicId", topicId);
 
-		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/findById",
+                        "http://localhost:8084/chat/internal/existChat",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
 	}
 	
-public Object updateStatus(Long id, int status) {
+	public Object getNewChat(String topicId) {
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		MultiValueMap<String, Object> map= new LinkedMultiValueMap<String, Object>();
-		map.add("id", id);
-		map.add("status", status);
-		
-		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(map, headers);
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("topicId", topicId);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/updateStatus",
+                        "http://localhost:8084/chat/internal/getNewChat",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

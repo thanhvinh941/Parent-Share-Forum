@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MqConfig {
 	public static final String CHAT_QUEUE_CREATE = "Chat-Queue-Create";
-	public static final String CHAT_QUEUE_UPDATE = "Chat-Queue-Create";
+	public static final String CHAT_QUEUE_UPDATE = "Chat-Queue-Update";
 	public static final String CHAT_EXCHANGE = "Chat-Exchange";
 	public static final String CHAT_ROUTING_KEY_CREATE = "Chat-Routing-Key-Create";
 	public static final String CHAT_ROUTING_KEY_UPDATE = "Chat-Routing-Key-Update";
@@ -37,7 +37,7 @@ public class MqConfig {
 
 	@Bean
 	public Binding bindingsChatCreate() {
-		return BindingBuilder.bind(queueChatUpdate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_CREATE);
+		return BindingBuilder.bind(queueChatCreate()).to(exchangeChat()).with(CHAT_ROUTING_KEY_CREATE);
 	}
 
 	@Bean
@@ -62,7 +62,7 @@ public class MqConfig {
         return BindingBuilder
                 .bind(queueSystem())
                 .to(exchangeSystem())
-                .with(SYSTEM_EXCHANGE);
+                .with(SYSTEM_ROUTING_KEY);
     }
 	@Bean
 	public MessageConverter jsonMessageConverter() {

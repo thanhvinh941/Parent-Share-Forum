@@ -124,6 +124,15 @@ public class UserController {
 		}
 	}
 
+	@PostMapping("/updateStatus")
+	public ResponseEntity<?> updateStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status){
+		try {
+			service.processUpdateStatus(id, status, apiResponseEntity);
+		} catch (Exception e) {
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
 	private User convertUserRequestDtoToNewUserEntity(UserRequestDto userRequestDto) {
 		User user = new User();
 		user.setId(userRequestDto.getId() != null ? userRequestDto.getId() : null);

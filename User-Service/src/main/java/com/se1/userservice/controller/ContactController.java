@@ -20,7 +20,7 @@ import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.service.ContactService;
 
 @RestController
-@RequestMapping("/users/internal/contact")
+@RequestMapping("/contact/external")
 public class ContactController {
 
 	@Autowired
@@ -102,6 +102,38 @@ public class ContactController {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 			contactService.processGetListFriend(userDetail, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
+	@PostMapping("/getListContactRequest")
+	public ResponseEntity<?> getContactRequest(@RequestHeader("user_detail") String userDetailHeader){
+		UserDetail userDetail;
+		try {
+			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+			contactService.processGetContactRequest(userDetail, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
+	@PostMapping("/getListContactForChat")
+	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader){
+		UserDetail userDetail;
+		try {
+			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

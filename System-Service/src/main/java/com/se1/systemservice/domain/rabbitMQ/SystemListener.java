@@ -47,7 +47,7 @@ public class SystemListener {
 		
 		case SCMConstant.SYSTEM_CHAT:
 			ChatDto chatDto = new ChatDto();
-			BeanUtils.copyProperties(rabbitRequest.getData(), chatDto);
+			chatDto = objectMapper.readValue(objectMapper.writeValueAsString(rabbitRequest.getData()), ChatDto.class);
 			systemListenerService.processActionSystemChat(chatDto);
 			break;
 		case SCMConstant.SYSTEM_CHAT_STATUS:

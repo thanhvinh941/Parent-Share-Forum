@@ -35,7 +35,7 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/save",
+                        "http://localhost:8088/user/internal/save",
                         entity,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -53,7 +53,7 @@ public class UserServiceRestTemplateClient {
 
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/findByEmail",
+                        "http://localhost:8088/user/internal/findByEmail",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -71,7 +71,7 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/findById",
+                        "http://localhost:8088/user/internal/findById",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
@@ -88,7 +88,7 @@ public class UserServiceRestTemplateClient {
 
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/existsByEmail",
+                        "http://localhost:8088/user/internal/existsByEmail",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

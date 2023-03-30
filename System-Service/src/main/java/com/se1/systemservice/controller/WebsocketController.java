@@ -50,7 +50,7 @@ public class WebsocketController {
 	@Autowired
 	private WebSocketSessionListener webSocketSessionListener;
 	
-//	@MessageMapping("/chat/{topicId}")
+	@MessageMapping("/chat/{topicId}")
 	public void sendChat(@RequestHeader(required = false, name = "user_detail") String userDetail,
 			@DestinationVariable String topicId, ChatRequest request) throws Exception {
 		

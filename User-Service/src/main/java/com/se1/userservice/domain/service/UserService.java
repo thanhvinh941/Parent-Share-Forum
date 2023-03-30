@@ -300,4 +300,9 @@ public class UserService {
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
+
+	public void processUpdateStatus(Long id, Integer status, ApiResponseEntity apiResponseEntity) {
+		// TODO Auto-generated method stub
+		
+	}
 }

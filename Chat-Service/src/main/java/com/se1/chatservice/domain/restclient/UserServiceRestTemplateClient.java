@@ -35,7 +35,7 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/findById",
+                        "http://localhost:8088/user/internal/findById",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

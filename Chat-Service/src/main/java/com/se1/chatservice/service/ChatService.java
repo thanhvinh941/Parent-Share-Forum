@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.chatservice.config.MqConfig;
 import com.se1.chatservice.config.SCMConstant;
 import com.se1.chatservice.domain.common.CommonUtils;
+import com.se1.chatservice.domain.db.read.RChatMapper;
 import com.se1.chatservice.domain.db.write.WChatMapper;
 import com.se1.chatservice.domain.restclient.UserServiceRestTemplateClient;
 import com.se1.chatservice.model.Chat;
@@ -24,6 +27,7 @@ import com.se1.chatservice.payload.ApiResponseEntity;
 import com.se1.chatservice.payload.ChatDto;
 import com.se1.chatservice.payload.ChatDto.User;
 import com.se1.chatservice.payload.CreateChatRequest;
+import com.se1.chatservice.payload.GetAllChatRequest;
 import com.se1.chatservice.payload.RabbitRequest;
 import com.se1.chatservice.payload.UpdateChatRequest;
 import com.se1.chatservice.repository.ChatRepository;
@@ -42,46 +46,30 @@ public class ChatService {
 	private final RabbitTemplate rabbitTemplate;
 	private final ObjectMapper objectMapper;
 	private final UserServiceRestTemplateClient restTemplateClient;
+	private final RChatMapper rChatMapper;
 	
-	public void processCreate(CreateChatRequest chatRequest, ApiResponseEntity apiResponseEntity) throws JsonProcessingException {
+	public void processCreate(CreateChatRequest chatRequest) throws JsonProcessingException {
 		log.info("processCreate ");
 		Chat chat = new Chat();
 		chat.setChatParent(chatRequest.getChatParentId());
 		chat.setUserId(chatRequest.getUserId());
 		chat.setCreateAt(new Date());
-		chat.setStatus(1);
+		chat.setStatus(0);
 		chat.setTopicId(chatRequest.getTopicId());
-		
-		String content = chatRequest.getContent();
-		String contentToMQ = content;
-		if (chatRequest.isFile()) {
-			String[] contentArray = content.split(",");
-
-			String imageName = CommonUtils.getFileName(contentArray[0].split("/")[1]);
-			byte[] imageByte = Base64.getDecoder().decode(contentArray[1].trim());
-			InputStream inputStream = new ByteArrayInputStream(imageByte);
-
-			contentToMQ = imageName;
-			//TODO CALL API STORE FILE
-//			commonService.saveFile("/chat", imageName, inputStream);
-		}
-		chat.setContent(contentToMQ);
+		chat.setContent(chatRequest.getContent());
 		
 		Chat chatNew = chatRepository.save(chat);
-		apiResponseEntity.setData(true);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-		
-		
 		ChatDto chatDto = new ChatDto();
 		BeanUtils.copyProperties(chatNew, chatDto);
-		ChatDto.User user = new User();
-		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findById(chatNew.getUserId());
-		if (apiResponseEntityResult.getStatus() == 1) {
-			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
-			user = objectMapper.readValue(apiResultStr, ChatDto.User.class);
+		chatDto.setUser(getUSerChat(chatNew.getUserId()));
+		
+		if(chatRequest.getChatParentId() != null) {
+			Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
+			ChatDto chatParentDto = new ChatDto();
+			BeanUtils.copyProperties(chatParent, chatParentDto);
+			chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
+			chatDto.setChatParent(chatParentDto);
 		}
-		chatDto.setUserId(user);
 		
 		RabbitRequest request = new RabbitRequest();
 		request.setAction(SCMConstant.SYSTEM_CHAT);
@@ -89,7 +77,7 @@ public class ChatService {
 		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 	}
 
-	public void processChangeStatus(UpdateChatRequest chatRequest, ApiResponseEntity apiResponseEntity) {
+	public void processChangeStatus(UpdateChatRequest chatRequest) {
 		log.info("processChangeStatus ");
 		int action = 0;
 		Long userId = null;
@@ -108,12 +96,6 @@ public class ChatService {
 
 		Long chatId = chatMapper.updateStatus(chatRequest.getId(), action, content, userId);
 		Chat updateChat = chatRepository.findById(chatId).get();
-		if(chatId > 0) {
-			apiResponseEntity.setData(true);
-			apiResponseEntity.setErrorList(null);
-			apiResponseEntity.setStatus(1);
-		}
-		
 		Map<String, Object> chatStatus = new HashMap<>();
 		chatStatus.put("chatId", chatId);
 		chatStatus.put("chatStatus", action);
@@ -123,6 +105,83 @@ public class ChatService {
 		request.setAction(SCMConstant.SYSTEM_CHAT_STATUS);
 		request.setData(chatStatus);
 		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
+	}
+
+	public void processExistChat(String topicId, ApiResponseEntity apiResponseEntity) {
+		boolean isExist = chatRepository.existsByTopicId(topicId);
+		apiResponseEntity.setData(isExist);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	public void processGetNewChat(String topicId, ApiResponseEntity apiResponseEntity) {
+		List<Chat> newChatList = chatRepository.findNewChat(topicId);
+		List<ChatDto> listChatResponse = newChatList.stream().map(c->{
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(c, chatDto);
+			chatDto.setUser(getUSerChat(c.getUserId()));
+			if(c.getChatParent() != null) {
+				Chat chatParent = chatRepository.findById(c.getChatParent()).get();
+				ChatDto chatParentDto = new ChatDto();
+				BeanUtils.copyProperties(chatParent, chatParentDto);
+				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
+				chatDto.setChatParent(chatParentDto);
+			}
+			
+			return chatDto;
+		}).collect(Collectors.toList());
+		
+		apiResponseEntity.setData(listChatResponse);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+	
+	private ChatDto.User getUSerChat(Long userId) {
+		ChatDto.User userChatParent = new User();
+		ApiResponseEntity userChatParentResult = (ApiResponseEntity) restTemplateClient.findById(userId);
+		if (userChatParentResult.getStatus() == 1) {
+			String apiResultStr;
+			try {
+				apiResultStr = objectMapper.writeValueAsString(userChatParentResult.getData());
+				userChatParent = objectMapper.readValue(apiResultStr, ChatDto.User.class);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return userChatParent;
+	}
+
+	public void processUpdateStatus(List<Long> chatIds, ApiResponseEntity apiResponseEntity) throws Exception {
+		List<Integer> update = chatRepository.updateStatusChat(chatIds);
+		if(update != null && update.size() > 0) {
+			apiResponseEntity.setData(true);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}else {
+			throw new Exception("update false");
+		}
+	}
+
+	public void processGetAllChat(GetAllChatRequest request, ApiResponseEntity apiResponseEntity) {
+		List<Chat> listChat = rChatMapper.getAllChat(request.getTopicId(), request.getLimit(), request.getOffset());
+		List<ChatDto> listChatResponse = listChat.stream().map(c->{
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(c, chatDto);
+			chatDto.setUser(getUSerChat(c.getUserId()));
+			if(c.getChatParent() != null) {
+				Chat chatParent = chatRepository.findById(c.getChatParent()).get();
+				ChatDto chatParentDto = new ChatDto();
+				BeanUtils.copyProperties(chatParent, chatParentDto);
+				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
+				chatDto.setChatParent(chatParentDto);
+			}
+			
+			return chatDto;
+		}).collect(Collectors.toList());
+		
+		apiResponseEntity.setData(listChatResponse);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 
 }
