@@ -26,24 +26,11 @@ public class GetPostResponseDto {
 	private User user;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Date publishAt;
-	private List<Comment> comment;
 	
 	@Data
 	public class TopicTag {
 		private long id;
 		private String name;
-	}
-
-	@Data
-	public class Comment {
-		private long id;
-		private String text;
-		private long likeCount;
-		private long disLikeCount;
-		private long commentChildCount;
-		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-		private Date createAt;
-		private User User;
 	}
 
 	@Data

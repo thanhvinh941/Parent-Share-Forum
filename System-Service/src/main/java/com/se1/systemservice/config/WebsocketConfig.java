@@ -1,25 +1,35 @@
 package com.se1.systemservice.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.kurento.client.KurentoClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
-@Configuration
-@EnableWebSocketMessageBroker
-public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+public class WebsocketConfig implements WebSocketConfigurer {
 
-	@Override
-	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app")
-				.enableSimpleBroker("/topic")
-			;
-		;
+	@Bean
+	public CallHandler callHandler() {
+		return new CallHandler();
+	}
+
+	@Bean
+	public KurentoClient kurentoClient() {
+		return KurentoClient.create();
+	}
+
+	@Bean
+	public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
+		ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+		container.setMaxTextMessageBufferSize(32768);
+		return container;
 	}
 
 	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
+	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+		registry.addHandler(callHandler(), "/call");
 	}
+
 }

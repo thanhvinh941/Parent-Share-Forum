@@ -1,5 +1,6 @@
 package com.se1.authservice.controller;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,10 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +40,7 @@ import com.se1.authservice.model.User;
 import com.se1.authservice.payload.ApiResponseEntity;
 import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.payload.LoginRequest;
+import com.se1.authservice.payload.MailRequest;
 import com.se1.authservice.payload.SignUpRequest;
 import com.se1.authservice.payload.SignUpResponseDto;
 import com.se1.authservice.payload.UserDetail;
@@ -60,36 +65,40 @@ public class AuthController {
 
 	@Autowired
 	ApiResponseEntity apiResponseEntity;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
+
+	private 
+	
+	@Value("front-end.url.login")
+	String urlFronEnd;
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		String email = loginRequest.getEmail();
-		String password = loginRequest.getPassword();
-		
 		try {
-			
+
 			User user = service.findByEmail(email).orElse(null);
-			if(user != null && user.getProvider() != AuthProvider.local) {
+			if (user != null && user.getProvider() != AuthProvider.local) {
 				return this.badResponse(List.of("User not login local with email : " + email));
 			}
-			
-			if(user == null) {
+
+			if (user == null) {
 				return this.badResponse(List.of("User not found with email : " + email));
 			}
-			
+
 			try {
 				Authentication authentication = authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-				
+
 				SecurityContextHolder.getContext().setAuthentication(authentication);
-				
+
 				UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-				
-				UserDetail userDetail = new UserDetail(user.getId(), user.getName(), user.getImageUrl(), user.getRole());
-				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail(),userDetail);
+
+				UserDetail userDetail = new UserDetail();
+				BeanUtils.copyProperties(user, userDetail);
+				AuthResponse authResponse = tokenProvider.createToken(userPrincipal.getEmail(), userDetail);
 				return this.okResponse(authResponse);
 			} catch (Exception e) {
 				return this.badResponse(List.of("Password not correst"));
@@ -100,68 +109,69 @@ public class AuthController {
 
 	}
 
-
+	@GetMapping("/verify-email")
+	public ResponseEntity<?> verifyEmail(@RequestParam("token") String token){
+		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(urlFronEnd)).build();
+	}
+	
 	@PostMapping("/getUserInfoByToken")
 	public ResponseEntity<?> getUserEmailByToken(@RequestHeader("Authorization") String token) {
 		Boolean isTokenValid = tokenProvider.validateToken(token);
-		if(!isTokenValid) {
+		if (!isTokenValid) {
 			return this.badResponse(List.of("token not valid"));
 		}
-		
+
 		String userEmail = tokenProvider.getUserEmailFromToken(token);
 		User user;
 		try {
 			user = service.findByEmail(userEmail).orElse(null);
-			if(user == null) {
+			if (user == null) {
 				return this.badResponse(List.of("User not found"));
 			}
-			UserResponseDto userResponseDto = new UserResponseDto();
-			userResponseDto.setEmail(user.getEmail());
-			userResponseDto.setId(user.getId());
-			userResponseDto.setName(user.getName());
-			userResponseDto.setImageUrl(user.getImageUrl());
-			userResponseDto.setEmailVerified(user.getEmailVerified());
-			userResponseDto.setRole(user.getRole());
-			
-			return this.okResponse(userResponseDto);
+			UserDetail userDetail = new UserDetail();
+			BeanUtils.copyProperties(user, userDetail);
+			return this.okResponse(userDetail);
 		} catch (JsonProcessingException e) {
 			return this.badResponse(List.of(e.getMessage()));
 		}
-		
+
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) throws JsonProcessingException {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest)
+			throws JsonProcessingException {
 
 		List<String> errors = new ArrayList<>();
 
 		errors = this.validRequest(signUpRequest, errors);
-		
-		if(errors.size() > 0) {
+
+		if (errors.size() > 0) {
 			return this.badResponse(errors);
 		}
-		
-        if(service.existsByEmail(signUpRequest.getEmail())) {
-        	return this.badResponse(List.of("Email address already in use."));
-        }
 
+		if (service.existsByEmail(signUpRequest.getEmail())) {
+			return this.badResponse(List.of("Email address already in use."));
+		}
 
 		User user = new User();
 		user.setName(signUpRequest.getName());
 		user.setEmail(signUpRequest.getEmail());
 		user.setPassword(signUpRequest.getPassword());
 		user.setProvider(AuthProvider.local);
-
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
 		try {
 			User result = service.save(user);
-			
+
 			SignUpResponseDto signUpResponseDto = new SignUpResponseDto();
-			if(result != null) {
+			if (result != null) {
+				MailRequest mailRequest = new MailRequest();
+				mailRequest.setMailTemplate("signup-template");
+				mailRequest.setTo(result.getEmail());
+				
 				signUpResponseDto.setMessage(List.of("Please check your email to login"));
 				signUpResponseDto.setSignUp(true);
-			}else {
+			} else {
 				signUpResponseDto.setMessage(List.of("Signup fail"));
 				signUpResponseDto.setSignUp(false);
 			}
@@ -176,26 +186,26 @@ public class AuthController {
 	}
 
 	private List<String> validRequest(@Valid SignUpRequest signUpRequest, List<String> errors) {
-		
-		//TODO check email
-		//TODO check name
-		//TODO chech password
-		
-		if(!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
+
+		// TODO check email
+		// TODO check name
+		// TODO chech password
+
+		if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
 			errors.add("ConfirmPassword not work");
 		}
-		
+
 		return errors;
 	}
 
-	private ResponseEntity<?> badResponse(List<String> errorMessage){
+	private ResponseEntity<?> badResponse(List<String> errorMessage) {
 		apiResponseEntity.setData(null);
 		apiResponseEntity.setErrorList(errorMessage);
 		apiResponseEntity.setStatus(0);
 		return ResponseEntity.badRequest().body(apiResponseEntity);
 	}
-	
-	private ResponseEntity<?> okResponse(Object data){
+
+	private ResponseEntity<?> okResponse(Object data) {
 		apiResponseEntity.setData(data);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);

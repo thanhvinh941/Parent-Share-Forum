@@ -4,8 +4,19 @@
 
 	<update id="updateTopicTag">
 		
-		Update db02.topic_tag ${condition}
-		
+		Update topic_tag 
+		Set 
+		<if test="topicTag.tagName != null">
+			tag_name = #{topicTag.tagName}
+		</if>
+		<if test="topicTag.color != null">
+			color = #{topicTag.color}
+		</if>
+		<if test="topicTag.delFlg != null">
+			del_flg = #{topicTag.delFlg}
+		</if>
+		user_update = #{topicTag.userUpdate}
+		update_at = #{topicTag.updateAt}
 	</update>
 
 </mapper>

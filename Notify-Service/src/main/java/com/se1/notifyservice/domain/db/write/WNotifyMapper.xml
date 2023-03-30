@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.notifyservice.domain.db.write.WNotifyMapper">
+
+	<insert id="insertNotify">
+		INSERT INTO notify (user_id, param, type, value, del_flg, create_at)
+		VALUES ( 
+			#{notify.userId}, 
+			#{notify.param}, 
+			#{notify.type}, 
+			#{notify.value}, 
+			0,
+			0,
+			NOW()
+		)
+	</insert>
+
+</mapper>

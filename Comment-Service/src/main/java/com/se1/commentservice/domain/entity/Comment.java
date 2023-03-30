@@ -1,12 +1,14 @@
 package com.se1.commentservice.domain.entity;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -16,24 +18,24 @@ public class Comment {
  
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer commentId;
+	private Long id;
 	
 	@Column(nullable = false)
-	private String commentContent;
+	private String content;
 	
 	@Column(nullable = false)
-	private Integer memberId;
+	private Long userId;
 	
 	@Column(nullable = false)
-	private Integer postId;
+	private Long postId;
 	
 	@Column(nullable = false)
-	private Timestamp commentAt;
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	private Date createAt;
+
+	private Long comemntParentId;
 	
 	@Column(nullable = false)
-	private Integer commentParentId;
-	
-	@Column(nullable = false)
-	private Byte validFlg;
+	private boolean delFlg;
 	
 }

@@ -23,7 +23,7 @@ public class Like {
 	private Integer id;
 	
 	@Column(nullable = false)
-	private Integer postId;
+	private Integer commentId;
 	
 	@Column(nullable = false)
 	private Integer userId;

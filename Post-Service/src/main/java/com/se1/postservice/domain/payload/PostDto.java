@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class PostDto {
 	private Integer id;
-	private Integer userId;
+	private PostUser user;
 	private String userName;
 	private String title;
 	private String metaTitle;
@@ -16,12 +16,23 @@ public class PostDto {
 	private String context;
 	private long likeCount;
 	private String hashTag;
-	private PostTopicTagDto topicTag;
+	private PostTopicTag topic;
 	private List<String> imageList;
 	
 	@Data
-	public class PostTopicTagDto {
+	public class PostTopicTag {
 		private Integer id;
 		private String topicTagName;
+		private String color;
+	}
+	
+	@Data
+	public class PostUser{
+		private Long id;
+		private String name;
+		private String imageUrl;
+		private boolean isExpert;
+		private Double rating;
+		private Byte status;
 	}
 }

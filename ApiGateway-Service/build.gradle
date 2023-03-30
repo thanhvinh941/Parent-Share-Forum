@@ -30,6 +30,7 @@ implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix:2
   implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
   testImplementation 'io.projectreactor:reactor-test'
 }
 

@@ -27,7 +27,7 @@ public class TopicTag {
 	private String color;
 
 	@Column(nullable = false)
-	private Boolean validFlag;
+	private Byte delFlg;
 	
 	@Column(nullable = false)
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -37,4 +37,9 @@ public class TopicTag {
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date updateAt;
 
+	@Column(nullable = false)
+	private String userCreate;
+	
+	@Column(nullable = false)
+	private String userUpdate;
 }
