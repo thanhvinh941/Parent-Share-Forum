@@ -4,19 +4,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.common.SCMConstant;
 import com.se1.postservice.domain.db.read.RPostMapper;
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.entity.TopicTag;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
+import com.se1.postservice.domain.payload.GetPostResponseDto;
+import com.se1.postservice.domain.payload.GetPostResponseDto.User;
 import com.se1.postservice.domain.payload.PostDto;
 import com.se1.postservice.domain.payload.PostDto.PostTopicTag;
 import com.se1.postservice.domain.payload.PostDto.PostUser;
@@ -26,6 +29,7 @@ import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.TopicTagRepository;
 import com.se1.postservice.domain.service.PostService;
 import com.se1.postservice.domain.util.CommonUtil;
+import com.se1.postservice.domain.util.UserServiceRestTemplateClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,10 +39,10 @@ import lombok.RequiredArgsConstructor;
 public class PostServiceImpl implements PostService {
 
 	private final PostRepository postRepository;
-	private final TopicTagService topicTagService;
 	private final TopicTagRepository topicTagRepository;
-	private final ObjectMapper mapper;
 	private final RPostMapper rPostMapper;
+	private final ObjectMapper objectMapper;
+	private final UserServiceRestTemplateClient restTemplateClient;
 	
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 	
@@ -69,6 +73,9 @@ public class PostServiceImpl implements PostService {
 
 		try {
 			postRepository.save(postRegist);
+			apiResponseEntity.setData(true);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
@@ -81,30 +88,21 @@ public class PostServiceImpl implements PostService {
 
 	Post convertPostRequestToPostEntity(PostRequest request, long userId, String userName) {
 		Post post = new Post();
-		post.setUserId(userId);
-		post.setTitle(request.getTitle());
-		post.setSlug(request.getSlug());
-		post.setSummary(request.getSummary());
-		post.setContext(request.getContext());
-		post.setHashTag(request.getHashTag());
-		post.setTopicTagId(request.getTopicTagId());
+		BeanUtils.copyProperties(request, post);
+		post.setTitle(request.getSummary());
+		post.setSlug(CommonUtil.camelToSnake(request.getSummary()));
 		post.setCreateAt(new Date());
 		post.setUpdateAt(new Date());
-		post.setImageList(request.getImageList());
-
+		post.setUserId(userId);
+		post.setStatus(1);
 		return post;
 	}
 
 	PostDto convertPostEntityToPostDto(Post post, PostUser postUser, PostTopicTag postTopicTag) {
 
 		PostDto postDto = new PostDto();
+		BeanUtils.copyProperties(post, postDto);
 		postDto.setUser(postUser);
-		postDto.setTitle(post.getTitle());
-		postDto.setSlug(post.getSlug());
-		postDto.setSummary(post.getSummary());
-		postDto.setContext(post.getContext());
-		postDto.setHashTag(post.getHashTag());
-		postDto.setImageList(post.getImageList());
 		postDto.setTopic(postTopicTag);
 
 		return postDto;
@@ -151,4 +149,62 @@ public class PostServiceImpl implements PostService {
 		return query;
 	}
 
+	@Override
+	public void processGetByTitle(String title, UserDetail detail, ApiResponseEntity apiResponseEntity) {
+		List<Post> posts = postRepository.findByTitleContaining(title);
+		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p->{
+			Long postId = p.getId();
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(getTopicTag(p.getTopicTagId()));
+			postResponseDto.setLikeCount(likeCountPost(postId));
+			postResponseDto.setDisLikeCount(disLikeCount(postId));
+			postResponseDto.setCommentCount(commentCount(postId));
+			postResponseDto.setShareCount(shareCount(postId));
+			
+			return postResponseDto;
+		}).collect(Collectors.toList());
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	private GetPostResponseDto.User getUSerPost(Long userId) {
+		GetPostResponseDto.User user = new User();
+		ApiResponseEntity userResult = (ApiResponseEntity) restTemplateClient.findById(userId);
+		if (userResult.getStatus() == 1) {
+			String apiResultStr;
+			try {
+				apiResultStr = objectMapper.writeValueAsString(userResult.getData());
+				user = objectMapper.readValue(apiResultStr, GetPostResponseDto.User.class);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return user;
+	}
+	
+	private GetPostResponseDto.TopicTag getTopicTag(Integer topicTagId){
+		TopicTag tag = topicTagRepository.findById(topicTagId).get();
+		GetPostResponseDto.TopicTag result = new com.se1.postservice.domain.payload.GetPostResponseDto.TopicTag();
+		BeanUtils.copyProperties(tag, result);
+		return result;
+	}
+	
+	private long likeCountPost(Long postId) {
+		return 0;
+	}
+	
+	private long commentCount(Long postId) {
+		return 0;
+	}
+	
+	private long disLikeCount(Long postId) {
+		return 0;
+	}
+	
+	private long shareCount(Long postId) {
+		return 0;
+	}
 }

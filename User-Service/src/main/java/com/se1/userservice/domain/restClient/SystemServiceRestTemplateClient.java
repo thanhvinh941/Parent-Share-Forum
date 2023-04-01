@@ -35,7 +35,7 @@ public class SystemServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://system-service/system/send-mail",
+                        "http://localhost:8081/system/send-mail",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

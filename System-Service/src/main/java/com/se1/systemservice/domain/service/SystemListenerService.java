@@ -30,19 +30,18 @@ public class SystemListenerService {
 		int status = data.getStatus();
 		UserDetail userReciver = data.getUserReciver();
 		UserDetail userSender = data.getUserSender();
+		String type = "contact";
 		switch (status) {
 		case 1: // Request Friend
-			NotifyDtoRequest notifyRequestFriend = generatorNotifyDto(userSender, userReciver, data.getTopicId(), status);
+			NotifyDtoRequest notifyRequestFriend = generatorNotifyDto(userSender, userReciver, data.getTopicId(), status, type);
 			
 			rabbitSenderService.convertAndSendNotify(notifyRequestFriend);
-//			websocketService.sendUser(userReciver.getTopicId(), data);
 			break;
 		case 0: // Unfiend
 		case 2: // Accept Friend
-			NotifyDtoRequest notifyUnfiendOrAcceptFriend = generatorNotifyDto(userReciver, userSender,data.getTopicId(), status);
+			NotifyDtoRequest notifyUnfiendOrAcceptFriend = generatorNotifyDto(userReciver, userSender,data.getTopicId(), status, type);
 			
 			rabbitSenderService.convertAndSendNotify(notifyUnfiendOrAcceptFriend);
-//			websocketService.sendUser(userSender.getTopicId(), data);
 			break;
 		default:
 			break;
@@ -50,7 +49,7 @@ public class SystemListenerService {
 		
 	}
 
-	private NotifyDtoRequest generatorNotifyDto(UserDetail userFrom, UserDetail userTo, String TopicId, int status) throws JsonProcessingException {
+	private NotifyDtoRequest generatorNotifyDto(UserDetail userFrom, UserDetail userTo, String TopicId, int status, String type) throws JsonProcessingException {
 		String notifyUserValue = String.format("userSender=%s", objectMapper.writeValueAsString(userFrom));
 		String notifyActionValue = String.format("action=%s", SCMConstant.getContactActionByStatus(status));
 		String notifyContactParam = String.format("topicId=%s", TopicId);
@@ -60,6 +59,7 @@ public class SystemListenerService {
 		notifyDto.setUserId(userTo.getId());
 		notifyDto.setParam(String.join("&", List.of(notifyStatusParam, notifyContactParam)));
 		notifyDto.setValue(String.join("&", List.of(notifyUserValue, notifyActionValue)));
+		notifyDto.setType(type);
 		
 		return notifyDto;
 	}

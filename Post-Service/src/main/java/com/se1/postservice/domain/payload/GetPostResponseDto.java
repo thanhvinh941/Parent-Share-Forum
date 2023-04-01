@@ -12,35 +12,37 @@ public class GetPostResponseDto {
 
 	private long id;
 	private String title;
-	private String metaTitle;
 	private String slug;
 	private String summary;
 	private String context;
+	private String hashTag;
+	private List<String> imageList;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+	private Date createAt;
 	private long likeCount;
 	private long disLikeCount;
 	private long commentCount;
 	private long shareCount;
-	private String hashTag;
-	private List<String> imageList;
+	
 	private TopicTag topicTag;
 	private User user;
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-	private Date publishAt;
-	
 	@Data
-	public class TopicTag {
+	public static class TopicTag {
 		private long id;
-		private String name;
+		private String color;
+		private String tagName;
 	}
 
 	@Data
-	public class User {
-		private long id;
-		private String name;
+	public static class User {
+		private Long id;
 		private String email;
+		private String name;
 		private String imageUrl;
+		private String role;
 		private Boolean isExpert;
-		private Double ratingCount;
+		private Double rating;
+		private int status;
 		private String topicId;
 	}
 }

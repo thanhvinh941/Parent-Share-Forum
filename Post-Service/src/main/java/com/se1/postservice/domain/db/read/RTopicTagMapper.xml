@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.postservice.domain.db.read.RTopicTagMapper">
+
+	<resultMap type="com.se1.postservice.domain.payload.dto.TopicTagResponse" id="ResultMap">
+		<result column="id" jdbcType="INTEGER" javaType="java.lang.Integer" property="id"/>
+		<result column="tag_name" jdbcType="VARCHAR" javaType="java.lang.String" property="tagName"/>
+		<result column="color" jdbcType="VARCHAR" javaType="java.lang.String" property="color"/>
+		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt"/>
+		<result column="user_create" jdbcType="VARCHAR" javaType="java.lang.String" property="userCreate"/>
+	</resultMap>
+
+	<select id="findAllByName" resultMap="ResultMap" parameterType="String">
+		SELECT * FROM topic_tag where tag_name like '%' #{tagName} '%'
+	</select>
+</mapper>

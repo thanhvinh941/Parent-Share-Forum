@@ -36,7 +36,7 @@ public class Post {
 	private String summary;
 		
 	@Column(nullable = false)
-	private Byte status;
+	private int status;
 	
 	@Lob
 	@Column(nullable = false)

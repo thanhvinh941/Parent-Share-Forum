@@ -34,7 +34,7 @@ public class ContactController {
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createContact(@RequestParam("reciver_id") long userReciverId,
-			@RequestParam("action") String action, @RequestHeader("user_detail") String userDetailHeader) {
+			@RequestParam(name = "action", required = false) String action, @RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			int status = 0;
