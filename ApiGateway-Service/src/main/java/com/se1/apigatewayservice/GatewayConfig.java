@@ -40,7 +40,7 @@ public class GatewayConfig {
                         .uri("lb://post-service"))
                 .route("topic-tag-service", r -> r.path("/topic-tag/**")
                         .filters(f -> f.filter(filter))
-                        .uri("lb://topic-tag-service"))
+                        .uri("lb://post-service"))
                 .route("comment-service", r -> r.path("/commet/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://post-service"))

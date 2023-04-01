@@ -26,23 +26,8 @@ public class NotifyListener {
 	private NotifyListenerService notifyListenerService;
 	
 	@RabbitListener(queues = MqConfig.NOTIFY_QUEUE)
-	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException {
-		log.info("SYSTEM_QUEUE listener message:  {}", objectMapper.writeValueAsString(rabbitRequest));
-		
-		String action = rabbitRequest.getAction();
-		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
-		String type = "";
-		switch (action) {
-		case SCMConstant.NOTIFY_CONTACT:
-			BeanUtils.copyProperties(rabbitRequest.getData(), notifyDto);
-			type = SCMConstant.NOTIFY_CONTACT;
-			break;
-
-		
-		default:
-			break;
-		}
-		
-		notifyListenerService.processNotify(type, notifyDto);
+	public void listener(NotifyDtoRequest notifyDtoRequest) throws JsonProcessingException {
+		log.info("NOTIFY_QUEUE listener message:  {}", objectMapper.writeValueAsString(notifyDtoRequest));
+		notifyListenerService.processNotify(notifyDtoRequest);
 	}
 }

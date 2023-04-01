@@ -35,13 +35,13 @@ public class SystemListener {
 		switch (action) {
 		case SCMConstant.SYSTEM_CONTACT:
 			ContactDto contactDto = new ContactDto();
-			BeanUtils.copyProperties(rabbitRequest.getData(), contactDto);
+			contactDto = objectMapper.readValue(objectMapper.writeValueAsString(rabbitRequest.getData()), ContactDto.class);
 			systemListenerService.processActionSystemContact(contactDto);
 			break;
 
 		case SCMConstant.SYSTEM_NOTIFY:
 			NotifyDto notifyDto = new NotifyDto();
-			BeanUtils.copyProperties(rabbitRequest.getData(), notifyDto);
+			notifyDto = objectMapper.readValue(objectMapper.writeValueAsString(rabbitRequest.getData()), NotifyDto.class);
 			systemListenerService.processActionSystemNotify(notifyDto);
 			break;
 		

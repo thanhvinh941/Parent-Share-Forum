@@ -7,4 +7,5 @@ public class NotifyDtoRequest {
 	private Long userId;
 	private String param;
 	private String value;
+	private String type;
 }

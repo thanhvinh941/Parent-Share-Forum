@@ -20,4 +20,6 @@ public interface PostService {
 
 	void processFindPost(Map<String, Object> response);
 
+	void processGetByTitle(String title, UserDetail detail, ApiResponseEntity apiResponseEntity);
+
 }

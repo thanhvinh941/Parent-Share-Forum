@@ -1,5 +1,7 @@
 package com.se1.notifyservice.domain.service;
 
+import java.util.Date;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +11,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.notifyservice.config.MqConfig;
 import com.se1.notifyservice.config.SCMConstant;
-import com.se1.notifyservice.domain.db.write.WNotifyMapper;
-import com.se1.notifyservice.domain.dto.NotifyDto;
 import com.se1.notifyservice.domain.model.Notify;
 import com.se1.notifyservice.domain.payload.ApiResponseEntity;
 import com.se1.notifyservice.domain.payload.NotifyResponse;
 import com.se1.notifyservice.domain.payload.NotifyResponse.User;
-import com.se1.notifyservice.domain.payload.UserDetail;
 import com.se1.notifyservice.domain.rabbitMQ.dto.NotifyDtoRequest;
 import com.se1.notifyservice.domain.rabbitMQ.dto.RabbitRequest;
 import com.se1.notifyservice.domain.repository.NotifyRepository;
@@ -24,9 +23,6 @@ import com.se1.notifyservice.domain.restclient.UserServiceRestTemplateClient;
 @Service
 public class NotifyListenerService {
 
-	@Autowired
-	private WNotifyMapper mapper;
-	
 	@Autowired
 	private NotifyRepository notifyRepository;
 	
@@ -39,18 +35,17 @@ public class NotifyListenerService {
 	@Autowired
 	private UserServiceRestTemplateClient restTemplateClient;
 	
-	public void processNotify(String type, NotifyDtoRequest notifyDtoRequest) throws JsonProcessingException {
-		NotifyDto notifyDto = new NotifyDto();
-		BeanUtils.copyProperties(notifyDtoRequest, notifyDto);
-		notifyDto.setType(type);
-		
-		Long notifyId = mapper.insertNotify(notifyDto);
-		Notify notify = notifyRepository.findById(notifyId).get();
+	public void processNotify(NotifyDtoRequest notifyDtoRequest) throws JsonProcessingException {
+		Notify notify = new Notify();
+		BeanUtils.copyProperties(notifyDtoRequest, notify);
+		notify.setDelFlg(new Byte("0"));
+		notify.setCreateAt(new Date());
+		Notify notifySave = notifyRepository.save(notify);
 		
 		NotifyResponse notifyResponse = new NotifyResponse();
-		BeanUtils.copyProperties(notify, notifyResponse);
+		BeanUtils.copyProperties(notifySave, notifyResponse);
 		NotifyResponse.User user = new User();
-		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findById(notify.getUserId());
+		ApiResponseEntity apiResponseEntityResult = (ApiResponseEntity) restTemplateClient.findById(notifySave.getUserId());
 		if (apiResponseEntityResult.getStatus() == 1) {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			user = objectMapper.readValue(apiResultStr, NotifyResponse.User.class);
@@ -61,6 +56,7 @@ public class NotifyListenerService {
 		rabbitRequest.setAction(SCMConstant.SYSTEM_NOTIFY);
 		rabbitRequest.setData(notifyResponse);
 		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE ,MqConfig.SYSTEM_ROUTING_KEY, rabbitRequest);
+	
 	}
 
 }
