@@ -1,4 +1,4 @@
-package com.se1.systemservice.domain.restClient;
+package com.se1.systemservice.domain.restclient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;

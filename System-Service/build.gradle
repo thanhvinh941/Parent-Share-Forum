@@ -22,8 +22,6 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-mail'    
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -32,16 +30,6 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	
-	// https://mvnrepository.com/artifact/org.webjars/webjars-locator
-	implementation 'org.webjars:webjars-locator:0.32'
-
-	implementation 'org.webjars.bower:demo-console:1.5.1'
-	implementation 'org.webjars.bower:ekko-lightbox:5.2.0'
-	implementation 'org.webjars.bower:webrtc-adapter:6.4.0'
-
-	implementation 'org.kurento:kurento-client:6.18.0'
-    implementation 'org.kurento:kurento-utils-js:6.18.0'
-
   	testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     
