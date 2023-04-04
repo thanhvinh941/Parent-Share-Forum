@@ -6,7 +6,7 @@ gradle wrapper
 
 gradle bootjar 
 
-cd build\libs
+cd build/libs
 
 java -jar Config-Service-0.0.1-SNAPSHOT.jar
               

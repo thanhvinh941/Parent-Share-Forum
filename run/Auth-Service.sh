@@ -6,6 +6,6 @@ gradle wrapper
 
 gradle bootjar 
 
-cd build\libs
+cd build/libs
 
-java -jar JarFile/Auth-Service-0.0.1-SNAPSHOT.jar
+java -jar Auth-Service-0.0.1-SNAPSHOT.jar
