@@ -139,10 +139,7 @@ public class ContactService {
 	public void processGetListFriend(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
 
-		Map<Integer, List<ContactDto>> mapResult = new HashMap<>();
-		mapResult.put(2, getContactResponse(userId));
-
-		apiResponseEntity.setData(mapResult);
+		apiResponseEntity.setData(getContactResponse(userId));
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
@@ -259,6 +256,12 @@ public class ContactService {
 		}).collect(Collectors.toList());
 
 		return contactResponses;
+	}
+
+	public void processGetListContact(Long userId, ApiResponseEntity apiResponseEntity) {
+		apiResponseEntity.setData(getContactResponse(userId));
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 
 }

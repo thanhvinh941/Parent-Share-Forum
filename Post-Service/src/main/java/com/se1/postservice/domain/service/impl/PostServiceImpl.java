@@ -1,9 +1,11 @@
 package com.se1.postservice.domain.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -18,6 +20,7 @@ import com.se1.postservice.domain.db.read.RPostMapper;
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.entity.TopicTag;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
+import com.se1.postservice.domain.payload.ContactDto;
 import com.se1.postservice.domain.payload.GetPostResponseDto;
 import com.se1.postservice.domain.payload.GetPostResponseDto.User;
 import com.se1.postservice.domain.payload.PostDto;
@@ -46,10 +49,10 @@ public class PostServiceImpl implements PostService {
 	
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 	
-	@Override
-	public List<Post> saveAll(List<Post> records) {
-		return postRepository.saveAll(records);
-	}
+//	@Override
+//	public List<Post> saveAll(List<Post> records) {
+//		return postRepository.saveAll(records);
+//	}
 
 	@Override
 	public Post save(Post post) {
@@ -206,5 +209,90 @@ public class PostServiceImpl implements PostService {
 	
 	private long shareCount(Long postId) {
 		return 0;
+	}
+
+	@Override
+	public void processGetAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity) {
+		List<Post> posts = postRepository.findByUserId(detail.getId());
+		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p->{
+			Long postId = p.getId();
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(getTopicTag(p.getTopicTagId()));
+			postResponseDto.setLikeCount(likeCountPost(postId));
+			postResponseDto.setDisLikeCount(disLikeCount(postId));
+			postResponseDto.setCommentCount(commentCount(postId));
+			postResponseDto.setShareCount(shareCount(postId));
+			
+			return postResponseDto;
+		}).collect(Collectors.toList());
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	@Override
+	public void findPostById(Long postId, ApiResponseEntity apiResponseEntity) throws Exception {
+		Optional<Post> post = postRepository.findById(postId);
+		if(post.isEmpty()) {
+			throw new Exception("Bài viết không tồn tại");
+		}else {
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(post.get(), postResponseDto);
+			postResponseDto.setUser(getUSerPost(post.get().getUserId()));
+			postResponseDto.setTopicTag(getTopicTag(post.get().getTopicTagId()));
+			postResponseDto.setLikeCount(likeCountPost(postId));
+			postResponseDto.setDisLikeCount(disLikeCount(postId));
+			postResponseDto.setCommentCount(commentCount(postId));
+			postResponseDto.setShareCount(shareCount(postId));
+			
+			apiResponseEntity.setData(postResponseDto);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}
+	}
+	
+//	Comparator.comparing(Post::getCreateAt,(p1,p2)->{
+//		return p1.after(p2);
+//		}
+//)
+
+	@Override
+	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+		Long userId = userDetail.getId();
+		Calendar cal = Calendar.getInstance();
+		
+		int date= Calendar.DAY_OF_MONTH;
+		int month = Calendar.MONTH;
+		int year = Calendar.YEAR;
+		
+		int targetDay = date - 3;
+		int targetMonth = month;
+		int targetYear = year;
+		if(targetDay <= 0) {
+			targetMonth = targetMonth - 1;
+		}
+		if(targetMonth <= 0) {
+			targetYear = targetYear - 1;
+		}
+		
+		cal.set(targetYear, targetMonth, targetDay);
+		
+		Date limitDate = cal.getTime();
+		List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
+		List<Long> userFriendId = contactDtos.stream().map(c->c.getUserFriend().getId()).collect(Collectors.toList());
+		List<Post> listPostFriend = postRepository.findAllByIdWithCondition(userFriendId, limitDate);
+		
+//		List<Sub>
+//				.stream()
+//				.sorted(
+//						Comparator.comparing(Post::getCreateAt,(p1,p2)->{
+//							return p1.compareTo(p2);
+//						})
+//						).collect(Collectors.toList());
+		
+//		List<>
+		
 	}
 }

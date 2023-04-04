@@ -23,14 +23,6 @@ services:
       RABBITMQ_DEFAULT_PASS: "Zaq12wsx1234"
     networks:
       - parent-share-forum
-  kurento:
-    image: kurento/kurento-media-server
-    container_name: kurento
-    restart: always
-    ports:
-      - "8888:8888"
-    networks:
-      - parent-share-forum
 networks:
   parent-share-forum:
     driver: bridge

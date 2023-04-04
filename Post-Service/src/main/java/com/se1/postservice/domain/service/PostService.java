@@ -10,7 +10,7 @@ import com.se1.postservice.domain.payload.UserDetail;
 
 public interface PostService {
 
-	List<Post> saveAll(List<Post> request);
+//	List<Post> saveAll(List<Post> request);
 
 	Post save(Post post);
 
@@ -21,5 +21,11 @@ public interface PostService {
 	void processFindPost(Map<String, Object> response);
 
 	void processGetByTitle(String title, UserDetail detail, ApiResponseEntity apiResponseEntity);
+
+	void processGetAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity);
+
+	void findPostById(Long postId, ApiResponseEntity apiResponseEntity) throws Exception;
+
+	void findAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity);
 
 }

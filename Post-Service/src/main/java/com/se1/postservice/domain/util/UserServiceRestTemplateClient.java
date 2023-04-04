@@ -1,5 +1,7 @@
 package com.se1.postservice.domain.util;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
+import com.se1.postservice.domain.payload.ContactDto;
 
 @Component
 public class UserServiceRestTemplateClient {
@@ -39,6 +42,23 @@ public class UserServiceRestTemplateClient {
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
+	}
+	
+	public List<ContactDto> getListFriend(Long id){
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, Long> map= new LinkedMultiValueMap<String, Long>();
+		map.add("id", id);
+
+		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
+		
+		ResponseEntity<?> restExchange =
+                restTemplate.postForEntity(
+                        "http://localhost:8088/contact/internal/getListContact",
+                        request,
+                        ApiResponseEntity.class);
+        return (List<ContactDto>) restExchange.getBody();
 	}
 
 }
