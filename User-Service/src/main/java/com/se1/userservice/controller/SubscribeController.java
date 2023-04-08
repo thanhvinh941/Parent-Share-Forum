@@ -30,7 +30,7 @@ public class SubscribeController {
 	@Autowired
 	private SubscribeService subscribeService;
 	
-	@PostMapping("subscribe")
+	@PostMapping("/subscribe")
 	public ResponseEntity<?> doSub(@RequestParam("expert_id")Long expertid, @RequestHeader("user_detail") String userDetailHeader) throws JsonMappingException, JsonProcessingException{
 		
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);

@@ -34,18 +34,19 @@ public class ContactController {
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createContact(@RequestParam("reciver_id") long userReciverId,
-			@RequestParam(name = "action", required = false) String action, @RequestHeader("user_detail") String userDetailHeader) {
+			@RequestParam(name = "action", required = false) String action,
+			@RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			int status = 0;
 			switch (action) {
-			case SCMConstant.CONTACT_REQUEST:
-				status = 1;
-				break;
-			default:
-				break;
+				case SCMConstant.CONTACT_REQUEST:
+					status = 1;
+					break;
+				default:
+					break;
 			}
-			
+
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 			Contact contactCreate = new Contact();
 			contactCreate.setStatus(status);
@@ -65,7 +66,8 @@ public class ContactController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<?> updateContact(@RequestParam("id") long userId, @RequestParam("action") String action,
+	public ResponseEntity<?> updateContact(@RequestParam("id") long userId,
+			@RequestParam(name = "action", required = false) String action,
 			@RequestHeader("user_detail") String userDetailHeader) {
 		// 0: unfriend, 1:request, 2:friend
 		UserDetail userDetail;
@@ -73,18 +75,19 @@ public class ContactController {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 			int statusUpdate = 0;
+			long userReciverId = 0;
+			long userSenderId = 0;
 			switch (action) {
-			case SCMConstant.CONTACT_FRIEND:
-				statusUpdate = 2;
-				break;
-			case SCMConstant.CONTACT_REQUEST:
-				statusUpdate = 1;
-				break;
-			default:
-				break;
+				case SCMConstant.CONTACT_FRIEND:
+					statusUpdate = 2;
+					userReciverId = userDetail.getId();
+					userSenderId = userId;
+					break;
+				default:
+					break;
 			}
 
-			contactService.processUpdate(userId, userDetail.getId(), statusUpdate, apiResponseEntity);
+			contactService.processUpdate(userReciverId, userSenderId, statusUpdate, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -93,10 +96,9 @@ public class ContactController {
 
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
-	
-	
+
 	@PostMapping("/getListFriend")
-	public ResponseEntity<?> getListFriend(@RequestHeader("user_detail") String userDetailHeader){
+	public ResponseEntity<?> getListFriend(@RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -107,12 +109,12 @@ public class ContactController {
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
 			apiResponseEntity.setStatus(0);
 		}
-		
+
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
-	
+
 	@PostMapping("/getListContactRequest")
-	public ResponseEntity<?> getContactRequest(@RequestHeader("user_detail") String userDetailHeader){
+	public ResponseEntity<?> getContactRequest(@RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -123,12 +125,12 @@ public class ContactController {
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
 			apiResponseEntity.setStatus(0);
 		}
-		
+
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
-	
+
 	@PostMapping("/getListContactForChat")
-	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader){
+	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -139,7 +141,7 @@ public class ContactController {
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
 			apiResponseEntity.setStatus(0);
 		}
-		
+
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 }

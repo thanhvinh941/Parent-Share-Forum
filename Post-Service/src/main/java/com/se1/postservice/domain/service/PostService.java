@@ -3,6 +3,8 @@ package com.se1.postservice.domain.service;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.PostRequest;
@@ -26,6 +28,6 @@ public interface PostService {
 
 	void findPostById(Long postId, ApiResponseEntity apiResponseEntity) throws Exception;
 
-	void findAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity);
+	void findAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity, int offset) throws JsonMappingException, JsonProcessingException;
 
 }

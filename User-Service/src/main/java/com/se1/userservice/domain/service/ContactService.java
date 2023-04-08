@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -30,6 +32,7 @@ import com.se1.userservice.domain.repository.ContactRepository;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.ChatServiceRestTemplate;
 
+@Transactional
 @Service
 public class ContactService {
 
@@ -93,18 +96,15 @@ public class ContactService {
 		Contact oldContact = contactRepository.findByUserReciverIdAndUserSenderId(userId, userLoginId);
 
 		if (oldContact != null) {
-			long userReciverId = oldContact.getUserReciverId();
-			long userSenderId = oldContact.getUserSenderId();
-
 			validStatus(oldContact.getStatus(), statusUpdate);
 
-			long contactId = contactRepository.updateContact(userReciverId, userSenderId, statusUpdate);
+			contactRepository.updateContact(oldContact.getId(), statusUpdate);
 
-			Contact contactUpdate = contactRepository.findById(contactId).orElse(null);
+			Contact contactUpdate = contactRepository.findById(oldContact.getId()).orElse(null);
 
 			if (contactUpdate != null) {
 
-				// Send to system
+//				// Send to system
 				RabbitRequest rabbitResponse = new RabbitRequest();
 				rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
 				rabbitResponse.setData(contactUpdate);

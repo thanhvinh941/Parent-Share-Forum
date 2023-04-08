@@ -5,4 +5,63 @@
 	<select id="findPost">
 		SELECT * FROM post ${query} 
 	</select>
+
+	<resultMap id="post_result" type="com.se1.postservice.domain.db.dto.PostDto">
+		<result column="id" jdbcType="BIGINT" javaType="java.lang.Long" property="id" />
+		<result column="user_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userId" />
+		<result column="title" jdbcType="VARCHAR" javaType="java.lang.String" property="title" />
+		<result column="summary" jdbcType="VARCHAR" javaType="java.lang.String" property="summary" />
+		<result column="status" jdbcType="INTEGER" javaType="java.lang.Integer" property="status" />
+		<result column="context" jdbcType="LONGNVARCHAR" javaType="java.lang.String" property="context" />
+		<result column="image_list" jdbcType="VARCHAR" javaType="java.lang.String" property="imageList" />
+		<result column="hashTag" jdbcType="VARCHAR" javaType="java.lang.String" property="hashTag" />
+		<result column="topic_tag_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="topicTagId" />
+		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
+		<result column="update_at" jdbcType="DATE" javaType="java.util.Date" property="updateAt" />
+		<result column="like_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="likeCount" />
+		<result column="dislike_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="dislikeCount" />
+		<result column="comment_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="commentCount" />
+		<result column="share_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="shareCount" />
+	</resultMap>
+
+	<select id="findAllByIdWithCondition" resultMap="post_result">
+		SELECT 
+		    *,
+		    (SELECT GROUP_CONCAT(image_list SEPARATOR ', ')
+		        FROM
+		            post_image_list
+		        WHERE
+		            post_id = p.id
+		        GROUP BY post_id) AS image_list,
+		    (SELECT 
+		            COUNT(pl.user_id)
+		        FROM
+		            db02.post_like pl
+		        WHERE
+		            pl.status = 1
+		        GROUP BY post_id) AS like_count,
+		    (SELECT 
+		            COUNT(pl.user_id)
+		        FROM
+		            db02.post_like pl
+		        WHERE
+		            pl.status = 0
+		        GROUP BY post_id) AS dislike_count,
+		    (SELECT 
+		            COUNT(id)
+		        FROM
+		            db02.comment cm
+		        WHERE
+		            cm.del_flg = 0
+		        GROUP BY post_id) AS comment_count
+		FROM
+		    post p
+		WHERE
+		    p.user_id IN (${userIds})
+		        AND p.create_at >= DATE_ADD(CURDATE(), INTERVAL - 3 DAY)
+		        AND p.delflg = 0 
+		        AND p.status = 1
+		ORDER BY p.create_at DESC
+		LIMIT 10 OFFSET #{offset}
+	</select>
 </mapper>

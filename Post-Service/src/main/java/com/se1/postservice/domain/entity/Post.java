@@ -30,9 +30,6 @@ public class Post {
 	private String title;
 	
 	@Column(nullable = false)
-	private String slug;
-
-	@Column(nullable = false)
 	private String summary;
 		
 	@Column(nullable = false)
@@ -58,4 +55,6 @@ public class Post {
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date updateAt;
 	
+	@Column(nullable = false)
+	private int delFLg;
 }

@@ -27,6 +27,8 @@ public class SubscribeService {
 
 	public void processDoSub(Long expertid, UserDetail userDetail, ApiResponseEntity apiResponseEntity)
 			throws Exception {
+		
+		//TODO check expert
 		Subscribe subscribe = new Subscribe();
 		subscribe.setCreateAt(new Date());
 		subscribe.setUserExpertId(expertid);

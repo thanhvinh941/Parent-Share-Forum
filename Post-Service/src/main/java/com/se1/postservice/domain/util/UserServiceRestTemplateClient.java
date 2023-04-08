@@ -12,9 +12,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.ContactDto;
+import com.se1.postservice.domain.payload.SubscribeDto;
 
 @Component
 public class UserServiceRestTemplateClient {
@@ -44,7 +47,7 @@ public class UserServiceRestTemplateClient {
         return restExchange.getBody();
 	}
 	
-	public List<ContactDto> getListFriend(Long id){
+	public List<ContactDto> getListFriend(Long id) throws JsonMappingException, JsonProcessingException{
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -58,7 +61,24 @@ public class UserServiceRestTemplateClient {
                         "http://localhost:8088/contact/internal/getListContact",
                         request,
                         ApiResponseEntity.class);
-        return (List<ContactDto>) restExchange.getBody();
+        return mapper.readValue(mapper.writeValueAsString(restExchange.getBody()), List.class);
+	}
+
+	public List<SubscribeDto> getAllExpertSubscribe(Long userId) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, Long> map= new LinkedMultiValueMap<String, Long>();
+		map.add("id", userId);
+
+		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
+		
+		ResponseEntity<?> restExchange =
+                restTemplate.postForEntity(
+                        "http://localhost:8088/subscriber/internal/getAllExpertSubscribe",
+                        request,
+                        ApiResponseEntity.class);
+        return (List<SubscribeDto>) restExchange.getBody();
 	}
 
 }

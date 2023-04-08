@@ -2,6 +2,7 @@ package com.se1.userservice.domain.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -22,8 +23,9 @@ public interface ContactRepository extends CrudRepository<Contact, Long> {
 	@Query("SELECT c FROM Contact c WHERE c.userSenderId = ?1")
 	List<Contact> findByUserSenderId(Long userSenderId);
 
-	@Query("UPDATE Contact c SET c.status = ?3 WHERE c.userReciverId = ?1 AND c.userSenderId = ?2")
-	long updateContact(long userReciverId, long userSenderId, int statusUpdate);
+	@Modifying
+	@Query("UPDATE Contact c SET c.status = ?2 WHERE c.id = ?1")
+	void updateContact(Long contactId, int statusUpdate);
 
 	@Query("SELECT c FROM Contact c WHERE c.userSenderId = :userId OR c.userReciverId = :userId AND (:status is null or c.status = :status)")
 	List<Contact> findByUserId(@Param("userId") Long userId, @Param("status") Integer status);

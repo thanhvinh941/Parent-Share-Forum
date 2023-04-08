@@ -1,6 +1,7 @@
 package com.se1.postservice.domain.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.common.SCMConstant;
 import com.se1.postservice.domain.db.read.RPostMapper;
@@ -27,6 +29,7 @@ import com.se1.postservice.domain.payload.PostDto;
 import com.se1.postservice.domain.payload.PostDto.PostTopicTag;
 import com.se1.postservice.domain.payload.PostDto.PostUser;
 import com.se1.postservice.domain.payload.PostRequest;
+import com.se1.postservice.domain.payload.SubscribeDto;
 import com.se1.postservice.domain.payload.UserDetail;
 import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.TopicTagRepository;
@@ -46,9 +49,9 @@ public class PostServiceImpl implements PostService {
 	private final RPostMapper rPostMapper;
 	private final ObjectMapper objectMapper;
 	private final UserServiceRestTemplateClient restTemplateClient;
-	
+
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
-	
+
 //	@Override
 //	public List<Post> saveAll(List<Post> records) {
 //		return postRepository.saveAll(records);
@@ -60,7 +63,8 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public void processSavePost(PostRequest request, UserDetail detail, ApiResponseEntity apiResponseEntity) throws Exception {
+	public void processSavePost(PostRequest request, UserDetail detail, ApiResponseEntity apiResponseEntity)
+			throws Exception {
 		long userId = detail.getId();
 		String userName = detail.getName();
 
@@ -82,7 +86,7 @@ public class PostServiceImpl implements PostService {
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
-		
+
 	}
 
 	private void validation(PostRequest request) {
@@ -93,7 +97,6 @@ public class PostServiceImpl implements PostService {
 		Post post = new Post();
 		BeanUtils.copyProperties(request, post);
 		post.setTitle(request.getSummary());
-		post.setSlug(CommonUtil.camelToSnake(request.getSummary()));
 		post.setCreateAt(new Date());
 		post.setUpdateAt(new Date());
 		post.setUserId(userId);
@@ -114,40 +117,40 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void processFindUserPost(Long id, ApiResponseEntity apiResponseEntity) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void processFindPost(Map<String, Object> response) {
 		String queryStr = generatorQueryAbsolute(response);
 		Object post = rPostMapper.findPost(queryStr);
-		
+
 	}
 
 	private String generatorQueryAbsolute(Map<String, Object> response) {
 		String query = "";
-		
-		List<String> queryList = response.entrySet().stream().map(res ->{
+
+		List<String> queryList = response.entrySet().stream().map(res -> {
 			String key = CommonUtil.camelToSnake(res.getKey());
 			Object value = res.getValue();
 			String valueStr = null;
 			String result = null;
-			
-			if(value instanceof List) {
-				List<String> valueInstanceofList = (List<String>) ((List) value).stream().map(v -> CommonUtil.convertObjectToValueSql(v)
-				).collect(Collectors.toList());
+
+			if (value instanceof List) {
+				List<String> valueInstanceofList = (List<String>) ((List) value).stream()
+						.map(v -> CommonUtil.convertObjectToValueSql(v)).collect(Collectors.toList());
 				valueStr += "(";
 				valueStr = String.join(", ", valueInstanceofList);
 				valueStr += ")";
 				result = String.format(" %s in %s ", key, valueStr);
-			}else {
+			} else {
 				valueStr = CommonUtil.convertObjectToValueSql(value);
 				result = String.format(" %s = %s ", key, valueStr);
 			}
-			
+
 			return result;
 		}).collect(Collectors.toList());
-		
+
 		query = String.join(" AND ", queryList);
 		return query;
 	}
@@ -155,7 +158,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void processGetByTitle(String title, UserDetail detail, ApiResponseEntity apiResponseEntity) {
 		List<Post> posts = postRepository.findByTitleContaining(title);
-		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p->{
+		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p -> {
 			Long postId = p.getId();
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(p, postResponseDto);
@@ -165,7 +168,7 @@ public class PostServiceImpl implements PostService {
 			postResponseDto.setDisLikeCount(disLikeCount(postId));
 			postResponseDto.setCommentCount(commentCount(postId));
 			postResponseDto.setShareCount(shareCount(postId));
-			
+
 			return postResponseDto;
 		}).collect(Collectors.toList());
 		apiResponseEntity.setData(getPostResponseDtos);
@@ -187,26 +190,37 @@ public class PostServiceImpl implements PostService {
 		}
 		return user;
 	}
-	
-	private GetPostResponseDto.TopicTag getTopicTag(Integer topicTagId){
+
+	private GetPostResponseDto.TopicTag getTopicTag(Integer topicTagId) {
 		TopicTag tag = topicTagRepository.findById(topicTagId).get();
 		GetPostResponseDto.TopicTag result = new com.se1.postservice.domain.payload.GetPostResponseDto.TopicTag();
 		BeanUtils.copyProperties(tag, result);
 		return result;
 	}
 	
+	private List<GetPostResponseDto.TopicTag> getTopicTag(List<Integer> topicTagId) {
+		List<TopicTag> tagList = (List<TopicTag>) topicTagRepository.findAllById(topicTagId);
+		List<GetPostResponseDto.TopicTag> resultList = tagList.stream().map(tag->{
+			
+			GetPostResponseDto.TopicTag result = new com.se1.postservice.domain.payload.GetPostResponseDto.TopicTag();
+			BeanUtils.copyProperties(tag, result);
+			return result;
+		}).collect(Collectors.toList());
+		return resultList;
+	}
+
 	private long likeCountPost(Long postId) {
 		return 0;
 	}
-	
+
 	private long commentCount(Long postId) {
 		return 0;
 	}
-	
+
 	private long disLikeCount(Long postId) {
 		return 0;
 	}
-	
+
 	private long shareCount(Long postId) {
 		return 0;
 	}
@@ -214,7 +228,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void processGetAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity) {
 		List<Post> posts = postRepository.findByUserId(detail.getId());
-		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p->{
+		List<GetPostResponseDto> getPostResponseDtos = posts.stream().map(p -> {
 			Long postId = p.getId();
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(p, postResponseDto);
@@ -224,7 +238,7 @@ public class PostServiceImpl implements PostService {
 			postResponseDto.setDisLikeCount(disLikeCount(postId));
 			postResponseDto.setCommentCount(commentCount(postId));
 			postResponseDto.setShareCount(shareCount(postId));
-			
+
 			return postResponseDto;
 		}).collect(Collectors.toList());
 		apiResponseEntity.setData(getPostResponseDtos);
@@ -235,9 +249,9 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void findPostById(Long postId, ApiResponseEntity apiResponseEntity) throws Exception {
 		Optional<Post> post = postRepository.findById(postId);
-		if(post.isEmpty()) {
+		if (post.isEmpty()) {
 			throw new Exception("Bài viết không tồn tại");
-		}else {
+		} else {
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(post.get(), postResponseDto);
 			postResponseDto.setUser(getUSerPost(post.get().getUserId()));
@@ -246,53 +260,46 @@ public class PostServiceImpl implements PostService {
 			postResponseDto.setDisLikeCount(disLikeCount(postId));
 			postResponseDto.setCommentCount(commentCount(postId));
 			postResponseDto.setShareCount(shareCount(postId));
-			
+
 			apiResponseEntity.setData(postResponseDto);
 			apiResponseEntity.setErrorList(null);
 			apiResponseEntity.setStatus(1);
 		}
 	}
-	
+
 //	Comparator.comparing(Post::getCreateAt,(p1,p2)->{
 //		return p1.after(p2);
 //		}
 //)
 
 	@Override
-	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity, int offset) throws JsonMappingException, JsonProcessingException {
 		Long userId = userDetail.getId();
-		Calendar cal = Calendar.getInstance();
-		
-		int date= Calendar.DAY_OF_MONTH;
-		int month = Calendar.MONTH;
-		int year = Calendar.YEAR;
-		
-		int targetDay = date - 3;
-		int targetMonth = month;
-		int targetYear = year;
-		if(targetDay <= 0) {
-			targetMonth = targetMonth - 1;
-		}
-		if(targetMonth <= 0) {
-			targetYear = targetYear - 1;
-		}
-		
-		cal.set(targetYear, targetMonth, targetDay);
-		
-		Date limitDate = cal.getTime();
 		List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
-		List<Long> userFriendId = contactDtos.stream().map(c->c.getUserFriend().getId()).collect(Collectors.toList());
-		List<Post> listPostFriend = postRepository.findAllByIdWithCondition(userFriendId, limitDate);
-		
-//		List<Sub>
-//				.stream()
-//				.sorted(
-//						Comparator.comparing(Post::getCreateAt,(p1,p2)->{
-//							return p1.compareTo(p2);
-//						})
-//						).collect(Collectors.toList());
-		
-//		List<>
-		
+		List<SubscribeDto> subscribeDtos = restTemplateClient.getAllExpertSubscribe(userId);
+		List<Long> userFriendId = contactDtos.stream().map(c -> c.getUserFriend().getId()).collect(Collectors.toList());
+		List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpertId().getId())
+				.collect(Collectors.toList());
+		List<Long> allIdUserId = new ArrayList<>(userFriendId);
+		allIdUserId.addAll(listExpertId);
+
+		String userIds = String.join(", ",
+				allIdUserId.stream().distinct().map(id -> id.toString()).collect(Collectors.toList()));
+
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllByIdWithCondition(userIds, offset*10);
+		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
+		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p->{
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(listTopicTagResponse.stream().filter(t-> p.getTopicTagId().equals(t.getId())).findFirst().get());
+
+			return postResponseDto;
+		}).collect(Collectors.toList());
+
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 }

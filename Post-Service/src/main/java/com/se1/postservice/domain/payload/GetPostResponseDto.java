@@ -28,7 +28,7 @@ public class GetPostResponseDto {
 	private User user;
 	@Data
 	public static class TopicTag {
-		private long id;
+		private Integer id;
 		private String color;
 		private String tagName;
 	}

@@ -20,7 +20,7 @@ public class WebsocketService {
 	private final String CONTACT_TOPIC = "/topic/contact";
 	private final String COMMENT_TOPIC = "/topic/comment";
 	private final String NOTIFY_TOPIC = "/topic/notify";
-	private final String USER_TOPIC = "/topic/user";
+	private final String USER_TOPIC = "/topic/user/";
 	
 	public void sendMessageChat(String topicId, Object request) {
 		
