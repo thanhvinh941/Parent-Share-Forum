@@ -1,6 +1,8 @@
 package com.se1.systemservice.domain.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,15 +52,16 @@ public class SystemListenerService {
 	}
 
 	private NotifyDtoRequest generatorNotifyDto(UserDetail userFrom, UserDetail userTo, String TopicId, int status, String type) throws JsonProcessingException {
-		String notifyUserValue = String.format("userSender=%s", objectMapper.writeValueAsString(userFrom));
-		String notifyActionValue = String.format("action=%s", SCMConstant.getContactActionByStatus(status));
+		Map<String, Object> notifyValue = new HashMap<>();
+		notifyValue.put("userSender", objectMapper.writeValueAsString(userFrom));
+		notifyValue.put("action", SCMConstant.getContactActionByStatus(status));
 		String notifyContactParam = String.format("topicId=%s", TopicId);
 		String notifyStatusParam = String.format("status=%d", status);
 		
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		notifyDto.setUserId(userTo.getId());
 		notifyDto.setParam(String.join("&", List.of(notifyStatusParam, notifyContactParam)));
-		notifyDto.setValue(String.join("&", List.of(notifyUserValue, notifyActionValue)));
+		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
 		notifyDto.setType(type);
 		
 		return notifyDto;
