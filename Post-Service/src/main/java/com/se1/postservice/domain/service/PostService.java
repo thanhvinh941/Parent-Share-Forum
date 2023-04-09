@@ -30,4 +30,6 @@ public interface PostService {
 
 	void findAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity, int offset) throws JsonMappingException, JsonProcessingException;
 
+	void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset);
+
 }

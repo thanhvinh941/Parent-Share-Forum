@@ -17,13 +17,18 @@ public interface SCMConstant {
 	public static final String SYSTEM_NOTIFY = "notify";
 	public static final String USER_UPDATE_STATUS = "update-status";
 
+	// Notify action
+	public static final String SUBSCRIBER = "subscribed";
+	public static final String POST = "post";
+	public static final String COMMENT = "comment";
+	
+	// USER TOPIC ACTION
+	public static final String CHAT = "new-message";
+	
 	public static String getContactActionByStatus(int status) {
 		String action = "";
 
 		switch (status) {
-		case 0:
-			action = "unfiend";
-			break;
 		case 1:
 			action = "request-friend";
 			break;
@@ -36,4 +41,5 @@ public interface SCMConstant {
 
 		return action;
 	}
+	
 }

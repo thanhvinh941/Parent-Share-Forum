@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class PostRequest {
 	private String title;
-	private String summary;
 	private String context;
 	private String hashTag;
 	private Integer topicTagId;

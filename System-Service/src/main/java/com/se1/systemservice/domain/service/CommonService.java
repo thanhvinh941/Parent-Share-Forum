@@ -15,8 +15,8 @@ public class CommonService {
 
 	private final String UPLOAD_DIR = "../local-store/";
 	
-	public boolean saveFile(String rathStr, String fileName, InputStream inputStream) throws IOException {
-		Path uploadPath = Paths.get(UPLOAD_DIR + rathStr);
+	public boolean saveFile(String fileName, InputStream inputStream) throws IOException {
+		Path uploadPath = Paths.get(UPLOAD_DIR);
 		long fileStore = 0;
 		if(!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);

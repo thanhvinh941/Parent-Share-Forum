@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/notify")
+@RequestMapping("/notify/external")
 public class NotifyController {
 
 	private final NotifyService notifyService;

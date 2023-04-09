@@ -35,6 +35,7 @@ import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.TopicTagRepository;
 import com.se1.postservice.domain.service.PostService;
 import com.se1.postservice.domain.util.CommonUtil;
+import com.se1.postservice.domain.util.SystemServiceRestTemplateClient;
 import com.se1.postservice.domain.util.UserServiceRestTemplateClient;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class PostServiceImpl implements PostService {
 	private final RPostMapper rPostMapper;
 	private final ObjectMapper objectMapper;
 	private final UserServiceRestTemplateClient restTemplateClient;
-
+	private final SystemServiceRestTemplateClient serviceRestTemplateClient;
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 
 //	@Override
@@ -76,6 +77,13 @@ public class PostServiceImpl implements PostService {
 		// TODO: validation post
 		validation(request);
 
+		List<String> imageList = request.getImageList();
+		List<String> imageNameList = new ArrayList<>();
+		for(String image : imageList) {
+			imageNameList.add(getFileName(image));
+		}
+		request.setImageList(imageNameList);
+		
 		Post postRegist = convertPostRequestToPostEntity(request, userId, userName);
 
 		try {
@@ -92,11 +100,15 @@ public class PostServiceImpl implements PostService {
 	private void validation(PostRequest request) {
 
 	}
-
+	
+	private String getFileName(String file) {
+		return serviceRestTemplateClient.uploadFile(file);
+	}
+	
 	Post convertPostRequestToPostEntity(PostRequest request, long userId, String userName) {
 		Post post = new Post();
 		BeanUtils.copyProperties(request, post);
-		post.setTitle(request.getSummary());
+		post.setSummary(request.getTitle());
 		post.setCreateAt(new Date());
 		post.setUpdateAt(new Date());
 		post.setUserId(userId);
@@ -292,6 +304,30 @@ public class PostServiceImpl implements PostService {
 		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p->{
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(p, postResponseDto);
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(listTopicTagResponse.stream().filter(t-> p.getTopicTagId().equals(t.getId())).findFirst().get());
+
+			return postResponseDto;
+		}).collect(Collectors.toList());
+
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	@Override
+	public void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset) {
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllByIdWithCondition(userId.toString(), offset*10);
+		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
+		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p->{
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			String imageListStr = p.getImageList();
+			if(imageListStr != null) {
+				String[] imageList = imageListStr.split(", ");
+				postResponseDto.setImageList(List.of(imageList));
+			}
 			postResponseDto.setUser(getUSerPost(p.getUserId()));
 			postResponseDto.setTopicTag(listTopicTagResponse.stream().filter(t-> p.getTopicTagId().equals(t.getId())).findFirst().get());
 

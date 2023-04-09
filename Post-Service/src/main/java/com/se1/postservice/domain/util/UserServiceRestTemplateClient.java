@@ -1,5 +1,6 @@
 package com.se1.postservice.domain.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.ContactDto;
+import com.se1.postservice.domain.payload.GetPostResponseDto;
 import com.se1.postservice.domain.payload.SubscribeDto;
 
 @Component
@@ -56,15 +58,21 @@ public class UserServiceRestTemplateClient {
 
 		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
 		
-		ResponseEntity<?> restExchange =
+		ResponseEntity<ApiResponseEntity> restExchange =
                 restTemplate.postForEntity(
                         "http://localhost:8088/contact/internal/getListContact",
                         request,
                         ApiResponseEntity.class);
-        return mapper.readValue(mapper.writeValueAsString(restExchange.getBody()), List.class);
+		
+		List<Object> objects = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), List.class);
+		List<ContactDto> contactDtos = new ArrayList<>();
+		for(Object object : objects) {
+			contactDtos.add(mapper.readValue(mapper.writeValueAsString(object), ContactDto.class));
+		}
+        return contactDtos;
 	}
 
-	public List<SubscribeDto> getAllExpertSubscribe(Long userId) {
+	public List<SubscribeDto> getAllExpertSubscribe(Long userId) throws JsonMappingException, JsonProcessingException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -73,12 +81,17 @@ public class UserServiceRestTemplateClient {
 
 		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
 		
-		ResponseEntity<?> restExchange =
+		ResponseEntity<ApiResponseEntity> restExchange =
                 restTemplate.postForEntity(
                         "http://localhost:8088/subscriber/internal/getAllExpertSubscribe",
                         request,
                         ApiResponseEntity.class);
-        return (List<SubscribeDto>) restExchange.getBody();
+		List<Object> objects = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), List.class);
+		List<SubscribeDto> subscribeDtos = new ArrayList<>();
+		for(Object object : objects) {
+			subscribeDtos.add(mapper.readValue(mapper.writeValueAsString(object), SubscribeDto.class));
+		}
+        return subscribeDtos;
 	}
 
 }

@@ -29,7 +29,6 @@ import com.se1.systemservice.domain.service.WebsocketService;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
-@Slf4j
 public class WebsocketController {
 
 	@Autowired
@@ -43,9 +42,6 @@ public class WebsocketController {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
-	
-	@Autowired
-	private ObjectMapper objectMapper;
 	
 	@Autowired
 	private WebSocketSessionListener webSocketSessionListener;
@@ -65,7 +61,7 @@ public class WebsocketController {
 			InputStream inputStream = new ByteArrayInputStream(imageByte);
 
 			contentToMQ = imageName;
-			commonService.saveFile("/chat", imageName, inputStream);
+			commonService.saveFile(imageName, inputStream);
 		}
 		
 		Map<String, Object> map = new HashMap<>();
