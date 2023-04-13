@@ -19,7 +19,7 @@ import com.se1.userservice.domain.service.SubscribeService;
 
 @RestController
 @RequestMapping("/subscriber/external")
-public class SubscribeController {
+public class SubscribeExternalController {
 
 	@Autowired
 	private ApiResponseEntity apiResponseEntity;

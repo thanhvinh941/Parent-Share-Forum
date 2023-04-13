@@ -1,5 +1,8 @@
 package com.se1.userservice.domain.restClient;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,8 +13,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.request.MailRequest;
 
 @Component
 public class SystemServiceRestTemplateClient {
@@ -22,23 +27,36 @@ public class SystemServiceRestTemplateClient {
 	@Autowired
 	ObjectMapper mapper;
 	
-	
-	public Object findById(Long id) {
+	public void sendMail(MailRequest mailRequest) throws JsonProcessingException {
 		
+		String requestJson = mapper.writeValueAsString(mailRequest);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+		
+        restTemplate.postForEntity(
+                "lb://localhost:8081/system/internal/send-mail",
+                entity,
+                ApiResponseEntity.class);
+	}
+	
+	public String uploadFile(String file) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		MultiValueMap<String, Long> map= new LinkedMultiValueMap<String, Long>();
-		map.add("id", id);
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("file", file);
 
-		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 		
-		ResponseEntity<?> restExchange =
-                restTemplate.postForEntity(
-                        "http://localhost:8081/system/send-mail",
+		String restExchange =
+                restTemplate.postForObject(
+                        "http://localhost:8081/system/internal/upload-file",
                         request,
-                        ApiResponseEntity.class);
-        return restExchange.getBody();
+                        String.class);
+        return restExchange;
 	}
 
 }

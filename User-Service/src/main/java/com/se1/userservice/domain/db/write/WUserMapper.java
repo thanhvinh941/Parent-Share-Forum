@@ -6,4 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 public interface WUserMapper {
 
 	void updateUserStatus(Long userId, int status);
+	
+	void updateLicenceImageToUser(String licenceFileName, Long userId);
+
+	void updateLicenceToUser(Long licenceId, Long userId);
 }

@@ -18,14 +18,12 @@ public class Verification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private Integer userId;
+	private Long userId;
 	
 	private String token;
 	
 	private Date expirationTime;
 	
 	private Byte validFlg;
-	
-	private Byte delFlg;
 	
 }

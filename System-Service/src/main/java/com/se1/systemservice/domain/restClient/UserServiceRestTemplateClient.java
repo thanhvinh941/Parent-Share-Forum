@@ -41,7 +41,7 @@ public class UserServiceRestTemplateClient {
         return restExchange.getBody();
 	}
 	
-public Object updateStatus(Long id, int status) {
+	public Object updateStatus(Long id, int status) {
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
