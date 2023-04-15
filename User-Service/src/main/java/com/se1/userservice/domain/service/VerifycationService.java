@@ -26,8 +26,11 @@ public class VerifycationService {
 	@Autowired
 	private VerifycationRepository repository;
 
-	@Value("micro-service.api-gateway")
+	@Value("${micro-service.api-gateway}")
 	private String apigatewayServiceUrl;
+	
+	@Value("${front-end.url.login}")
+	private String urlFronEnd;
 
 	@Autowired
 	private SystemServiceRestTemplateClient restTemplateClient;
@@ -45,9 +48,9 @@ public class VerifycationService {
 				VERIFYCATION_EXTERNAL, VERIFYCATION_MAPPING, verificationSave.getToken());
 
 		MailRequest mailRequest = new MailRequest();
-		mailRequest.setMailTemplate("sign-up");
+		mailRequest.setMailTemplate("regist_user");
 		mailRequest.setTo(mail);
-		mailRequest.setData(Map.of("verificationLink", verificationLink, "userName" , "userName"));
+		mailRequest.setData(Map.of("__VERIFY_LINK__", verificationLink, "__MY_DOMAIN__" , urlFronEnd));
 		
 		restTemplateClient.sendMail(mailRequest);
 	}

@@ -44,6 +44,10 @@ spring:
     username: admin
     password: Zaq12wsx1234
 
+front-end:
+  url:
+    login: localhost:3000/login
+
 management:
   endpoints:
     web:

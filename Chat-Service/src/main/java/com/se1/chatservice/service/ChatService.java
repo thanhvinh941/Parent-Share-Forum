@@ -3,6 +3,7 @@ package com.se1.chatservice.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -164,6 +165,7 @@ public class ChatService {
 
 	public void processGetAllChat(GetAllChatRequest request, ApiResponseEntity apiResponseEntity) {
 		List<Chat> listChat = rChatMapper.getAllChat(request.getTopicId(), request.getLimit(), request.getOffset());
+		Collections.reverse(listChat);
 		List<ChatDto> listChatResponse = listChat.stream().map(c->{
 			ChatDto chatDto = new ChatDto();
 			BeanUtils.copyProperties(c, chatDto);

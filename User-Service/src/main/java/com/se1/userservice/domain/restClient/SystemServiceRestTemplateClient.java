@@ -37,7 +37,7 @@ public class SystemServiceRestTemplateClient {
 		HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
 		
         restTemplate.postForEntity(
-                "lb://localhost:8081/system/internal/send-mail",
+                "http://localhost:8081/system/internal/send-mail",
                 entity,
                 ApiResponseEntity.class);
 	}

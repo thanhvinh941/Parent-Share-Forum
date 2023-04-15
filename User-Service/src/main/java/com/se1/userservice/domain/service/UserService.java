@@ -75,13 +75,11 @@ public class UserService {
 			userDto.setId(user.getId());
 			userDto.setName(user.getName());
 			userDto.setEmail(user.getEmail());
-			userDto.setBirthday(user.getBirthday());
 			userDto.setEmailVerified(user.getEmailVerified());
 			userDto.setRole(user.getRole().toString());
 			userDto.setProvider(user.getProvider().toString());
 			userDto.setStatus(user.getStatus());
 			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIdentifyNo(user.getIdentifyNo());
 			userDto.setIsExpert(user.getIsExpert());
 			userDto.setDelFlg(user.getDelFlg());
 			userDto.setCreateAt(user.getCreateAt());
@@ -170,13 +168,11 @@ public class UserService {
 			userDto.setId(user.getId());
 			userDto.setName(user.getName());
 			userDto.setEmail(user.getEmail());
-			userDto.setBirthday(user.getBirthday());
 			userDto.setEmailVerified(user.getEmailVerified());
 			userDto.setRole(user.getRole().toString());
 			userDto.setProvider(user.getProvider().toString());
 			userDto.setStatus(user.getStatus());
 			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIdentifyNo(user.getIdentifyNo());
 			userDto.setIsExpert(user.getIsExpert());
 			userDto.setDelFlg(user.getDelFlg());
 			userDto.setCreateAt(user.getCreateAt());

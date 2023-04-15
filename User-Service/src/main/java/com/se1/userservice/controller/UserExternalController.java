@@ -76,20 +76,4 @@ public class UserExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 	
-	@PostMapping("/regis-expert")
-	public ResponseEntity<?> registExpert(@RequestHeader("user_detail") String userDetailHeader,
-			@RequestBody String imageLicenceBase64) throws JsonMappingException, JsonProcessingException{
-		
-		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-		
-		try {
-			service.processRegistExpert(userDetail, imageLicenceBase64, apiResponseEntity);
-		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
-		}
-		
-		return ResponseEntity.ok(apiResponseEntity);
-	}
 }

@@ -139,9 +139,6 @@ public class UserController {
 		user.setName(userRequestDto.getName());
 		user.setEmail(userRequestDto.getEmail());
 		user.setImageUrl(userRequestDto.getImageUrl());
-		user.setBirthday(
-				userRequestDto.getBirthday() != null ? LocalDate.parse(userRequestDto.getBirthday(), localDateFormatter)
-						: null);
 		user.setEmailVerified(false);
 		user.setPassword(userRequestDto.getPassword());
 		user.setProvider(AuthProvider.valueOf(userRequestDto.getProvider()));
