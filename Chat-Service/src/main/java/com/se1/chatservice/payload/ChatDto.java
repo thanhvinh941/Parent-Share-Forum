@@ -2,6 +2,8 @@ package com.se1.chatservice.payload;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -10,10 +12,9 @@ public class ChatDto {
 	private User user;
 	private String content;
 	private int status;
-	private String topicId;
 	private ChatDto chatParent;
+	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	private Date createAt;
-	private Long userDeleteId;
 	
 	@Data
 	public static class User {
@@ -21,10 +22,10 @@ public class ChatDto {
 		private String email;
 		private String name;
 		private String imageUrl;
-		private String role;
 		private Boolean isExpert;
-		private Double rating;
+		private Double rating = null;
 		private int status;
-		private String topicId;
+		@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+		private Date lastTime = new Date();
 	}
 }

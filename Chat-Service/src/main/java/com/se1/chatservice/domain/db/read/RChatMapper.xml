@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.se1.chatservice.domain.db.read.RChatMapper">
-	
-	<select id="updateStatus" resultType="com.se1.chatservice.model.Chat">
-		Select * from chat 
-		Where topic_id = #{topicId}
-		Limit #{limit} Offset #{offset}
-		Order create_at DESC
+
+	<resultMap id="chat_result" type="com.se1.chatservice.domain.db.dto.ChatDto">
+		<result column="id" jdbcType="BIGINT" javaType="java.lang.Long" property="id" />
+		<result column="user_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userId" />
+		<result column="content" jdbcType="VARCHAR" javaType="java.lang.String" property="content" />
+		<result column="status" jdbcType="INTEGER" javaType="java.lang.Integer" property="status" />
+		<result column="topic_id" jdbcType="VARCHAR" javaType="java.lang.String" property="topicId" />
+		<result column="chat_parent" jdbcType="BIGINT" javaType="java.lang.Long" property="chatParent" />
+		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
+		<result column="user_delete_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userDeleteId" />
+	</resultMap>
+
+	<select id="getAllChat" resultMap="chat_result">
+		Select * from chats 
+		Where topic_id = '${topicId}'
+		Order by create_at DESC
+		Limit ${limit} Offset ${offset}
+	</select>
+
+	<select id="getChatById" resultMap="chat_result">
+		Select * from chats 
+		Where id = '${id}'
 	</select>
 
 </mapper>
