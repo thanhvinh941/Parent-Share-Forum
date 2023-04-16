@@ -58,7 +58,6 @@
 		    post p
 		WHERE
 		    p.user_id IN (${userIds})
-		        AND p.create_at >= DATE_ADD(CURDATE(), INTERVAL - 3 DAY)
 		        AND p.delflg = 0 
 		        AND p.status = 1
 		ORDER BY p.create_at DESC

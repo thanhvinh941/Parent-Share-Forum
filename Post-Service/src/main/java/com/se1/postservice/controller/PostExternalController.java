@@ -33,7 +33,7 @@ public class PostExternalController {
 	private final ApiResponseEntity apiResponseEntity;
 	
 	@PostMapping("/findAllPost")
-	public ResponseEntity<?> findAllPost(@RequestHeader("user_detail") String userDetail, @RequestParam("offset") int offset) throws JsonMappingException, JsonProcessingException{
+	public ResponseEntity<?> findAllPost(@RequestHeader("user_detail") String userDetail, @RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException{
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 		
 		try {
@@ -47,7 +47,7 @@ public class PostExternalController {
 	}
 	
 	@PostMapping("/findAllPostByUserId")
-	public ResponseEntity<?> findAllPostByUserId(@RequestParam("user-id") Long userId, @RequestParam("offset") int offset) throws JsonMappingException, JsonProcessingException{
+	public ResponseEntity<?> findAllPostByUserId(@RequestParam("user-id") Long userId, @RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException{
 		
 		try {
 			postService.findAllPostByUserId(userId, apiResponseEntity, offset);
@@ -60,7 +60,7 @@ public class PostExternalController {
 	}
 	
 	@PostMapping("/getAllPost")
-	public ResponseEntity<?> getAllPost(@RequestHeader("user_detail") String userDetail, @RequestParam("offset") int offset) throws JsonMappingException, JsonProcessingException{
+	public ResponseEntity<?> getAllPost(@RequestHeader("user_detail") String userDetail, @RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException{
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 		
 		try {
