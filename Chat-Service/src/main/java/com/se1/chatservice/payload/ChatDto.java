@@ -12,6 +12,7 @@ public class ChatDto {
 	private User user;
 	private String content;
 	private int status;
+	private String topicId;
 	private ChatDto chatParent;
 	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	private Date createAt;

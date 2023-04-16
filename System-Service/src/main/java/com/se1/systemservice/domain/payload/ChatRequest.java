@@ -6,5 +6,5 @@ import lombok.Data;
 public class ChatRequest {
 	private String content;
 	private Long chatParent;
-	private boolean isFile;
+	private Boolean isFile;
 }

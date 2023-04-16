@@ -53,7 +53,7 @@ public class WebsocketController {
 		String userId = webSocketSessionListener.getConnectedClientId().get(0);
 		String content = request.getContent();
 		String contentToMQ = content;
-		if (request.isFile()) {
+		if (request.getIsFile()) {
 			String[] contentArray = content.split(",");
 
 			String imageName = CommonUtils.getFileName(contentArray[0].split("/")[1]);

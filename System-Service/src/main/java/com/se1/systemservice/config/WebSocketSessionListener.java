@@ -15,7 +15,7 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.se1.systemservice.domain.restclient.UserServiceRestTemplateClient;
+import com.se1.systemservice.domain.restClient.UserServiceRestTemplateClient;
 
 import lombok.Data;
 
@@ -23,7 +23,7 @@ import lombok.Data;
 @Data
 public class WebSocketSessionListener {
 	private static final Logger logger = LoggerFactory.getLogger(WebSocketSessionListener.class.getName());
-	private List<String> connectedClientId = new ArrayList<String>();
+	private List<String> connectedClientIdos = new ArrayList<String>();
 	
 	@Autowired
 	private UserServiceRestTemplateClient restTemplateClient;
@@ -39,7 +39,7 @@ public class WebSocketSessionListener {
 		// TODO Authen
 
 		restTemplateClient.updateStatus(Long.valueOf(userIdValue), 1);
-		connectedClientId.add(userIdValue);
+		connectedClientIdos.add(userIdValue);
 
 	}
 
@@ -52,15 +52,15 @@ public class WebSocketSessionListener {
 		String userIdValue = nativeAccessor.getNativeHeader("userId").get(0);
 
 		restTemplateClient.updateStatus(Long.valueOf(userIdValue), 0);
-		connectedClientId.remove(userIdValue);
+		connectedClientIdos.remove(userIdValue);
 
 	}
 
 	public List<String> getConnectedClientId() {
-		return connectedClientId;
+		return connectedClientIdos;
 	}
 
 	public void setConnectedClientId(List<String> connectedClientId) {
-		this.connectedClientId = connectedClientId;
+		this.connectedClientIdos = connectedClientId;
 	}
 }
