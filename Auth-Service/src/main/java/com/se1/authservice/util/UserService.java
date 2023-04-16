@@ -25,12 +25,12 @@ public class UserService {
 		return mapper.readValue(resultStr, User.class);
 	}
 
-	public User findByCondition(MultiValueMap<String, Object> request, String url) throws JsonProcessingException {
+	public User findByCondition(MultiValueMap<String, String> request, String url) throws JsonProcessingException {
 		String resultStr = apiService.callPostMenthodForParam(request, CallApiService.USER_SERVICE, url);
 		return mapper.readValue(resultStr, User.class);
 	}
 
-	public Boolean existsByEmail(MultiValueMap<String, Object> request) throws JsonProcessingException {
+	public Boolean existsByEmail(MultiValueMap<String, String> request) throws JsonProcessingException {
 		String resultStr = apiService.callPostMenthodForParam(request, CallApiService.USER_SERVICE, UrlConstance.USER_EXIST_BY_EMAIL);
 		return mapper.readValue(resultStr, Boolean.class);
 	}

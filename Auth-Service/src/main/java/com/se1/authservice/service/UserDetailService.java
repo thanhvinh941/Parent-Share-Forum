@@ -31,7 +31,7 @@ public class UserDetailService {
 	}
 
 	public Optional<User> findByEmail(String email) throws JsonProcessingException {
-		MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.add("email", email);
 
 		User user = userService.findByCondition(map, UrlConstance.USER_FIND_BY_EMAIL);
@@ -44,14 +44,14 @@ public class UserDetailService {
 	}
 
 	public User findById(Integer id) throws JsonMappingException, JsonProcessingException {
-		MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
-		map.add("id", id);
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("id", id.toString());
 
 		return userService.findByCondition(map, UrlConstance.USER_FIND_BY_ID);
 	}
 
 	public Boolean existsByEmail(String email) throws JsonProcessingException {
-		MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.add("email", email);
 		
 		return userService.existsByEmail(map);
@@ -67,14 +67,16 @@ public class UserDetailService {
 		BeanUtils.copyProperties(userSave, userRequestDto);
 		userRequestDto.setRole("user");
 		userRequestDto.setEmailVerified(isSocalProvider(userSave.getProvider()) ? true : false);
-
+		userRequestDto.setProvider(userSave.getProvider().name());
+		userRequestDto.setProviderId(userSave.getProviderId() != null ? userSave.getProviderId() : null);
+		userRequestDto.setRole("user");
 		return userRequestDto;
 	}
 
 	public void sendMail(Long userId, String mail, String userName) throws JsonProcessingException {
-		MultiValueMap<String, Object> map = new LinkedMultiValueMap<String, Object>();
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
 		map.add("email", mail);
-		map.add("user_id", userId);
+		map.add("user_id", userId.toString());
 		map.add("name", userName);
 		
 		verifyService.createVerify(map);

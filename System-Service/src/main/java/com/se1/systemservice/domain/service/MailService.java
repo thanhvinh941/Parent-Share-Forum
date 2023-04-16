@@ -51,10 +51,14 @@ public class MailService {
             List<String> listKey = new ArrayList<String>(mailRequest.getData().keySet());
             for(String key : listKey) {
             	String data = mailRequest.getData().get(key).toString();
-            	body.replace(key, data);
+            	body = body.replace(key, data);
             }
-//            body.replace(0, 0);
-//            body.replace(0, 0);
+            body = body.replace("&lt;", "<");
+            body = body.replace("&gt;", ">");
+            body = body.replace("tdalign", "td align");
+            body = body.replace("tableborder", "table border");
+            body = body.replace("bodystyle", "body style");
+            
             // Setting up necessary details
             mailMessage.setFrom(sender);
             mailMessage.setTo(mailRequest.getTo());

@@ -18,7 +18,7 @@ public class VerifyService {
 	private final ObjectMapper mapper;
 	private final CallApiService<User> apiService;
 	
-	public Boolean createVerify(MultiValueMap<String, Object> request) throws JsonProcessingException {
+	public Boolean createVerify(MultiValueMap<String, String> request) throws JsonProcessingException {
 		String resultStr = apiService.callPostMenthodForParam(request, CallApiService.USER_SERVICE, UrlConstance.VERIFY_CREATE);
 		return mapper.readValue(resultStr, Boolean.class);
 	}
