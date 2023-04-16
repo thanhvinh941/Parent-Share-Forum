@@ -1,8 +1,5 @@
 package com.se1.chatservice.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,32 +9,26 @@ import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.chatservice.config.MqConfig;
 import com.se1.chatservice.config.SCMConstant;
 import com.se1.chatservice.config.UrlConstant;
-import com.se1.chatservice.domain.common.CommonUtils;
 import com.se1.chatservice.domain.db.read.RChatMapper;
 import com.se1.chatservice.domain.db.write.WChatMapper;
-import com.se1.chatservice.domain.restclient.UserServiceRestTemplateClient;
 import com.se1.chatservice.model.Chat;
 import com.se1.chatservice.payload.ApiResponseEntity;
 import com.se1.chatservice.payload.ChatDto;
-import com.se1.chatservice.payload.ChatDto.User;
 import com.se1.chatservice.payload.CreateChatRequest;
 import com.se1.chatservice.payload.GetAllChatRequest;
 import com.se1.chatservice.payload.RabbitRequest;
 import com.se1.chatservice.payload.UpdateChatRequest;
 import com.se1.chatservice.repository.ChatRepository;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +41,6 @@ public class ChatService {
 	private final WChatMapper chatMapper;
 	private final RabbitTemplate rabbitTemplate;
 	private final ObjectMapper objectMapper;
-	private final UserServiceRestTemplateClient restTemplateClient;
 	private final RChatMapper rChatMapper;
 	private final CallApiService<ChatDto.User> callApiService;
 

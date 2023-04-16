@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequestMapping("/user/internal")
 @RequiredArgsConstructor
-public class UserController {
+public class UserInternalController {
 
 	private final UserService service;
 

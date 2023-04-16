@@ -1,6 +1,5 @@
 package com.se1.postservice.domain.service;
 
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,5 +30,7 @@ public interface PostService {
 	void findAllPost(UserDetail detail, ApiResponseEntity apiResponseEntity, int offset) throws JsonMappingException, JsonProcessingException;
 
 	void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset);
+
+	void findAllPostByCondition(Map<String, Object> param, ApiResponseEntity apiResponseEntity, int offset);
 
 }

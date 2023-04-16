@@ -18,13 +18,13 @@ import com.se1.authservice.exception.OAuth2AuthenticationProcessingException;
 import com.se1.authservice.model.AuthProvider;
 import com.se1.authservice.model.User;
 import com.se1.authservice.security.UserPrincipal;
-import com.se1.authservice.service.UserService;
+import com.se1.authservice.service.UserDetailService;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
-    private UserService userService;
+    private UserDetailService userService;
     
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
