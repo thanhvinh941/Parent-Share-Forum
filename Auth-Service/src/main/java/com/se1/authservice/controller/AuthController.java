@@ -71,7 +71,7 @@ public class AuthController {
 
 	private 
 	
-	@Value("front-end.url.login")
+	@Value("${front-end.url.login}")
 	String urlFronEnd;
 	
 	@PostMapping("/login")
@@ -169,6 +169,8 @@ public class AuthController {
 				mailRequest.setMailTemplate("signup-template");
 				mailRequest.setTo(result.getEmail());
 				
+				service.sendMail(result.getId(),result.getEmail(),result.getName());
+				
 				signUpResponseDto.setMessage(List.of("Please check your email to login"));
 				signUpResponseDto.setSignUp(true);
 			} else {
@@ -189,7 +191,7 @@ public class AuthController {
 
 		// TODO check email
 		// TODO check name
-		// TODO chech password
+		// TODO check password
 
 		if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
 			errors.add("ConfirmPassword not work");

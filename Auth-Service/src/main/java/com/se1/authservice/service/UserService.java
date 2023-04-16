@@ -96,5 +96,10 @@ public class UserService {
 		return userRequestDto;
 	}
 
+	public void sendMail(Long userId, String mail, String userName) {
+		restTemplateClient.createVerifycation(userId, mail, userName);
+		
+	}
+
 	
 }

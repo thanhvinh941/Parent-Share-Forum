@@ -21,7 +21,7 @@ import com.se1.userservice.domain.service.ContactService;
 
 @RestController
 @RequestMapping("/contact/external")
-public class ContactController {
+public class ContactExternalController {
 
 	@Autowired
 	private ObjectMapper objectMapper;

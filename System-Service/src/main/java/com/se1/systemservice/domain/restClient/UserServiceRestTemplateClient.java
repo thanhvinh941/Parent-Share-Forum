@@ -1,5 +1,8 @@
 package com.se1.systemservice.domain.restClient;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,14 +38,13 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/findById",
+                        "http://localhost:8081/user/internal/findById",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();
 	}
 	
-public Object updateStatus(Long id, int status) {
-		
+	public Object updateStatus(Long id, int status) throws MalformedURLException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -54,7 +56,7 @@ public Object updateStatus(Long id, int status) {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "lb://user-service/user/internal/updateStatus",
+                        "http://localhost:8088/user/internal/updateStatus",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

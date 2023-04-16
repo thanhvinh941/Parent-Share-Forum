@@ -5,17 +5,22 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.se1.userservice.domain.db.read.RUserMapper;
+import com.se1.userservice.domain.db.write.WUserMapper;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.UserDto;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.repository.UserRepository;
+import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +31,8 @@ public class UserService {
 	private final UserRepository repository;
 	private final RUserMapper rUserMapper;
 	private final RatingService ratingService;
+	private final SystemServiceRestTemplateClient restTemplateClient;
+	private final WUserMapper wUserMapper;
 	
 	public User save(User user) throws Exception {
 
@@ -68,13 +75,11 @@ public class UserService {
 			userDto.setId(user.getId());
 			userDto.setName(user.getName());
 			userDto.setEmail(user.getEmail());
-			userDto.setBirthday(user.getBirthday());
 			userDto.setEmailVerified(user.getEmailVerified());
 			userDto.setRole(user.getRole().toString());
 			userDto.setProvider(user.getProvider().toString());
 			userDto.setStatus(user.getStatus());
 			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIdentifyNo(user.getIdentifyNo());
 			userDto.setIsExpert(user.getIsExpert());
 			userDto.setDelFlg(user.getDelFlg());
 			userDto.setCreateAt(user.getCreateAt());
@@ -163,13 +168,11 @@ public class UserService {
 			userDto.setId(user.getId());
 			userDto.setName(user.getName());
 			userDto.setEmail(user.getEmail());
-			userDto.setBirthday(user.getBirthday());
 			userDto.setEmailVerified(user.getEmailVerified());
 			userDto.setRole(user.getRole().toString());
 			userDto.setProvider(user.getProvider().toString());
 			userDto.setStatus(user.getStatus());
 			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIdentifyNo(user.getIdentifyNo());
 			userDto.setIsExpert(user.getIsExpert());
 			userDto.setDelFlg(user.getDelFlg());
 			userDto.setCreateAt(user.getCreateAt());
@@ -267,10 +270,10 @@ public class UserService {
 	}
 
 	public void processFindUser(Map<String, Object> findRequestMap, ApiResponseEntity apiResponseEntity) {
-		
+
 		String query = generateQueryContionFind(findRequestMap);
 		List<User> userList = rUserMapper.find(query);
-		List<UserResponseDto> responseList = userList.stream().map(ul->{
+		List<UserResponseDto> responseList = userList.stream().map(ul -> {
 			double rating = 0;
 			if (ul.getIsExpert()) {
 				rating = ratingService.getRatingByUserId(ul.getId());
@@ -278,7 +281,7 @@ public class UserService {
 			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
 			return userResponseDto;
 		}).collect(Collectors.toList());
-		
+
 		apiResponseEntity.setData(responseList);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
@@ -287,22 +290,54 @@ public class UserService {
 	public void processFindByName(String name, ApiResponseEntity apiResponseEntity) {
 		String query = generateQueryContionFindByName(name);
 		List<User> userList = rUserMapper.find(query);
-		List<UserResponseDto> responseList = userList.stream().filter(ul-> ul.getEmailVerified() && !ul.getDelFlg()).map(ul->{
-			double rating = 0;
-			if (ul.getIsExpert()) {
-				rating = ratingService.getRatingByUserId(ul.getId());
-			}
-			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
-			return userResponseDto;
-		}).collect(Collectors.toList());
-		
+		List<UserResponseDto> responseList = userList.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
+				.map(ul -> {
+					double rating = 0;
+					if (ul.getIsExpert()) {
+						rating = ratingService.getRatingByUserId(ul.getId());
+					}
+					UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
+					return userResponseDto;
+				}).collect(Collectors.toList());
+
 		apiResponseEntity.setData(responseList);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
 
 	public void processUpdateStatus(Long id, Integer status, ApiResponseEntity apiResponseEntity) {
-		// TODO Auto-generated method stub
+		wUserMapper.updateUserStatus(id, status);
+	}
+
+	public void processRegistExpert(UserDetail userDetail, String imageLicenceBase64, ApiResponseEntity apiResponseEntity) throws Exception {
+		Long userId = userDetail.getId();
+		Boolean isExpert = userDetail.getIsExpert();
+		if (isExpert) {
+			throw new Exception("Người dùng đã là chuyên gia");
+		}
+
+		String[] imageBase64 = imageLicenceBase64.split(",");
+
+		boolean isImage = checkImage(imageBase64[0].split("/")[1]);
+
+		if(!isImage) {
+			throw new Exception("Chỉ nhận file hình ảnh hoặc file pdf");
+		}
 		
+		String licenceFileName = restTemplateClient.uploadFile(imageLicenceBase64);
+		if (Objects.isNull(licenceFileName)) {
+			throw new Exception("Lưu bằng cấp thất bại. Xin hãy thử lại !!!");
+		}
+		
+		wUserMapper.updateLicenceImageToUser(licenceFileName, userId);
+		
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	private boolean checkImage(String extension) {
+		return extension.equals("jpeg;base64") || extension.equals("png;base64") || extension.equals("pdf;base64")
+				|| extension.equals("jpg;base64");
 	}
 }

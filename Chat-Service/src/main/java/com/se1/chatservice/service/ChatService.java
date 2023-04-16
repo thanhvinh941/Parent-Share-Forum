@@ -3,6 +3,7 @@ package com.se1.chatservice.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +14,15 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.chatservice.config.MqConfig;
 import com.se1.chatservice.config.SCMConstant;
+import com.se1.chatservice.config.UrlConstant;
 import com.se1.chatservice.domain.common.CommonUtils;
 import com.se1.chatservice.domain.db.read.RChatMapper;
 import com.se1.chatservice.domain.db.write.WChatMapper;
@@ -47,7 +52,8 @@ public class ChatService {
 	private final ObjectMapper objectMapper;
 	private final UserServiceRestTemplateClient restTemplateClient;
 	private final RChatMapper rChatMapper;
-	
+	private final CallApiService<ChatDto.User> callApiService;
+
 	public void processCreate(CreateChatRequest chatRequest) throws JsonProcessingException {
 		log.info("processCreate ");
 		Chat chat = new Chat();
@@ -57,20 +63,20 @@ public class ChatService {
 		chat.setStatus(0);
 		chat.setTopicId(chatRequest.getTopicId());
 		chat.setContent(chatRequest.getContent());
-		
+
 		Chat chatNew = chatRepository.save(chat);
 		ChatDto chatDto = new ChatDto();
 		BeanUtils.copyProperties(chatNew, chatDto);
 		chatDto.setUser(getUSerChat(chatNew.getUserId()));
-		
-		if(chatRequest.getChatParentId() != null) {
+
+		if (chatRequest.getChatParentId() != null) {
 			Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
 			ChatDto chatParentDto = new ChatDto();
 			BeanUtils.copyProperties(chatParent, chatParentDto);
 			chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
 			chatDto.setChatParent(chatParentDto);
 		}
-		
+
 		RabbitRequest request = new RabbitRequest();
 		request.setAction(SCMConstant.SYSTEM_CHAT);
 		request.setData(chatDto);
@@ -99,8 +105,8 @@ public class ChatService {
 		Map<String, Object> chatStatus = new HashMap<>();
 		chatStatus.put("chatId", chatId);
 		chatStatus.put("chatStatus", action);
-		chatStatus.put("topicId",updateChat.getTopicId());
-		
+		chatStatus.put("topicId", updateChat.getTopicId());
+
 		RabbitRequest request = new RabbitRequest();
 		request.setAction(SCMConstant.SYSTEM_CHAT_STATUS);
 		request.setData(chatStatus);
@@ -116,69 +122,72 @@ public class ChatService {
 
 	public void processGetNewChat(String topicId, ApiResponseEntity apiResponseEntity) {
 		List<Chat> newChatList = chatRepository.findNewChat(topicId);
-		List<ChatDto> listChatResponse = newChatList.stream().map(c->{
+		List<ChatDto> listChatResponse = newChatList.stream().map(c -> {
 			ChatDto chatDto = new ChatDto();
 			BeanUtils.copyProperties(c, chatDto);
 			chatDto.setUser(getUSerChat(c.getUserId()));
-			if(c.getChatParent() != null) {
+			if (c.getChatParent() != null) {
 				Chat chatParent = chatRepository.findById(c.getChatParent()).get();
 				ChatDto chatParentDto = new ChatDto();
 				BeanUtils.copyProperties(chatParent, chatParentDto);
 				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
 				chatDto.setChatParent(chatParentDto);
 			}
-			
+
 			return chatDto;
 		}).collect(Collectors.toList());
-		
+
 		apiResponseEntity.setData(listChatResponse);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
-	
+
 	private ChatDto.User getUSerChat(Long userId) {
-		ChatDto.User userChatParent = new User();
-		ApiResponseEntity userChatParentResult = (ApiResponseEntity) restTemplateClient.findById(userId);
-		if (userChatParentResult.getStatus() == 1) {
-			String apiResultStr;
-			try {
-				apiResultStr = objectMapper.writeValueAsString(userChatParentResult.getData());
-				userChatParent = objectMapper.readValue(apiResultStr, ChatDto.User.class);
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
+
+		MultiValueMap<String, Long> request = new LinkedMultiValueMap<String, Long>();
+		request.add("id", userId);
+
+		ChatDto.User userChatParent = null;
+		try {
+			userChatParent = objectMapper.readValue(callApiService.callPostMenthodForParam(request,
+					CallApiService.USER_SERVICE, UrlConstant.USER_FINDBYID),ChatDto.User.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
+
 		return userChatParent;
 	}
 
 	public void processUpdateStatus(List<Long> chatIds, ApiResponseEntity apiResponseEntity) throws Exception {
 		List<Integer> update = chatRepository.updateStatusChat(chatIds);
-		if(update != null && update.size() > 0) {
+		if (update != null && update.size() > 0) {
 			apiResponseEntity.setData(true);
 			apiResponseEntity.setErrorList(null);
 			apiResponseEntity.setStatus(1);
-		}else {
+		} else {
 			throw new Exception("update false");
 		}
 	}
 
 	public void processGetAllChat(GetAllChatRequest request, ApiResponseEntity apiResponseEntity) {
-		List<Chat> listChat = rChatMapper.getAllChat(request.getTopicId(), request.getLimit(), request.getOffset());
-		List<ChatDto> listChatResponse = listChat.stream().map(c->{
+		List<com.se1.chatservice.domain.db.dto.ChatDto> listChat = rChatMapper.getAllChat(request.getTopicId(),
+				request.getLimit(), request.getOffset());
+		Collections.reverse(listChat);
+		List<ChatDto> listChatResponse = listChat.stream().map(c -> {
 			ChatDto chatDto = new ChatDto();
 			BeanUtils.copyProperties(c, chatDto);
 			chatDto.setUser(getUSerChat(c.getUserId()));
-			if(c.getChatParent() != null) {
+			if (c.getChatParent() != null) {
 				Chat chatParent = chatRepository.findById(c.getChatParent()).get();
 				ChatDto chatParentDto = new ChatDto();
 				BeanUtils.copyProperties(chatParent, chatParentDto);
 				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
 				chatDto.setChatParent(chatParentDto);
 			}
-			
+
 			return chatDto;
 		}).collect(Collectors.toList());
-		
+
 		apiResponseEntity.setData(listChatResponse);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);

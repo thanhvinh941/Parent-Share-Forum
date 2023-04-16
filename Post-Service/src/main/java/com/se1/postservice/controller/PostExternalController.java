@@ -86,20 +86,6 @@ public class PostExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);	
 	}
 	
-//	@PostMapping("/getAllPost")
-//	public ResponseEntity<?> getAllPost(@RequestHeader("user_detail") String userDetail) throws JsonMappingException, JsonProcessingException{
-//		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
-//	
-//		try {
-//			postService.processGetAllPost(detail, apiResponseEntity);
-//		} catch (Exception e) {
-//			apiResponseEntity.setData(null);
-//			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-//			apiResponseEntity.setStatus(0);
-//		}
-//		return ResponseEntity.ok().body(apiResponseEntity);
-//	}
-	
 	@PostMapping("/create")
 	public ResponseEntity<?> save(@RequestBody PostRequest postRequest, @RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {

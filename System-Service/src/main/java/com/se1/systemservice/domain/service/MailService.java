@@ -1,6 +1,8 @@
 package com.se1.systemservice.domain.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 
@@ -43,11 +45,20 @@ public class MailService {
             // Creating a simple mail message
             SimpleMailMessage mailMessage
                 = new SimpleMailMessage();
- 
+            
+            String body = mail.getBody();
+            
+            List<String> listKey = new ArrayList<String>(mailRequest.getData().keySet());
+            for(String key : listKey) {
+            	String data = mailRequest.getData().get(key).toString();
+            	body.replace(key, data);
+            }
+//            body.replace(0, 0);
+//            body.replace(0, 0);
             // Setting up necessary details
             mailMessage.setFrom(sender);
             mailMessage.setTo(mailRequest.getTo());
-            mailMessage.setText(mail.getBody());
+            mailMessage.setText(body);
             mailMessage.setSubject(mail.getSubject());
  
             // Sending the mail
