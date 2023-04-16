@@ -1,6 +1,8 @@
 package com.se1.postservice.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -103,14 +105,16 @@ public class PostExternalController {
 
 	}
 	
-	@PostMapping("/getByTitle")
-	public ResponseEntity<?> getByTitle(@RequestParam("title") String title, @RequestHeader("user_detail") String userDetail)
+	@PostMapping("/findByTitle")
+	public ResponseEntity<?> getByTitle(@RequestParam("title") String title,@RequestParam("offset") Integer offset, @RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {
 
-		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
-		
+		Map<String, Object> param = new HashMap<>();
+		param.put("title", title);
+		param.put("context", title);
+		param.put("hashTag", title);
 		try {
-			postService.processGetByTitle(title, detail, apiResponseEntity);
+			postService.findAllPostByCondition(param, apiResponseEntity, offset);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

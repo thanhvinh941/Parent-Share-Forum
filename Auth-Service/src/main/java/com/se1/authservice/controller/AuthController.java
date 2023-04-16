@@ -47,15 +47,15 @@ import com.se1.authservice.payload.UserDetail;
 import com.se1.authservice.payload.UserResponseDto;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
-import com.se1.authservice.service.UserService;
-import com.se1.authservice.util.UserServiceRestTemplateClient;
+import com.se1.authservice.service.UserDetailService;
+import com.se1.authservice.util.UserService;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
 	@Autowired
-	UserService service;
+	UserDetailService service;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;

@@ -69,7 +69,6 @@ public class WebsocketController {
 		map.put("topicId", topicId);
 		map.put("chatParent", null);
 		
-		
 		ChatMqRequest mqRequest = new ChatMqRequest();
 		mqRequest.setChatParentId(request.getChatParent());
 		mqRequest.setContent(contentToMQ);

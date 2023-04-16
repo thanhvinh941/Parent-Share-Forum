@@ -2,8 +2,8 @@ package com.se1.postservice.domain.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,11 +53,6 @@ public class PostServiceImpl implements PostService {
 	private final SystemServiceRestTemplateClient serviceRestTemplateClient;
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 
-//	@Override
-//	public List<Post> saveAll(List<Post> records) {
-//		return postRepository.saveAll(records);
-//	}
-
 	@Override
 	public Post save(Post post) {
 		return postRepository.save(post);
@@ -79,11 +74,11 @@ public class PostServiceImpl implements PostService {
 
 		List<String> imageList = request.getImageList();
 		List<String> imageNameList = new ArrayList<>();
-		for(String image : imageList) {
+		for (String image : imageList) {
 			imageNameList.add(getFileName(image));
 		}
 		request.setImageList(imageNameList);
-		
+
 		Post postRegist = convertPostRequestToPostEntity(request, userId, userName);
 
 		try {
@@ -100,11 +95,11 @@ public class PostServiceImpl implements PostService {
 	private void validation(PostRequest request) {
 
 	}
-	
+
 	private String getFileName(String file) {
 		return serviceRestTemplateClient.uploadFile(file);
 	}
-	
+
 	Post convertPostRequestToPostEntity(PostRequest request, long userId, String userName) {
 		Post post = new Post();
 		BeanUtils.copyProperties(request, post);
@@ -209,11 +204,11 @@ public class PostServiceImpl implements PostService {
 		BeanUtils.copyProperties(tag, result);
 		return result;
 	}
-	
+
 	private List<GetPostResponseDto.TopicTag> getTopicTag(List<Integer> topicTagId) {
 		List<TopicTag> tagList = (List<TopicTag>) topicTagRepository.findAllById(topicTagId);
-		List<GetPostResponseDto.TopicTag> resultList = tagList.stream().map(tag->{
-			
+		List<GetPostResponseDto.TopicTag> resultList = tagList.stream().map(tag -> {
+
 			GetPostResponseDto.TopicTag result = new com.se1.postservice.domain.payload.GetPostResponseDto.TopicTag();
 			BeanUtils.copyProperties(tag, result);
 			return result;
@@ -279,33 +274,30 @@ public class PostServiceImpl implements PostService {
 		}
 	}
 
-//	Comparator.comparing(Post::getCreateAt,(p1,p2)->{
-//		return p1.after(p2);
-//		}
-//)
-
 	@Override
-	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity, int offset) throws JsonMappingException, JsonProcessingException {
+	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity, int offset)
+			throws JsonMappingException, JsonProcessingException {
 		Long userId = userDetail.getId();
 		List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
 		List<SubscribeDto> subscribeDtos = restTemplateClient.getAllExpertSubscribe(userId);
 		List<Long> userFriendId = contactDtos.stream().map(c -> c.getUserFriend().getId()).collect(Collectors.toList());
-		List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpertId().getId())
+		List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpert().getId())
 				.collect(Collectors.toList());
 		List<Long> allIdUserId = new ArrayList<>(userFriendId);
 		allIdUserId.addAll(listExpertId);
 
-		String userIds = String.join(", ",
-				allIdUserId.stream().distinct().map(id -> id.toString()).collect(Collectors.toList()));
+		List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
 
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllByIdWithCondition(userIds, offset*10);
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(allIdUserIdDistinct,
+				offset);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
-		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p->{
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(p, postResponseDto);
 			postResponseDto.setUser(getUSerPost(p.getUserId()));
-			postResponseDto.setTopicTag(listTopicTagResponse.stream().filter(t-> p.getTopicTagId().equals(t.getId())).findFirst().get());
+			postResponseDto.setTopicTag(
+					listTopicTagResponse.stream().filter(t -> p.getTopicTagId().equals(t.getId())).findFirst().get());
 
 			return postResponseDto;
 		}).collect(Collectors.toList());
@@ -317,19 +309,21 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset) {
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllByIdWithCondition(userId.toString(), offset*10);
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(List.of(userId),
+				offset);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
-		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p->{
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			BeanUtils.copyProperties(p, postResponseDto);
 			String imageListStr = p.getImageList();
-			if(imageListStr != null) {
+			if (imageListStr != null) {
 				String[] imageList = imageListStr.split(", ");
 				postResponseDto.setImageList(List.of(imageList));
 			}
 			postResponseDto.setUser(getUSerPost(p.getUserId()));
-			postResponseDto.setTopicTag(listTopicTagResponse.stream().filter(t-> p.getTopicTagId().equals(t.getId())).findFirst().get());
+			postResponseDto.setTopicTag(
+					listTopicTagResponse.stream().filter(t -> p.getTopicTagId().equals(t.getId())).findFirst().get());
 
 			return postResponseDto;
 		}).collect(Collectors.toList());
@@ -337,5 +331,44 @@ public class PostServiceImpl implements PostService {
 		apiResponseEntity.setData(getPostResponseDtos);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
+	}
+
+	@Override
+	public void findAllPostByCondition(Map<String, Object> param, ApiResponseEntity apiResponseEntity, int offset) {
+		Map<String, String> paramConvert = convertMapToQuery(param);
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByCondition(paramConvert,
+				offset);
+		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
+		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			String imageListStr = p.getImageList();
+			if (imageListStr != null) {
+				String[] imageList = imageListStr.split(", ");
+				postResponseDto.setImageList(List.of(imageList));
+			}
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(
+					listTopicTagResponse.stream().filter(t -> p.getTopicTagId().equals(t.getId())).findFirst().get());
+
+			return postResponseDto;
+		}).collect(Collectors.toList());
+
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	private Map<String, String> convertMapToQuery(Map<String, Object> param) {
+		Map<String, String> result = param.entrySet().stream().map(p -> {
+			String key = p.getKey();
+			Class<?> classType = CommonUtil.checkTypeByKey(key, Post.class);
+			String value = CommonUtil.convertObjectToValueSql(p.getValue(), classType);
+
+			return CommonUtil.camelToSnake(key) + "=" + value;
+		}).map(s -> s.split("=")).collect(Collectors.toMap(s -> s[0], s -> s[1]));
+
+		return result;
 	}
 }

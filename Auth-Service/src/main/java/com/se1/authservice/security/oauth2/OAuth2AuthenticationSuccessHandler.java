@@ -26,7 +26,7 @@ import com.se1.authservice.payload.AuthResponse;
 import com.se1.authservice.payload.UserDetail;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
-import com.se1.authservice.service.UserService;
+import com.se1.authservice.service.UserDetailService;
 import com.se1.authservice.util.CookieUtils;
 
 import io.jsonwebtoken.security.InvalidKeyException;
@@ -37,7 +37,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 	public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
 
 	private TokenProvider tokenProvider;
-	private UserService userService;
+	private UserDetailService userService;
 	private AppProperties appProperties;
 
 	private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;

@@ -12,7 +12,6 @@ public class GetPostResponseDto {
 
 	private long id;
 	private String title;
-	private String slug;
 	private String summary;
 	private String context;
 	private String hashTag;

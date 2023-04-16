@@ -1,10 +1,17 @@
 package com.se1.postservice.domain.util;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.se1.postservice.common.SCMConstant;
+import com.se1.postservice.domain.entity.Post;
 
 public class CommonUtil {
 
@@ -45,6 +52,41 @@ public class CommonUtil {
 		} else if (value instanceof Boolean) {
 			Integer booleanValue = value.equals(new Boolean(true)) ? 1 : 0;
 			valueStr = String.format("%d", booleanValue);
+		}
+		
+		return valueStr;
+	}
+	
+	public static Class<?> checkTypeByKey(String key, Class<?> classTarget){
+		Field[] specificFieldArray = classTarget.getDeclaredFields();
+		List<Field> specificFieldList = List.of(specificFieldArray);
+		Map<String, Class<?>> specificFieldMap = specificFieldList.stream().collect(Collectors.toMap(Field::getName, Field::getType));
+		
+		Class<?> classTypeResult = specificFieldMap.get(key);
+		
+		return classTypeResult;
+	}
+	
+	public static String convertObjectToValueSql(Object value, Class<?> classType) {
+		String valueStr = "";
+		switch (classType.getName()) {
+		case "java.lang.String":
+			valueStr = String.format("%s", value);
+			break;
+		case "java.lang.Integer":
+			valueStr = value.toString();
+			break;
+		case "java.lang.Long":
+			valueStr = value.toString();
+			break;
+		case "int":
+			valueStr = String.valueOf(value);
+			break;
+		case "java.util.Date":
+			valueStr = String.format("'%s'", dateFormatYYYYMMDDHHMMSS.format(value));
+			break;
+		default:
+			break;
 		}
 		
 		return valueStr;

@@ -1,6 +1,9 @@
 package com.se1.postservice.domain.payload;
 
+import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -27,12 +30,15 @@ public class PostDto {
 	}
 	
 	@Data
-	public class PostUser{
+	public static class PostUser{
 		private Long id;
+		private String email;
 		private String name;
 		private String imageUrl;
 		private boolean isExpert;
 		private Double rating;
 		private Byte status;
+		@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+		private Date lastTime = new Date();
 	}
 }

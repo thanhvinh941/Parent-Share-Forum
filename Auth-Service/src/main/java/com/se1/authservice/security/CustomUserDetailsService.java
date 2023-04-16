@@ -13,18 +13,18 @@ import com.se1.authservice.exception.ResourceNotFoundException;
 import com.se1.authservice.model.AuthProvider;
 import com.se1.authservice.model.User;
 import com.se1.authservice.payload.ApiResponseEntity;
-import com.se1.authservice.service.UserService;
-import com.se1.authservice.util.UserServiceRestTemplateClient;
+import com.se1.authservice.service.UserDetailService;
+import com.se1.authservice.util.UserService;
 
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    UserServiceRestTemplateClient client;
+    UserDetailService client;
     
     @Autowired
-    private UserService userService;
+    private UserDetailService userService;
     
     @Override
     public UserDetails loadUserByUsername(String email)

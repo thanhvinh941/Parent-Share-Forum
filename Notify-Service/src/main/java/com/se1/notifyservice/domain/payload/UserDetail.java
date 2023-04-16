@@ -8,9 +8,4 @@ public class UserDetail {
 	private String email;
 	private String name;
 	private String imageUrl;
-	private String role;
-	private Boolean isExpert;
-	private Double rating;
-	private int status;
-	private String topicId;
 }
