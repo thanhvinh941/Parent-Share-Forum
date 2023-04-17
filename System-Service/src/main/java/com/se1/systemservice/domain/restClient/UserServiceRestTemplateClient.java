@@ -1,4 +1,4 @@
-package com.se1.systemservice.domain.restclient;
+package com.se1.systemservice.domain.restClient;
 
 import java.net.MalformedURLException;
 import java.net.URL;

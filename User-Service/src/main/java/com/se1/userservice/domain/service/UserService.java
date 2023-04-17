@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.UserDto;
 import com.se1.userservice.domain.payload.UserResponseDto;
+import com.se1.userservice.domain.payload.response.UserResponseForClient;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
@@ -218,7 +220,7 @@ public class UserService {
 
 		validationUser(userFind);
 
-		generatorResponse(userFind, apiResponseEntity);
+		generatorResponseForClient(userFind, apiResponseEntity);
 	}
 
 	private void validationUser(User userFind) throws Exception {
@@ -267,6 +269,29 @@ public class UserService {
 		apiResponseEntity.setData(userResponseDto);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
+	}
+	
+	private void generatorResponseForClient(User userFind, ApiResponseEntity apiResponseEntity) {
+		double rating = 0;
+		if (userFind.getIsExpert()) {
+			rating = ratingService.getRatingByUserId(userFind.getId());
+		}
+		UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(userFind, rating);
+
+		apiResponseEntity.setData(userResponseDto);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	private UserResponseForClient convertUserEntityToUserResponseForClient(User userFind, double rating) {
+		UserResponseForClient userResponseDto = null;
+		if (userFind != null) {
+			userResponseDto = new UserResponseForClient();
+			BeanUtils.copyProperties(userFind, userResponseDto);
+			userResponseDto.setRating(rating);
+		}
+
+		return userResponseDto;
 	}
 
 	public void processFindUser(Map<String, Object> findRequestMap, ApiResponseEntity apiResponseEntity) {
