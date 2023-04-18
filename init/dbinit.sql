@@ -10,6 +10,180 @@ ALTER DATABASE db03 CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER DATABASE db04 CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER DATABASE db05 CHARACTER SET utf8 COLLATE utf8_general_ci;
 
+use db05;
+-- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
+--
+-- Host: localhost    Database: db05
+-- ------------------------------------------------------
+-- Server version	8.0.29
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `chats`
+--
+
+DROP TABLE IF EXISTS `chats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `chats` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `chat_parent` bigint DEFAULT NULL,
+  `content` varchar(255) NOT NULL,
+  `create_at` datetime(6) NOT NULL,
+  `status` int NOT NULL,
+  `topic_id` varchar(255) NOT NULL,
+  `user_delete_id` bigint DEFAULT NULL,
+  `user_id` bigint NOT NULL,
+  `is_file` bit(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `chats`
+--
+
+LOCK TABLES `chats` WRITE;
+/*!40000 ALTER TABLE `chats` DISABLE KEYS */;
+INSERT INTO `chats` VALUES (1,NULL,'test 1','2023-04-15 18:26:28.764000',0,'24399549-89cc-40e9-a548-8c66f985941f',NULL,12,_binary '\0'),(2,NULL,'test 1','2023-04-15 18:26:33.995000',0,'24399549-89cc-40e9-a548-8c66f985941f',NULL,12,_binary '\0'),(3,NULL,'test 2','2023-04-15 18:26:40.119000',0,'24399549-89cc-40e9-a548-8c66f985941f',NULL,12,_binary '\0');
+/*!40000 ALTER TABLE `chats` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+use db01;
+-- Dump completed on 2023-04-18 19:08:02
+-- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
+--
+-- Host: localhost    Database: db01
+-- ------------------------------------------------------
+-- Server version	8.0.29
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `mail`
+--
+
+DROP TABLE IF EXISTS `mail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mail` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `subject` varchar(255) NOT NULL,
+  `body` longtext NOT NULL,
+  `mail_template` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mail`
+--
+
+LOCK TABLES `mail` WRITE;
+/*!40000 ALTER TABLE `mail` DISABLE KEYS */;
+INSERT INTO `mail` VALUES (1,'Xác thực email','&lt;!DOCTYPE html&gt; &lt;html&gt; &lt;head&gt; &lt;meta charset=\"utf-8\" /&gt;&lt;meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\" /&gt; &lt;title&gt;EmailConfirmation&lt;/title&gt; &lt;meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" /&gt; &lt;style type=\"text/css\"&gt; /** * Google webfonts.Recommended to include the .woff version for cross-client compatibility. */@media screen { @font-face { font-family: \"Source Sans Pro\"; font-style: normal;font-weight: 400; src: local(\"Source Sans Pro Regular\"),local(\"SourceSansPro-Regular\"),url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff)format(\"woff\"); } @font-face { font-family: \"Source Sans Pro\"; font-style:normal; font-weight: 700; src: local(\"Source Sans Pro Bold\"),local(\"SourceSansPro-Bold\"),url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff)format(\"woff\"); } } /** * Avoid browser level font resizing. * 1. Windows Mobile* 2. iOS / OSX */ body, table, td, a { -ms-text-size-adjust: 100%; /* 1 */-webkit-text-size-adjust: 100%; /* 2 */ } /** * Remove extra space added totables and cells in Outlook. */ table, td { mso-table-rspace: 0pt;mso-table-lspace: 0pt; } /** * Better fluid images in Internet Explorer. */ img{ -ms-interpolation-mode: bicubic; } /** * Remove blue links for iOS devices. */a[x-apple-data-detectors] { font-family: inherit !important; font-size: inherit!important; font-weight: inherit !important; line-height: inherit !important;color: inherit !important; text-decoration: none !important; } /** * Fixcentering issues in Android 4.4. */ div[style*=\"margin: 16px 0;\"] { margin: 0!important; } body { width: 100% !important; height: 100% !important; padding: 0!important; margin: 0 !important; } /** * Collapse table borders to avoid spacebetween cells. */ table { border-collapse: collapse !important; } a { color:#1a82e2; } img { height: auto; line-height: 100%; text-decoration: none; border:0; outline: none; } &lt;/style&gt; &lt;/head&gt; &lt;bodystyle=\"background-color: #e9ecef\"&gt; &lt;table border=\"0\" cellpadding=\"0\"cellspacing=\"0\" width=\"100%\"&gt; &lt;tr&gt; &lt;td align=\"center\"bgcolor=\"#e9ecef\"&gt; &lt;table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"width=\"100%\" style=\"max-width: 600px\" bgcolor=\"#ffffff\" &gt;&lt;/table&gt;&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=\"center\" bgcolor=\"#e9ecef\"&gt;&lt;table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"style=\"max-width: 600px\" &gt; &lt;tr&gt; &lt;td align=\"center\" valign=\"top\"style=\"padding: 36px 24px\"&gt;&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;tdalign=\"left\" bgcolor=\"#ffffff\" style=\" padding: 36px 24px 0; font-family:\'Source Sans Pro\', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;\" &gt; &lt;a href=\"__MY_DOMAIN__\" target=\"_blank\" style=\"display: flex;justify-content: center\" &gt; &lt;imgsrc=\"https://anh4.com/images/2023/04/15/logovuong.png\" alt=\"Logo\" border=\"0\"width=\"100\" style=\" display: block; width: 100px; max-width: 100px; min-width:100px; \" /&gt; &lt;/a&gt; &lt;h1 style=\" margin: 0; font-size: 32px;font-weight: 700; letter-spacing: -1px; line-height: 48px; \" &gt; Xác nhận email của bạn &lt;/h1&gt; &lt;/td&gt; &lt;/tr&gt; &lt;/table&gt; &lt;/td&gt;&lt;/tr&gt; &lt;tr&gt; &lt;td align=\"center\" bgcolor=\"#e9ecef\"&gt; &lt;tableborder=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px\"&gt; &lt;tr&gt; &lt;td align=\"left\" bgcolor=\"#ffffff\" style=\" padding: 24px;font-family: \'Source Sans Pro\', Helvetica, Arial, sans-serif; font-size: 16px;line-height: 24px; \" &gt; &lt;p style=\"margin: 0\"&gt; Cảm ơn bạn đã chọn đăng ký tài khoảng tại VBBC social network. &lt;br /&gt; Chúng tôi muốn xác nhận rằng email này chắc chắn là của bạn. Làm ơn hãy nhấn vào nút \"xác nhận\" dưới đây để hoàn tất quá trình tạo tài khoản &lt;br /&gt; &lt;/p&gt; &lt;/td&gt; &lt;/tr&gt;&lt;tr&gt; &lt;td align=\"left\" bgcolor=\"#ffffff\"&gt; &lt;table border=\"0\"cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"&gt; &lt;tr&gt; &lt;tdalign=\"center\" bgcolor=\"#ffffff\" style=\"padding: 12px\"&gt; &lt;table border=\"0\"cellpadding=\"0\" cellspacing=\"0\"&gt; &lt;tr&gt; &lt;td align=\"center\"bgcolor=\"#1a82e2\" style=\"border-radius: 6px\" &gt; &lt;a href=\"__VERIFY_LINK__\"target=\"_blank\" style=\" display: inline-block; padding: 16px 36px; font-family:\'Source Sans Pro\', Helvetica, Arial, sans-serif; font-size: 16px; color:#ffffff; text-decoration: none; border-radius: 6px; \" &gt;Xác nhận&lt;/a &gt;&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt; &lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;&lt;/td&gt; &lt;/tr&gt; &lt;!-- end button --&gt; &lt;!-- start copy --&gt;&lt;tr&gt; &lt;td align=\"left\" bgcolor=\"#ffffff\" style=\" padding: 24px;font-family: \'Source Sans Pro\', Helvetica, Arial, sans-serif; font-size: 16px;line-height: 24px; border-bottom: 3px solid #d4dadf; \" &gt; &lt;p style=\"margin:0\"&gt; Cheers,&lt;br /&gt; VB Team &lt;/p&gt; &lt;/td&gt; &lt;/tr&gt;&lt;/table&gt; &lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td align=\"center\"bgcolor=\"#e9ecef\" style=\"padding: 24px\"&gt; &lt;table border=\"0\" cellpadding=\"0\"cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px\" &gt; &lt;tr&gt; &lt;tdalign=\"center\" bgcolor=\"#e9ecef\" style=\" padding: 12px 24px; font-family:\'Source Sans Pro\', Helvetica, Arial, sans-serif; font-size: 14px; line-height:20px; color: #666; \" &gt;&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt; &lt;/td&gt;&lt;/tr&gt; &lt;/table&gt; &lt;/body&gt; &lt;/html&gt;','regist_user');
+/*!40000 ALTER TABLE `mail` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+use db03;
+-- Dump completed on 2023-04-18 19:08:02
+-- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
+--
+-- Host: localhost    Database: db03
+-- ------------------------------------------------------
+-- Server version	8.0.29
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `notify`
+--
+
+DROP TABLE IF EXISTS `notify`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notify` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `create_at` datetime(6) NOT NULL,
+  `del_flg` tinyint NOT NULL,
+  `param` varchar(255) NOT NULL,
+  `status` int NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `user_id` bigint NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notify`
+--
+
+LOCK TABLES `notify` WRITE;
+/*!40000 ALTER TABLE `notify` DISABLE KEYS */;
+INSERT INTO `notify` VALUES (1,'2023-04-15 18:25:52.312000',0,'status=1&topicId=24399549-89cc-40e9-a548-8c66f985941f',0,'contact',8,'{\"userSender\":\"{\\\"id\\\":12,\\\"email\\\":\\\"baotran245@gmail.com\\\",\\\"name\\\":\\\"Bảo Trấn\\\",\\\"imageUrl\\\":null,\\\"role\\\":null,\\\"isExpert\\\":false,\\\"rating\\\":null,\\\"status\\\":0,\\\"topicId\\\":\\\"fe7b2a5c-051f-491d-af13-22def87eee8e\\\"}\",\"action\":\"request-friend\"}');
+/*!40000 ALTER TABLE `notify` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+use db04;
+
+-- Dump completed on 2023-04-18 19:08:02
 -- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db04
@@ -238,4 +412,197 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-18 18:59:09
+use db02;
+-- Dump completed on 2023-04-18 19:08:02
+-- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
+--
+-- Host: localhost    Database: db02
+-- ------------------------------------------------------
+-- Server version	8.0.29
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `comment`
+--
+
+DROP TABLE IF EXISTS `comment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comment` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `comemnt_parent_id` bigint DEFAULT NULL,
+  `content` varchar(255) NOT NULL,
+  `create_at` datetime(6) NOT NULL,
+  `del_flg` bit(1) NOT NULL,
+  `post_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comment`
+--
+
+LOCK TABLES `comment` WRITE;
+/*!40000 ALTER TABLE `comment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comment_like`
+--
+
+DROP TABLE IF EXISTS `comment_like`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comment_like` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `comment_id` int NOT NULL,
+  `create_at` datetime(6) NOT NULL,
+  `status` tinyint NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comment_like`
+--
+
+LOCK TABLES `comment_like` WRITE;
+/*!40000 ALTER TABLE `comment_like` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment_like` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `post`
+--
+
+DROP TABLE IF EXISTS `post`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `context` longtext NOT NULL,
+  `create_at` datetime(6) NOT NULL,
+  `delflg` int NOT NULL,
+  `hash_tag` varchar(255) DEFAULT NULL,
+  `status` int NOT NULL,
+  `summary` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `topic_tag_id` int NOT NULL,
+  `update_at` datetime(6) NOT NULL,
+  `user_id` bigint NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `post`
+--
+
+LOCK TABLES `post` WRITE;
+/*!40000 ALTER TABLE `post` DISABLE KEYS */;
+/*!40000 ALTER TABLE `post` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `post_image_list`
+--
+
+DROP TABLE IF EXISTS `post_image_list`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post_image_list` (
+  `post_id` bigint NOT NULL,
+  `image_list` varchar(255) DEFAULT NULL,
+  KEY `FK5va1h0pl9uv57eflygdejfal1` (`post_id`),
+  CONSTRAINT `FK5va1h0pl9uv57eflygdejfal1` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `post_image_list`
+--
+
+LOCK TABLES `post_image_list` WRITE;
+/*!40000 ALTER TABLE `post_image_list` DISABLE KEYS */;
+/*!40000 ALTER TABLE `post_image_list` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `post_like`
+--
+
+DROP TABLE IF EXISTS `post_like`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post_like` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `create_at` datetime(6) NOT NULL,
+  `post_id` int NOT NULL,
+  `status` tinyint NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `post_like`
+--
+
+LOCK TABLES `post_like` WRITE;
+/*!40000 ALTER TABLE `post_like` DISABLE KEYS */;
+/*!40000 ALTER TABLE `post_like` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `topic_tag`
+--
+
+DROP TABLE IF EXISTS `topic_tag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `topic_tag` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `color` varchar(255) NOT NULL,
+  `create_at` datetime(6) NOT NULL,
+  `del_flg` tinyint NOT NULL,
+  `tag_name` varchar(255) NOT NULL,
+  `update_at` datetime(6) NOT NULL,
+  `user_create` varchar(255) NOT NULL,
+  `user_update` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `topic_tag`
+--
+
+LOCK TABLES `topic_tag` WRITE;
+/*!40000 ALTER TABLE `topic_tag` DISABLE KEYS */;
+/*!40000 ALTER TABLE `topic_tag` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2023-04-18 19:08:02
