@@ -26,4 +26,6 @@ public class UserDto {
 	private Date createAt;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date updateAt;
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date lastTime;
 }

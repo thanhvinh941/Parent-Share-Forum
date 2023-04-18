@@ -8,4 +8,5 @@ public class CreateChatRequest {
 	private long userId;
 	private String topicId;
 	private Long chatParentId;
+	private Boolean isFile;
 }

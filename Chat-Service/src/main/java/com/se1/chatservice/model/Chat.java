@@ -31,6 +31,9 @@ public class Chat {
 	private int status;
 	
 	@Column(nullable = false)
+	private Boolean isFile;
+	
+	@Column(nullable = false)
 	private String topicId;
 	
 	private Long chatParent;

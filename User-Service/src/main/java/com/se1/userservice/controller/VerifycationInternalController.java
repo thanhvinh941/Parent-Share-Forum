@@ -1,5 +1,7 @@
 package com.se1.userservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,9 +29,11 @@ public class VerifycationInternalController {
 	public ResponseEntity<?> save(@RequestParam("user_id") Long userId, @RequestParam("email") String mail, @RequestParam("name") String name) {
 
 		try {
-			verifycationService.processCreate(userId, mail, name);
+			verifycationService.processCreate(userId, mail, name, apiResponseEntity);
 		} catch (Exception e) {
-			// TODO: handle exception
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of());
+			apiResponseEntity.setStatus(0);
 		}
 		
 		return ResponseEntity.ok(apiResponseEntity);

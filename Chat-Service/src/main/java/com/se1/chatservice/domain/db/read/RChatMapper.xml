@@ -11,13 +11,14 @@
 		<result column="chat_parent" jdbcType="BIGINT" javaType="java.lang.Long" property="chatParent" />
 		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
 		<result column="user_delete_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userDeleteId" />
+		<result column="is_file" jdbcType="INTEGER" javaType="java.lang.Integer" property="isFile" />
 	</resultMap>
 
 	<select id="getAllChat" resultMap="chat_result">
 		Select * from chats 
-		Where topic_id = '${topicId}'
+		Where topic_id = #{topicId}
 		Order by create_at DESC
-		Limit ${limit} Offset ${offset}
+		Limit #{limit} Offset #{offset}
 	</select>
 
 	<select id="getChatById" resultMap="chat_result">

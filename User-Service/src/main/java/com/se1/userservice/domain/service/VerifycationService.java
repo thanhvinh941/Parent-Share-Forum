@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.model.Verification;
+import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.request.MailRequest;
 import com.se1.userservice.domain.repository.VerifycationRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
@@ -35,7 +36,7 @@ public class VerifycationService {
 	@Autowired
 	private SystemServiceRestTemplateClient restTemplateClient;
 	
-	public void processCreate(Long userId, String mail, String userName) throws JsonProcessingException {
+	public void processCreate(Long userId, String mail, String userName, ApiResponseEntity apiResponseEntity) throws JsonProcessingException {
 
 		Verification verification = new Verification();
 		verification.setValidFlg(SCMConstant.VALID_FLG);
@@ -53,6 +54,10 @@ public class VerifycationService {
 		mailRequest.setData(Map.of("__VERIFY_LINK__", verificationLink, "__MY_DOMAIN__" , urlFronEnd));
 		
 		restTemplateClient.sendMail(mailRequest);
+		
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 
 	private Date getExpirationTime() {

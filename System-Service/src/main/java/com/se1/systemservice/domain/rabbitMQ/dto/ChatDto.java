@@ -17,6 +17,7 @@ public class ChatDto {
 	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	private Date createAt;
 	private Long userDeleteId;
+	private Boolean isFile;
 	
 	@Data
 	public static class User {

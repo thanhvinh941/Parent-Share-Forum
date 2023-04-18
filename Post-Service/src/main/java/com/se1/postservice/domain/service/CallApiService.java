@@ -37,7 +37,7 @@ public class CallApiService<T> {
 
 	public final static String SYSTEM_SERVICE = "micro-service.system-service";
 
-	public String callPostMenthodForParam(MultiValueMap<String, Long> param, String target, String path)
+	public String callPostMenthodForParam(MultiValueMap<String, String> param, String target, String path)
 			throws JsonProcessingException {
 
 		String url = getFullUrl(target, path);
@@ -45,7 +45,7 @@ public class CallApiService<T> {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(param, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(param, headers);
 
 		ResponseEntity<ApiResponseEntity> restExchange = restTemplate.postForEntity(url, request,
 				ApiResponseEntity.class);
@@ -61,10 +61,11 @@ public class CallApiService<T> {
 
 		String url = getFullUrl(target, path);
 
+		String requestJson = objectMapper.writeValueAsString(requestObject);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 
-		HttpEntity<Object> request = new HttpEntity<Object>(requestObject, headers);
+		HttpEntity<String> request = new HttpEntity<String>(requestJson, headers);
 
 		ResponseEntity<ApiResponseEntity> restExchange = restTemplate.postForEntity(url, request, ApiResponseEntity.class);
 
@@ -76,9 +77,7 @@ public class CallApiService<T> {
 
 	private String getFullUrl(String target, String path) {
 		String host = environment.getProperty(target);
-
 		String fullUri = host + "/" + path;
-
 		return fullUri;
 	}
 }

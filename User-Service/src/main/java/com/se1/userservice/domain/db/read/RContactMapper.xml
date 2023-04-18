@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.se1.userservice.domain.db.read.RContactMapper">
+
+
+	<resultMap id="contact_map" type="com.se1.userservice.domain.db.dto.ContactDto">
+		<result column="id" jdbcType="BIGINT" javaType="java.lang.Long" property="id" />
+		<result column="user_reciver_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userReciverId" />
+		<result column="user_sender_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userSenderId" />
+		<result column="topic_id" jdbcType="VARCHAR" javaType="java.lang.String" property="topicId" />
+		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
+	</resultMap>
+
+	<select id="findContactByUserIdAndTopicId" resultMap="contact_map">
+		Select * from contacts
+		Where topic_id = #{topicId}
+		AND (user_reciver_id = #{userId} OR user_sender_id = #{userId})
+	</select>
+
+</mapper>

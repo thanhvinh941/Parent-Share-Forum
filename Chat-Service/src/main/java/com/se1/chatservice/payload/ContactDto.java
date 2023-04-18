@@ -1,4 +1,4 @@
-package com.se1.userservice.domain.payload;
+package com.se1.chatservice.payload;
 
 import java.util.Date;
 

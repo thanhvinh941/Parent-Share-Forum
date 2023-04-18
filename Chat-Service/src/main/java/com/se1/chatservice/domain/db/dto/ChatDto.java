@@ -19,6 +19,7 @@ public class ChatDto {
 	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
 	private Date createAt;
 	private Long userDeleteId;
+	private Integer isFile;
 	private List<React> reactList;
 
 	@Data

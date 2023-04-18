@@ -36,4 +36,18 @@ public class ContactInternalController {
 		
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
+	
+	@PostMapping("/findContactByUserIdAndTopicId")
+	public ResponseEntity<?> getContact(@RequestParam("userId") Long userId,
+			@RequestParam("topicId") String topicId){
+		try {
+			contactService.processFindContactByUserIdAndTopicIdGetListContact(userId, topicId,apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
 }

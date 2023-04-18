@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -12,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,10 +25,12 @@ import com.se1.chatservice.domain.db.write.WChatMapper;
 import com.se1.chatservice.model.Chat;
 import com.se1.chatservice.payload.ApiResponseEntity;
 import com.se1.chatservice.payload.ChatDto;
+import com.se1.chatservice.payload.ContactDto;
 import com.se1.chatservice.payload.CreateChatRequest;
 import com.se1.chatservice.payload.GetAllChatRequest;
 import com.se1.chatservice.payload.RabbitRequest;
 import com.se1.chatservice.payload.UpdateChatRequest;
+import com.se1.chatservice.payload.UserDetail;
 import com.se1.chatservice.repository.ChatRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -43,16 +47,14 @@ public class ChatService {
 	private final ObjectMapper objectMapper;
 	private final RChatMapper rChatMapper;
 	private final CallApiService<ChatDto.User> callApiService;
-
+	private final ContactService contactService;
+	
 	public void processCreate(CreateChatRequest chatRequest) throws JsonProcessingException {
 		log.info("processCreate ");
 		Chat chat = new Chat();
-		chat.setChatParent(chatRequest.getChatParentId());
-		chat.setUserId(chatRequest.getUserId());
+		BeanUtils.copyProperties(chatRequest, chat);
 		chat.setCreateAt(new Date());
 		chat.setStatus(0);
-		chat.setTopicId(chatRequest.getTopicId());
-		chat.setContent(chatRequest.getContent());
 
 		Chat chatNew = chatRepository.save(chat);
 		ChatDto chatDto = new ChatDto();
@@ -134,8 +136,8 @@ public class ChatService {
 
 	private ChatDto.User getUSerChat(Long userId) {
 
-		MultiValueMap<String, Long> request = new LinkedMultiValueMap<String, Long>();
-		request.add("id", userId);
+		MultiValueMap<String, String> request = new LinkedMultiValueMap<String, String>();
+		request.add("id", userId.toString());
 
 		ChatDto.User userChatParent = null;
 		try {
@@ -159,13 +161,19 @@ public class ChatService {
 		}
 	}
 
-	public void processGetAllChat(GetAllChatRequest request, ApiResponseEntity apiResponseEntity) {
+	public void processGetAllChat(GetAllChatRequest request, UserDetail userDetail, ApiResponseEntity apiResponseEntity) throws Exception {
+		ContactDto contactDto = contactService.findContactByUserIdAndTopicId(request.getTopicId(), userDetail.getId());
+		if(Objects.isNull(contactDto)) {
+			throw new Exception("Hành động không cho phép");
+		}
+		
 		List<com.se1.chatservice.domain.db.dto.ChatDto> listChat = rChatMapper.getAllChat(request.getTopicId(),
 				request.getLimit(), request.getOffset());
 		Collections.reverse(listChat);
 		List<ChatDto> listChatResponse = listChat.stream().map(c -> {
 			ChatDto chatDto = new ChatDto();
 			BeanUtils.copyProperties(c, chatDto);
+			chatDto.setIsFile(c.getIsFile().equals(1));
 			chatDto.setUser(getUSerChat(c.getUserId()));
 			if (c.getChatParent() != null) {
 				Chat chatParent = chatRepository.findById(c.getChatParent()).get();

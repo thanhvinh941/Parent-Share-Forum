@@ -45,6 +45,7 @@ import com.se1.authservice.payload.SignUpRequest;
 import com.se1.authservice.payload.SignUpResponseDto;
 import com.se1.authservice.payload.UserDetail;
 import com.se1.authservice.payload.UserResponseDto;
+import com.se1.authservice.payload.UserResponseForClient;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.service.UserDetailService;
@@ -128,7 +129,7 @@ public class AuthController {
 			if (user == null) {
 				return this.badResponse(List.of("User not found"));
 			}
-			UserDetail userDetail = new UserDetail();
+			UserResponseForClient userDetail = new UserResponseForClient();
 			BeanUtils.copyProperties(user, userDetail);
 			return this.okResponse(userDetail);
 		} catch (JsonProcessingException e) {

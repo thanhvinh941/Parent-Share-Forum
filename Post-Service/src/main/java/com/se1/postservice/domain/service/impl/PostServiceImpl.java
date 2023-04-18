@@ -288,7 +288,7 @@ public class PostServiceImpl implements PostService {
 
 		List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
 
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(allIdUserIdDistinct,
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(allIdUserIdDistinct.toString(),
 				offset);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
@@ -309,7 +309,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset) {
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(List.of(userId),
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(userId.toString(),
 				offset);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);

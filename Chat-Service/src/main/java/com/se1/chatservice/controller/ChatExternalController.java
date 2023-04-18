@@ -6,11 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.chatservice.payload.ApiResponseEntity;
 import com.se1.chatservice.payload.GetAllChatRequest;
+import com.se1.chatservice.payload.UserDetail;
 import com.se1.chatservice.service.ChatService;
 
 @RestController
@@ -23,11 +28,15 @@ public class ChatExternalController {
 	@Autowired
 	private ApiResponseEntity apiResponseEntity;
 	
+	@Autowired
+	private ObjectMapper mapper;
+	
 	@PostMapping("/getAllChat")
-	public ResponseEntity<?> getAllChat(@RequestBody GetAllChatRequest request){
+	public ResponseEntity<?> getAllChat(@RequestHeader("user_detail") String userDetailHeader, @RequestBody GetAllChatRequest request) throws JsonMappingException, JsonProcessingException{
+		UserDetail userDetail = mapper.readValue(userDetailHeader, UserDetail.class);
 		
 		try {
-			chatService.processGetAllChat(request, apiResponseEntity);
+			chatService.processGetAllChat(request, userDetail,apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

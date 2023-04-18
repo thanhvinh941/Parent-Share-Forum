@@ -64,42 +64,14 @@ public class WebsocketController {
 			commonService.saveFile(imageName, inputStream);
 		}
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("content", contentToMQ);
-		map.put("topicId", topicId);
-		map.put("chatParent", null);
-		
 		ChatMqRequest mqRequest = new ChatMqRequest();
 		mqRequest.setChatParentId(request.getChatParent());
 		mqRequest.setContent(contentToMQ);
 		mqRequest.setUserId(Long.parseLong(userId));
 		mqRequest.setTopicId(topicId);
+		mqRequest.setIsFile(request.getIsFile());
 		
 		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
-
-//		websocketService.sendMessageChat(topicId, request, Long.parseLong(userId));
 	}
 
-	@MessageMapping("/comment/{topicId}")
-	public void sendComment() {
-
-	}
-
-	@MessageMapping("/contact/{topicId}")
-	public void sendContact(@DestinationVariable String topicId, ChatRequest request) {
-		websocketService.sendContact(topicId, request);
-	}
-
-	@MessageMapping("/user/{topicId}")
-	public void sendUser(@DestinationVariable String topicId, ChatRequest request) {
-
-		websocketService.sendContact(topicId, request);
-	}
-
-	@MessageMapping("/userContact/{userId}")
-	public void updateUserContact(@DestinationVariable Integer userId, String action) {
-		boolean isChoose = action.equals("CONNECT");
-		System.out.println(userId + "/" + action);
-		contactService.updateUserChoose(userId, isChoose);
-	}
 }

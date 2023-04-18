@@ -15,7 +15,7 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.se1.systemservice.domain.restClient.UserServiceRestTemplateClient;
+import com.se1.systemservice.domain.restclient.UserServiceRestTemplateClient;
 
 import lombok.Data;
 
