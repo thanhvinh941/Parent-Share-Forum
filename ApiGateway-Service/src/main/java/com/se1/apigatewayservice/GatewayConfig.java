@@ -20,8 +20,8 @@ public class GatewayConfig {
 				.route("user-service",
 						r -> r.path("/user/**").filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
 								.uri("lb://user-service"))
-				.route("licence-service",
-						r -> r.path("/licence/**")
+				.route("author-service",
+						r -> r.path("/author-item/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
 								.uri("lb://user-service"))
 				.route("contact-service",
