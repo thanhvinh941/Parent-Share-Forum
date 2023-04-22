@@ -1,6 +1,5 @@
 package com.se1.userservice.domain.model;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

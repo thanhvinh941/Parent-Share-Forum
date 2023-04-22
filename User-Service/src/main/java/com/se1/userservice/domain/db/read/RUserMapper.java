@@ -12,4 +12,6 @@ public interface RUserMapper {
 
 	List<User> find(@Param("query") String query);
 
+	List<User> findAll(@Param("conditions") List<String> mapRequest,@Param("userId") Long userId);
+
 }
