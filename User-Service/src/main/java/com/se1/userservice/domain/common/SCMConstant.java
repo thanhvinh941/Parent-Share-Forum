@@ -34,14 +34,15 @@ public interface SCMConstant {
 
 	public static Map<Integer, String> getAllAuthorItem() {
 		List<AuthorizationItem> authorizationItems = List.of(AuthorizationItem.values());
-		return authorizationItems.stream()
-				.collect(Collectors.toMap(AuthorizationItem::getId, AuthorizationItem::name));
+		return authorizationItems.stream().collect(Collectors.toMap(AuthorizationItem::getId, AuthorizationItem::name));
 	}
-	
+
 	public static Map<Integer, String> getAllAuthorItemByIds(List<String> ids) {
 		List<AuthorizationItem> authorizationItems = List.of(AuthorizationItem.values());
-		return authorizationItems.stream()
-				.filter(author -> ids.contains(author.getId()))
-				.collect(Collectors.toMap(AuthorizationItem::getId, AuthorizationItem::name));
+		return authorizationItems.stream().filter(author -> {
+			var id = author.getId().toString();
+			boolean isValid = ids.contains(id);
+			return isValid;
+		}).collect(Collectors.toMap(AuthorizationItem::getId, AuthorizationItem::name));
 	}
 }

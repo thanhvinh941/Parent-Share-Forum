@@ -30,7 +30,7 @@ public class GroupRole {
     private List<String> roles;
     
     @Column(nullable = false)
-    private Boolean delFlg;
+    private Byte delFlg;
     
     @Column(nullable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
