@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.se1.chatservice.config.SCMConstant;
 
 import lombok.Data;
 
@@ -42,5 +43,5 @@ public class Chat {
 	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
 	private Date createAt;
 	
-	private Long userDeleteId;
+	private Long userDeleteId = SCMConstant.USER_DELETE_OFF;
 }

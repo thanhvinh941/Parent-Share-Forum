@@ -1,5 +1,7 @@
 package com.se1.postservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,15 +31,17 @@ public class CommentExternalController {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
-	@PostMapping
+	@PostMapping("/create")
 	public ResponseEntity<?> create(@RequestHeader("user_detail") String userDetailHeader, @RequestBody CreateCommentRequest request) throws JsonMappingException, JsonProcessingException{
 		
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 		
 		try {
-			commentService.processCreat(null, apiResponseEntity);
+			commentService.processCreat(request, apiResponseEntity, userDetail);
 		} catch (Exception e) {
-			// TODO: handle exception
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
 		}
 		
 		return ResponseEntity.ok(apiResponseEntity);

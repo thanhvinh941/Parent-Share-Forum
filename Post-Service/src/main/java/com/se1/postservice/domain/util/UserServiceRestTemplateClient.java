@@ -14,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
@@ -64,11 +65,8 @@ public class UserServiceRestTemplateClient {
                         request,
                         ApiResponseEntity.class);
 		
-		List<Object> objects = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), List.class);
-		List<ContactDto> contactDtos = new ArrayList<>();
-		for(Object object : objects) {
-			contactDtos.add(mapper.readValue(mapper.writeValueAsString(object), ContactDto.class));
-		}
+		List<ContactDto> contactDtos = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), new TypeReference<List<ContactDto>>() {
+		});
         return contactDtos;
 	}
 

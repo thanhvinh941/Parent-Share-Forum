@@ -55,7 +55,7 @@ public class User {
     private String topicId;
 
     @Column(nullable = false)
-	private Byte status; // 1: online, 2 offline
+	private Byte status; // 1: online, 0 offline
     
     private String providerId;
     

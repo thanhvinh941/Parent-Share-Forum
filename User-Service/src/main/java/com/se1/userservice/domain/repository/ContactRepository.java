@@ -30,4 +30,9 @@ public interface ContactRepository extends CrudRepository<Contact, Long> {
 	@Query("SELECT c FROM Contact c WHERE c.userSenderId = :userId OR c.userReciverId = :userId AND (:status is null or c.status = :status)")
 	List<Contact> findByUserId(@Param("userId") Long userId, @Param("status") Integer status);
 
+	@Modifying
+	@Query("UPDATE Contact c SET c.userSenderId = ?2 , c.userReciverId = ?1 , c.status = ?4 WHERE c.id = ?3")
+	void updateContactV2(Long userReciverId, Long userSenderId, Long id,
+			int status);
+
 }

@@ -11,5 +11,5 @@ import com.se1.chatservice.model.Chat;
 @Mapper
 public interface RChatMapper {
 
-	List<ChatDto> getAllChat(@Param("topicId") String topicId,@Param("limit") Integer limit,@Param("offset") Integer offset);
+	List<ChatDto> getAllChat(@Param("topicId") String topicId,@Param("limit") Integer limit,@Param("offset") Integer offset, @Param("userDelete") Long userDelete);
 }

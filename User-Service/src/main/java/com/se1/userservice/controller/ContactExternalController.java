@@ -66,7 +66,7 @@ public class ContactExternalController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<?> updateContact(@RequestParam("id") long userId,
+	public ResponseEntity<?> updateContact(@RequestParam("user_id") long userId,
 			@RequestParam(name = "action", required = false) String action,
 			@RequestHeader("user_detail") String userDetailHeader) {
 		// 0: unfriend, 1:request, 2:friend
@@ -80,6 +80,11 @@ public class ContactExternalController {
 			switch (action) {
 				case SCMConstant.CONTACT_FRIEND:
 					statusUpdate = 2;
+					userReciverId = userDetail.getId();
+					userSenderId = userId;
+					break;
+				case SCMConstant.CONTACT_UNFRIEND:
+					statusUpdate = 0;
 					userReciverId = userDetail.getId();
 					userSenderId = userId;
 					break;
@@ -103,7 +108,7 @@ public class ContactExternalController {
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
-			contactService.processGetListFriend(userDetail, apiResponseEntity);
+			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -129,19 +134,19 @@ public class ContactExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 
-	@PostMapping("/getListContactForChat")
-	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader) {
-		UserDetail userDetail;
-		try {
-			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-
-			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
-		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
-		}
-
-		return ResponseEntity.ok().body(apiResponseEntity);
-	}
+//	@PostMapping("/getListContactForChat")
+//	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader) {
+//		UserDetail userDetail;
+//		try {
+//			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+//
+//			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
+//		} catch (Exception e) {
+//			apiResponseEntity.setData(null);
+//			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+//			apiResponseEntity.setStatus(0);
+//		}
+//
+//		return ResponseEntity.ok().body(apiResponseEntity);
+//	}
 }

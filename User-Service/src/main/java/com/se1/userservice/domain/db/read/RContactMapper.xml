@@ -16,5 +16,15 @@
 		Where topic_id = #{topicId}
 		AND (user_reciver_id = #{userId} OR user_sender_id = #{userId})
 	</select>
+	
+	<select id="findByUserReciverIdAndUserSenderId" resultMap="contact_map">
+		SELECT * FROM contacts 
+		where user_reciver_id = #{userReciverId} and user_sender_id = #{userSenderId} 
+	</select>
 
+<select id="findByUserReciverIdOrUserSenderId" resultMap="contact_map">
+		SELECT * FROM contacts 
+		where user_reciver_id = #{userReciverId} and user_sender_id = #{userSenderId} 
+		Or user_reciver_id = #{userSenderId} and user_sender_id = #{userReciverId}
+	</select>
 </mapper>

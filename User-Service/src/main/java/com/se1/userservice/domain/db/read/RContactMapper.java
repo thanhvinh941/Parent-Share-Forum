@@ -11,4 +11,8 @@ import com.se1.userservice.domain.db.dto.ContactDto;
 public interface RContactMapper {
 
 	List<ContactDto> findContactByUserIdAndTopicId(@Param("userId") Long userId, @Param("topicId") String topicId);
+
+	ContactDto findByUserReciverIdAndUserSenderId(@Param("userReciverId") Long userId, @Param("userSenderId") Long userLoginId);
+
+	ContactDto findByUserReciverIdOrUserSenderId(@Param("userReciverId") Long userId, @Param("userSenderId") Long userLoginId);
 }

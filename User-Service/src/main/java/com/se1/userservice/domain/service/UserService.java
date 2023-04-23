@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ import com.se1.userservice.domain.payload.UserDto;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
 import com.se1.userservice.domain.payload.request.CreateUserRequest.Description;
+import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.payload.response.UserResponseForClient;
 import com.se1.userservice.domain.payload.response.UserResponseForClient.ExpertInfo;
 import com.se1.userservice.domain.repository.UserDescriptionRepository;
@@ -322,23 +324,23 @@ public class UserService {
 		return userResponseDto;
 	}
 
-	public void processFindUser(Map<String, Object> findRequestMap, ApiResponseEntity apiResponseEntity) {
-
-		String query = generateQueryContionFind(findRequestMap);
-		List<User> userList = rUserMapper.find(query);
-		List<UserResponseDto> responseList = userList.stream().map(ul -> {
-			double rating = 0;
-			if (ul.getIsExpert()) {
-				rating = ratingService.getRatingByUserId(ul.getId());
-			}
-			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
-			return userResponseDto;
-		}).collect(Collectors.toList());
-
-		apiResponseEntity.setData(responseList);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-	}
+//	public void processFindUser(Map<String, Object> findRequestMap, ApiResponseEntity apiResponseEntity) {
+//
+//		String query = generateQueryContionFind(findRequestMap);
+//		List<User> userList = rUserMapper.find(query);
+//		List<UserResponseDto> responseList = userList.stream().map(ul -> {
+//			double rating = 0;
+//			if (ul.getIsExpert()) {
+//				rating = ratingService.getRatingByUserId(ul.getId());
+//			}
+//			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
+//			return userResponseDto;
+//		}).collect(Collectors.toList());
+//
+//		apiResponseEntity.setData(responseList);
+//		apiResponseEntity.setErrorList(null);
+//		apiResponseEntity.setStatus(1);
+//	}
 
 	public void processFindByName(String name, ApiResponseEntity apiResponseEntity) {
 		String query = generateQueryContionFindByName(name);
@@ -362,33 +364,33 @@ public class UserService {
 		wUserMapper.updateUserStatus(id, status);
 	}
 
-	public void processRegistExpert(UserDetail userDetail, String imageLicenceBase64,
-			ApiResponseEntity apiResponseEntity) throws Exception {
-		Long userId = userDetail.getId();
-		Boolean isExpert = userDetail.getIsExpert();
-		if (isExpert) {
-			throw new Exception("Người dùng đã là chuyên gia");
-		}
-
-		String[] imageBase64 = imageLicenceBase64.split(",");
-
-		boolean isImage = checkImage(imageBase64[0].split("/")[1]);
-
-		if (!isImage) {
-			throw new Exception("Chỉ nhận file hình ảnh hoặc file pdf");
-		}
-
-		String licenceFileName = restTemplateClient.uploadFile(imageLicenceBase64);
-		if (Objects.isNull(licenceFileName)) {
-			throw new Exception("Lưu bằng cấp thất bại. Xin hãy thử lại !!!");
-		}
-
-		wUserMapper.updateLicenceImageToUser(licenceFileName, userId);
-
-		apiResponseEntity.setData(true);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-	}
+//	public void processRegistExpert(UserDetail userDetail, String imageLicenceBase64,
+//			ApiResponseEntity apiResponseEntity) throws Exception {
+//		Long userId = userDetail.getId();
+//		Boolean isExpert = userDetail.getIsExpert();
+//		if (isExpert) {
+//			throw new Exception("Người dùng đã là chuyên gia");
+//		}
+//
+//		String[] imageBase64 = imageLicenceBase64.split(",");
+//
+//		boolean isImage = checkImage(imageBase64[0].split("/")[1]);
+//
+//		if (!isImage) {
+//			throw new Exception("Chỉ nhận file hình ảnh hoặc file pdf");
+//		}
+//
+//		String licenceFileName = restTemplateClient.uploadFile(imageLicenceBase64);
+//		if (Objects.isNull(licenceFileName)) {
+//			throw new Exception("Lưu bằng cấp thất bại. Xin hãy thử lại !!!");
+//		}
+//
+//		wUserMapper.updateLicenceImageToUser(licenceFileName, userId);
+//
+//		apiResponseEntity.setData(true);
+//		apiResponseEntity.setErrorList(null);
+//		apiResponseEntity.setStatus(1);
+//	}
 
 	private boolean checkImage(String extension) {
 		return extension.equals("jpeg;base64") || extension.equals("png;base64") || extension.equals("pdf;base64")
@@ -420,7 +422,7 @@ public class UserService {
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 
-		return null;
+		return error;
 	}
 
 	private User generatorCreateEntity(CreateUserRequest request, Map<Integer, String> error) throws Exception {
@@ -437,9 +439,14 @@ public class UserService {
 		}
 
 		BeanUtils.copyProperties(request, user);
-		if (requestRole.equals("admin")) {
+		if (!requestRole.equals("admin")) {
+			String[] imageBase64 = imageUrl.split(",");
+			boolean isImage = checkImage(imageBase64[0].split("/")[1]);
 
-		} else {
+			if (!isImage) {
+				error.put(200, "Chỉ nhận file hình ảnh hoặc file pdf");
+			}
+
 			user.setImageUrl(restTemplateClient.uploadFile(imageUrl));
 			com.se1.userservice.domain.payload.request.CreateUserRequest.ExpertInfo expertInfo = request
 					.getExpertInfo();
@@ -470,6 +477,7 @@ public class UserService {
 
 			List<UserDescription> flat = userDescriptions.stream().flatMap(List::stream).collect(Collectors.toList());
 			user.setDescription(flat);
+
 		}
 
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -488,7 +496,8 @@ public class UserService {
 
 	}
 
-	public void findAll(FindAllUserRequest request, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public void findAll(FindAllUserRequest request, UserDetail userDetail, Integer offset,
+			ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
 
 		String nameQuery = !request.getName().isEmpty() ? " name like '% " + request.getName() + " %'" : "";
@@ -498,16 +507,92 @@ public class UserService {
 						request.getProvider().stream().map(p -> String.format("'%s'", p)).collect(Collectors.toList()))
 						+ ")"
 				: "";
-		String roleQuery = (!Objects.isNull(request.getRole()) && request.getRole().size() > 0) 
-				? " role in (" + String.join(", ",
+		String roleQuery = (!Objects.isNull(request.getRole()) && request.getRole().size() > 0) ? " role in ("
+				+ String.join(", ",
 						request.getRole().stream().map(r -> String.format("'%s'", r)).collect(Collectors.toList()))
 				+ ")" : "";
 
 		List<String> mergeQuery = List.of(nameQuery, emailQuery, providerQuery, roleQuery);
 
-		List<User> allUser = rUserMapper.findAll(mergeQuery, userId);
+		List<User> allUser = rUserMapper.findAll(mergeQuery, userId, offset);
 		apiResponseEntity.setData(allUser);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
+	}
+
+	public void update(UpdateUserRequest request, UserDetail userDetail, ApiResponseEntity apiResponseEntity)
+			throws Exception {
+		Boolean isCurrenUser = userDetail.getId().equals(request.getId());
+		if (!userDetail.getRole().equals("admin") && 
+				!isCurrenUser) {
+			throw new Exception("Hành đông không cho phép");
+		}
+		Optional<User> userFind = repository.findById(request.getId());
+		if (userFind.isEmpty()) {
+			throw new Exception("Người dùng không tồn tại");
+		}
+
+		User userOld = userFind.get();
+		if(request.getName() != null) {
+			userOld.setName(request.getName());
+		}
+		String imageUrl = "";
+		if (request.getImageUrlBase64() != null) {
+			imageUrl = restTemplateClient.uploadFile(request.getImageUrlBase64());
+		}
+		if(imageUrl != null && !imageUrl.isEmpty() && !imageUrl.isBlank()) {
+			userOld.setImageUrl(imageUrl);
+		}
+		if(request.getPassword()!= null) {
+			userOld.setPassword(passwordEncoder.encode(request.getPassword()));
+		}
+		if(userOld.getRole().name().equals("expert") && request.getExpertInfo() != null){
+			com.se1.userservice.domain.payload.request.UpdateUserRequest.ExpertInfo expertInfo = request.getExpertInfo();
+			if(expertInfo.getPhoneNumber() != null) {
+				userOld.setPhoneNumber(expertInfo.getPhoneNumber());
+			}
+			if(expertInfo.getJobTitle() != null) {
+				userOld.setJobTitle(expertInfo.getJobTitle());
+			}
+			if(expertInfo.getSpecialist() != null) {
+				userOld.setSpecialist(expertInfo.getSpecialist());
+			}
+			if(expertInfo.getWorkPlace() != null) {
+				userOld.setWorkPlace(expertInfo.getWorkPlace());
+			}
+			if(expertInfo.getDescription() != null && expertInfo.getDescription().size() > 0) {
+				List<com.se1.userservice.domain.payload.request.UpdateUserRequest.Description> description = expertInfo.getDescription();
+				List<List<UserDescription>> userDescriptions = description.stream().filter(des -> {
+					return (!Objects.isNull(des.getTitle()) || !Objects.isNull(des.getDescription()));
+				}).map(des -> {
+					List<UserDescription> userDescriptionsList = new ArrayList<>();
+					for (String descriptionStr : des.getDescription()) {
+						UserDescription userDescription = new UserDescription();
+						userDescription.setTitle(des.getTitle());
+						userDescription.setDescription(descriptionStr);
+
+						userDescriptionsList.add(userDescription);
+					}
+
+					return userDescriptionsList;
+				}).collect(Collectors.toList());
+
+				List<UserDescription> flat = userDescriptions.stream().flatMap(List::stream).collect(Collectors.toList());
+				userOld.setDescription(flat);
+			}
+		}
+		
+		if(userOld.getDescription() != null && userOld.getDescription().size() > 0) {
+			List<UserDescription> userDescriptions = userDescriptionRepository.saveAll(userOld.getDescription());
+			userOld.setDescription(userDescriptions);
+		}
+		
+		User userUpdate = repository.save(userOld);
+		if(userUpdate != null) {
+			apiResponseEntity.setData(userUpdate.getId());
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}
+
 	}
 }

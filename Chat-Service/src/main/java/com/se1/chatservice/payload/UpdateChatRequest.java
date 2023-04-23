@@ -4,7 +4,11 @@ import lombok.Data;
 
 @Data
 public class UpdateChatRequest {
-	private long id;
+	private Long id;
+	private String content;
 	private Long userId;
+	private String topicId;
+	private Long chatParentId;
+	private Boolean isFile;
 	private String action;
 }

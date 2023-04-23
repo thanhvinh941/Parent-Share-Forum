@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,11 @@ import org.springframework.stereotype.Service;
 import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.model.GroupRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
-import com.se1.userservice.domain.payload.CreateGroupRoleRequest;
 import com.se1.userservice.domain.payload.GroupRoleResponse;
 import com.se1.userservice.domain.payload.UserDetail;
+import com.se1.userservice.domain.payload.request.CreateGroupRoleRequest;
+import com.se1.userservice.domain.payload.request.UDeleteGroupRoleRequest;
+import com.se1.userservice.domain.payload.request.UpdateGroupRoleRequest;
 import com.se1.userservice.domain.repository.GroupRoleRepository;
 
 @Service
@@ -89,6 +93,49 @@ public class GroupRoleService {
 		apiResponseEntity.setData(response);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
+	}
+
+	public void processupdateGoupRole(UpdateGroupRoleRequest request, UserDetail userDetail,
+			ApiResponseEntity apiResponseEntity) throws Exception {
+		Optional<GroupRole> groupRoleFind = groupRoleRepository.findById(request.getId());
+		if(groupRoleFind.isEmpty()) {
+			throw new Exception("Group role không tồn tại");
+		}
+		
+		GroupRole groupRole = groupRoleFind.get();
+		if(request.getName() != null) {
+			groupRole.setName(request.getName());
+		}
+		
+		if(request.getRoles() != null && request.getRoles().size() > 0) {
+			groupRole.setRoles(request.getRoles());
+		}
+		
+		GroupRole groupRoleSave = groupRoleRepository.save(groupRole);
+		
+		GroupRoleResponse response = new GroupRoleResponse();
+		BeanUtils.copyProperties(groupRoleSave, response);
+		response.setRoles(SCMConstant.getAllAuthorItemByIds(groupRoleSave.getRoles()));
+		
+		apiResponseEntity.setData(response);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	@Transactional
+	public void processdeleteGoupRole(UDeleteGroupRoleRequest request, UserDetail userDetail,
+			ApiResponseEntity apiResponseEntity) throws Exception {
+		Optional<GroupRole> groupRoleFind = groupRoleRepository.findById(request.getId());
+		if(groupRoleFind.isEmpty()) {
+			throw new Exception("Group role không tồn tại");
+		}
+		
+		groupRoleRepository.uDelete(request.getId());
+		
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+		
 	}
 
 }

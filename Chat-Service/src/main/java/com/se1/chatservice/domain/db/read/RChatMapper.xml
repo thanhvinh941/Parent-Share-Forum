@@ -16,7 +16,7 @@
 
 	<select id="getAllChat" resultMap="chat_result">
 		Select * from chats 
-		Where topic_id = #{topicId}
+		Where topic_id = #{topicId} AND user_delete_id != #{userDelete} 
 		Order by create_at DESC
 		Limit #{limit} Offset #{offset}
 	</select>

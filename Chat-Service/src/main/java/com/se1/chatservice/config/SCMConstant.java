@@ -17,6 +17,8 @@ public interface SCMConstant {
 	public static final String SYSTEM_NOTIFY = "notify";
 	public static final String USER_UPDATE_STATUS = "update-status";
 
+	public static final Long USER_DELETE_OFF = (long) 0;
+	
 	public static String getContactActionByStatus(int status) {
 		String action = "";
 

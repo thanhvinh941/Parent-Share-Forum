@@ -4,12 +4,13 @@
 	
 	<select id="updateStatus" parameterType="String">
 		Update chats
-		SET status = #{action} 
+		SET
+		is_file = 0 
 		<if test="content != null">
-			content = #{content}
+			, content = #{content}
 		</if>
-		<if test="userId != null">
-			userDeleteId = #{userId}
+		<if test="userDeleteId != null">
+			, user_delete_id = #{userDeleteId}
 		</if>
 		Where id = #{id} 
 		

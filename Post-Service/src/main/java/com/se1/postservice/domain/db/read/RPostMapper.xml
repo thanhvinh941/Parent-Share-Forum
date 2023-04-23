@@ -27,7 +27,9 @@
 	<select id="findAllPostByUserId" resultMap="post_result">
 		SELECT 
 		    *,
-		    (SELECT GROUP_CONCAT(image_list SEPARATOR ', ')
+		    (SELECT 
+		            GROUP_CONCAT(image_list
+		                    SEPARATOR ', ')
 		        FROM
 		            post_image_list
 		        WHERE
@@ -38,21 +40,21 @@
 		        FROM
 		            db02.post_like pl
 		        WHERE
-		            pl.status = 1
+		            pl.post_id = p.id AND pl.status = 1
 		        GROUP BY post_id) AS like_count,
 		    (SELECT 
 		            COUNT(pl.user_id)
 		        FROM
 		            db02.post_like pl
 		        WHERE
-		            pl.status = 0
+		            pl.post_id = p.id AND pl.status = 0
 		        GROUP BY post_id) AS dislike_count,
 		    (SELECT 
 		            COUNT(id)
 		        FROM
 		            db02.comment cm
 		        WHERE
-		            cm.del_flg = 0
+		            cm.post_id = p.id AND cm.del_flg = 0
 		        GROUP BY post_id) AS comment_count
 		FROM
 		    post p

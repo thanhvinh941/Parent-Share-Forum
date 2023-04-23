@@ -1,6 +1,7 @@
 package com.se1.systemservice.controller;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.HashMap;
@@ -20,7 +21,8 @@ import com.se1.systemservice.config.MqConfig;
 import com.se1.systemservice.config.SCMConstant;
 import com.se1.systemservice.config.WebSocketSessionListener;
 import com.se1.systemservice.domain.common.utils.CommonUtils;
-import com.se1.systemservice.domain.payload.ChatMqRequest;
+import com.se1.systemservice.domain.payload.ChatMqCreateRequest;
+import com.se1.systemservice.domain.payload.ChatMqUpdateRequest;
 import com.se1.systemservice.domain.payload.ChatRequest;
 import com.se1.systemservice.domain.service.CommonService;
 import com.se1.systemservice.domain.service.UserContactService;
@@ -43,17 +45,44 @@ public class WebsocketController {
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
-	@Autowired
-	private WebSocketSessionListener webSocketSessionListener;
-	
 	@MessageMapping("/chat/{topicId}")
-	public void sendChat(@RequestHeader(required = false, name = "user_detail") String userDetail,
+	public void sendChat(
 			@DestinationVariable String topicId, ChatRequest request) throws Exception {
+		String action = request.getAction() != null ? request.getAction() : "create";
+		switch (action) {
+		case "delete":
+			deleteProcess(request.getUserId(), request.getId(), topicId, action);
+			break;
+		case "revoke":
+			revokeProcess(request.getUserId(), request.getId(), topicId,request.getChatParent(), action);
+			break;
+		default:
+			createChat(request.getUserId(), request.getContent(), request.getIsFile(), topicId, request.getChatParent());
+			break;
+		}
 		
-		String userId = webSocketSessionListener.getConnectedClientId().get(0);
-		String content = request.getContent();
+		
+	}
+
+	private void revokeProcess(String userId, Long chatId, String topicId, Long chatParentId, String action) {
+		String contentToMQ = "Tin nhắn bị thu hồi";
+		
+		ChatMqUpdateRequest mqRequest = new ChatMqUpdateRequest();
+		mqRequest.setChatParentId(chatParentId);
+		mqRequest.setContent(contentToMQ);
+		mqRequest.setUserId(Long.parseLong(userId));
+		mqRequest.setTopicId(topicId);
+		mqRequest.setIsFile(false);
+		mqRequest.setId(chatId);
+		mqRequest.setAction(action);
+		
+		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_UPDATE, mqRequest);
+		
+	}
+
+	private void createChat(String userId, String content, Boolean isFile, String topicId, Long chatParentId ) throws IOException {
 		String contentToMQ = content;
-		if (request.getIsFile()) {
+		if (isFile) {
 			String[] contentArray = content.split(",");
 
 			String imageName = CommonUtils.getFileName(contentArray[0].split("/")[1]);
@@ -64,14 +93,28 @@ public class WebsocketController {
 			commonService.saveFile(imageName, inputStream);
 		}
 		
-		ChatMqRequest mqRequest = new ChatMqRequest();
-		mqRequest.setChatParentId(request.getChatParent());
+		ChatMqUpdateRequest mqRequest = new ChatMqUpdateRequest();
+		mqRequest.setChatParentId(chatParentId);
 		mqRequest.setContent(contentToMQ);
 		mqRequest.setUserId(Long.parseLong(userId));
 		mqRequest.setTopicId(topicId);
-		mqRequest.setIsFile(request.getIsFile());
+		mqRequest.setIsFile(isFile);
 		
 		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_CREATE, mqRequest);
+		
+	}
+
+	private void deleteProcess(String userId, Long chatId, String topicId, String action) {
+		ChatMqUpdateRequest mqRequest = new ChatMqUpdateRequest();
+		mqRequest.setChatParentId(null);
+		mqRequest.setContent(null);
+		mqRequest.setUserId(Long.parseLong(userId));
+		mqRequest.setTopicId(topicId);
+		mqRequest.setIsFile(false);
+		mqRequest.setId(chatId);
+		mqRequest.setAction(action);
+		
+		rabbitTemplate.convertAndSend(MqConfig.CHAT_EXCHANGE, MqConfig.CHAT_ROUTING_KEY_UPDATE, mqRequest);
 	}
 
 }

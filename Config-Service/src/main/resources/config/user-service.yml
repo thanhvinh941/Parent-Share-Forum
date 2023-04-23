@@ -65,3 +65,7 @@ micro-service:
   api-gateway: http://localhost:8080
   eureka-service: http://localhost:8761
   config-service: http://localhost:8071
+  
+logging:
+  level:
+    com.se1.userservice: TRACE

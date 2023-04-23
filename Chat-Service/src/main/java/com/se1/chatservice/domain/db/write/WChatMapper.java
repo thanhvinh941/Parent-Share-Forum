@@ -1,10 +1,11 @@
 package com.se1.chatservice.domain.db.write;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface WChatMapper {
 
-	Long updateStatus(long id, int action, String content, Long userId);
+	void updateStatus(@Param("id") Long id, @Param("content") String content, @Param("userDeleteId") Long userDeleteId);
 
 }

@@ -21,10 +21,8 @@ public class ChatListener {
 	private final ObjectMapper objectMapper;
 	private final ChatService chatService;
 	
-	
-	
 	@RabbitListener(queues = MqConfig.CHAT_QUEUE_CREATE)
-	public void listenerCreate(CreateChatRequest chatRequest) throws JsonProcessingException {
+	public void listenerCreate(UpdateChatRequest chatRequest) throws JsonProcessingException {
 		log.info("Listener {} : {}" , MqConfig.CHAT_QUEUE_CREATE , objectMapper.writeValueAsString(chatRequest));
 		chatService.processCreate(chatRequest);
 	}

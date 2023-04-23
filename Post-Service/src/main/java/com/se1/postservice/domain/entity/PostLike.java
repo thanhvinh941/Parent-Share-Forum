@@ -23,10 +23,10 @@ public class PostLike {
 	private Integer id;
 	
 	@Column(nullable = false)
-	private Integer postId;
+	private Long postId;
 	
 	@Column(nullable = false)
-	private Integer userId;
+	private Long userId;
 		
 	@Column(nullable = false)
 	private Byte status; // 1: like, 2: dislike

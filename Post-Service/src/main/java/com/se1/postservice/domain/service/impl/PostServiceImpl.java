@@ -216,19 +216,19 @@ public class PostServiceImpl implements PostService {
 		return resultList;
 	}
 
-	private long likeCountPost(Long postId) {
+	private Integer likeCountPost(Long postId) {
 		return 0;
 	}
 
-	private long commentCount(Long postId) {
+	private Integer commentCount(Long postId) {
 		return 0;
 	}
 
-	private long disLikeCount(Long postId) {
+	private Integer disLikeCount(Long postId) {
 		return 0;
 	}
 
-	private long shareCount(Long postId) {
+	private Integer shareCount(Long postId) {
 		return 0;
 	}
 
@@ -285,10 +285,12 @@ public class PostServiceImpl implements PostService {
 				.collect(Collectors.toList());
 		List<Long> allIdUserId = new ArrayList<>(userFriendId);
 		allIdUserId.addAll(listExpertId);
+		allIdUserId.add(userId);
 
 		List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
 
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(allIdUserIdDistinct.toString(),
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(
+				String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
 				offset);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
@@ -371,4 +373,5 @@ public class PostServiceImpl implements PostService {
 
 		return result;
 	}
+
 }

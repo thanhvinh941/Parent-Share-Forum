@@ -45,7 +45,7 @@ public class GatewayConfig {
 				.route("topic-tag-service",
 						r -> r.path("/topic-tag/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
 				.route("comment-service",
-						r -> r.path("/commet/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+						r -> r.path("/comment/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
 				.route("system-service",
 						r -> r.path("/system/**").filters(f -> f.filter(filter)).uri("lb://system-service"))
 				.route("notify-service",

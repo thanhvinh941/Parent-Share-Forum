@@ -18,10 +18,10 @@ public class GetPostResponseDto {
 	private List<String> imageList;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Date createAt;
-	private long likeCount;
-	private long disLikeCount;
-	private long commentCount;
-	private long shareCount;
+	private Integer likeCount;
+	private Integer disLikeCount;
+	private Integer commentCount;
+	private Integer shareCount;
 	
 	private TopicTag topicTag;
 	private User user;
@@ -35,13 +35,13 @@ public class GetPostResponseDto {
 	@Data
 	public static class User {
 		private Long id;
-		private String email;
-		private String name;
-		private String imageUrl;
-		private String role;
-		private Boolean isExpert;
-		private Double rating;
-		private int status;
-		private String topicId;
+    	private String name;
+    	private String email;
+    	private String imageUrl;
+    	private Boolean isExpert;
+    	private Double rating;
+    	private Byte status; // 1: online, 2 offline
+    	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+        private Date lastTime;
 	}
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -49,56 +50,75 @@ public class ChatService {
 	private final CallApiService<ChatDto.User> callApiService;
 	private final ContactService contactService;
 	
-	public void processCreate(CreateChatRequest chatRequest) throws JsonProcessingException {
+	public void processCreate(UpdateChatRequest chatRequest) throws JsonProcessingException {
 		log.info("processCreate ");
-		Chat chat = new Chat();
-		BeanUtils.copyProperties(chatRequest, chat);
-		chat.setCreateAt(new Date());
-		chat.setStatus(0);
-
-		Chat chatNew = chatRepository.save(chat);
-		ChatDto chatDto = new ChatDto();
-		BeanUtils.copyProperties(chatNew, chatDto);
-		chatDto.setUser(getUSerChat(chatNew.getUserId()));
-
-		if (chatRequest.getChatParentId() != null) {
-			Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
-			ChatDto chatParentDto = new ChatDto();
-			BeanUtils.copyProperties(chatParent, chatParentDto);
-			chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
-			chatDto.setChatParent(chatParentDto);
+		if(chatRequest.getId()== null) {
+			
+			Chat chat = new Chat();
+			BeanUtils.copyProperties(chatRequest, chat);
+			chat.setCreateAt(new Date());
+			chat.setStatus(0);
+			
+			Chat chatNew = chatRepository.save(chat);
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(chatNew, chatDto);
+			chatDto.setUser(getUSerChat(chatNew.getUserId()));
+			
+			if (chatRequest.getChatParentId() != null) {
+				Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
+				ChatDto chatParentDto = new ChatDto();
+				BeanUtils.copyProperties(chatParent, chatParentDto);
+				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
+				chatDto.setChatParent(chatParentDto);
+			}
+			
+			RabbitRequest request = new RabbitRequest();
+			request.setAction(SCMConstant.SYSTEM_CHAT);
+			request.setData(chatDto);
+			rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 		}
-
-		RabbitRequest request = new RabbitRequest();
-		request.setAction(SCMConstant.SYSTEM_CHAT);
-		request.setData(chatDto);
-		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 	}
 
 	public void processChangeStatus(UpdateChatRequest chatRequest) {
 		log.info("processChangeStatus ");
-		int action = 0;
 		Long userId = null;
 		String content = "";
 		switch (chatRequest.getAction()) {
 		case "delete":
-			action = 0;
 			userId = chatRequest.getUserId();
+			processUDelete(chatRequest.getId(), content, userId, chatRequest.getAction());
 			break;
 		case "revoke":
-			action = 2;
 			content = "Tin nhắn đã được thu hồi";
+			processUDelete(chatRequest.getId(), content, userId, chatRequest.getAction());
+			break;
 		default:
 			break;
 		}
 
-		Long chatId = chatMapper.updateStatus(chatRequest.getId(), action, content, userId);
-		Chat updateChat = chatRepository.findById(chatId).get();
+		
+	}
+	
+
+	void processUDelete(Long id, String content, Long userId, String action){
+		chatMapper.updateStatus(id, content, userId);
+		Chat updateChat = chatRepository.findById(id).get();
 		Map<String, Object> chatStatus = new HashMap<>();
-		chatStatus.put("chatId", chatId);
+		chatStatus.put("chatId", id);
 		chatStatus.put("chatStatus", action);
 		chatStatus.put("topicId", updateChat.getTopicId());
 
+		if(action.equals("revoke")) {
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(updateChat, chatDto);
+			chatDto.setUser(getUSerChat(updateChat.getUserId()));
+			chatStatus.put("chat", chatDto);
+		}else {
+			ChatDto chatDto = new ChatDto();
+			BeanUtils.copyProperties(updateChat, chatDto);
+			chatStatus.put("chat", chatDto);
+		}
+		
 		RabbitRequest request = new RabbitRequest();
 		request.setAction(SCMConstant.SYSTEM_CHAT_STATUS);
 		request.setData(chatStatus);
@@ -168,7 +188,7 @@ public class ChatService {
 		}
 		
 		List<com.se1.chatservice.domain.db.dto.ChatDto> listChat = rChatMapper.getAllChat(request.getTopicId(),
-				request.getLimit(), request.getOffset());
+				request.getLimit(), request.getOffset(), userDetail.getId());
 		Collections.reverse(listChat);
 		List<ChatDto> listChatResponse = listChat.stream().map(c -> {
 			ChatDto chatDto = new ChatDto();

@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.se1.userservice.domain.db.write.WUserMapper">
-	
+
 	<update id="updateUserStatus">
 		update users Set status = #{status}
-		<if test="status == 1">
-			last_time = NOW()
-		</if>
-		
 		<if test="status == 0">
-		 last_time = null
+			, last_time = NOW()
+		</if>
+
+		<if test="status == 1">
+		   , last_time = null
 		</if>
 		where id = #{userId}
-		
 	</update>
-	
+
 	<update id="updateLicenceImageToUser">
 		update users Set image_licence = ${licenceFileName}
 		where id = ${userId}
 	</update>
-	
+
 	<update id="updateLicenceToUser">
 		update users Set licence_id = ${licenceId}
 		where id = ${userId}

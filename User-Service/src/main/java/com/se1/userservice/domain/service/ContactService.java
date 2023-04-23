@@ -52,7 +52,7 @@ public class ContactService {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
+
 	@Autowired
 	private RContactMapper contactMapper;
 
@@ -63,8 +63,17 @@ public class ContactService {
 		}
 
 		Contact contact = null;
+
+		com.se1.userservice.domain.db.dto.ContactDto oldContact = contactMapper
+				.findByUserReciverIdOrUserSenderId(contactCreate.getUserReciverId(), contactCreate.getUserSenderId());
+
 		try {
-			contact = contactRepository.save(contactCreate);
+			if (oldContact != null) {
+				contactRepository.updateContactV2(contactCreate.getUserReciverId(), contactCreate.getUserSenderId() ,oldContact.getId(), contactCreate.getStatus());
+				contact = contactRepository.findById(oldContact.getId()).get();
+			}else {				
+				contact = contactRepository.save(contactCreate);
+			}
 			User userSender = userRepository.findById(contact.getUserSenderId()).orElse(null);
 
 			UserDetail userSenderDto = new UserDetail();
@@ -79,7 +88,6 @@ public class ContactService {
 			contactResponse.setUserSender(userSenderDto);
 
 			if (contact.getStatus() == 1) {
-				// Send to system
 				RabbitRequest rabbitResponse = new RabbitRequest();
 				rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
 				rabbitResponse.setData(contactResponse);
@@ -95,10 +103,15 @@ public class ContactService {
 		apiResponseEntity.setStatus(1);
 	}
 
-	public void processUpdate(long userId, long userLoginId, int statusUpdate, ApiResponseEntity apiResponseEntity)
+	public void processUpdate(long userReciverId, long userSenderId, int statusUpdate, ApiResponseEntity apiResponseEntity)
 			throws Exception {
 
-		Contact oldContact = contactRepository.findByUserReciverIdAndUserSenderId(userId, userLoginId);
+		com.se1.userservice.domain.db.dto.ContactDto oldContact = null;
+		if (statusUpdate == 2) {
+			oldContact = contactMapper.findByUserReciverIdAndUserSenderId(userReciverId, userSenderId);
+		} else if (statusUpdate == 0) {
+			oldContact = contactMapper.findByUserReciverIdOrUserSenderId(userReciverId, userSenderId);
+		}
 
 		if (oldContact != null) {
 			validStatus(oldContact.getStatus(), statusUpdate);
@@ -109,12 +122,13 @@ public class ContactService {
 
 			if (contactUpdate != null) {
 
-//				// Send to system
-				RabbitRequest rabbitResponse = new RabbitRequest();
-				rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
-				rabbitResponse.setData(contactUpdate);
-				rabbitSenderService.convertAndSendSysTem(rabbitResponse);
+				if (contactUpdate.getStatus() != 0) {
+					RabbitRequest rabbitResponse = new RabbitRequest();
+					rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
+					rabbitResponse.setData(contactUpdate);
+					rabbitSenderService.convertAndSendSysTem(rabbitResponse);
 
+				}
 				apiResponseEntity.setData(true);
 				apiResponseEntity.setErrorList(null);
 				apiResponseEntity.setStatus(1);
@@ -122,7 +136,7 @@ public class ContactService {
 				throw new Exception("Thao tác không hợp lệ");
 			}
 		} else {
-			throw new Exception("Tin nhắn không hợp lệ");
+			throw new Exception("Thao tác không hợp lệ");
 		}
 
 	}
@@ -169,13 +183,12 @@ public class ContactService {
 			BeanUtils.copyProperties(ct, contactDto);
 			contactDto.setTopicContactId(ct.getTopicId());
 			Long userFriendId = ct.getUserReciverId().equals(userId) ? ct.getUserSenderId() : ct.getUserReciverId();
-			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream().filter(u -> userFriendId.equals(u.getId())).findFirst()
-					.get();
+			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream()
+					.filter(u -> userFriendId.equals(u.getId())).findFirst().get();
 			contactDto.setUserFriend(userFriend);
 
 			return contactDto;
 		}).collect(Collectors.toList());
-
 
 		Map<String, List<ContactDto>> mapResult = new HashMap<>();
 		mapResult.put("Reciver", contactResponsesReciver);
@@ -205,9 +218,12 @@ public class ContactService {
 		Long userId = userDetail.getId();
 
 		List<ContactDto> contactDtos = getContactResponse(userId);
-		List<ContactDtoForChat> contactDtoForChats = contactDtos.stream().map(cd->{
+		List<ContactDtoForChat> contactDtoForChats = contactDtos.stream().map(cd -> {
 			ContactDtoForChat contactDtoForChat = new ContactDtoForChat();
 			BeanUtils.copyProperties(cd, contactDtoForChat);
+			com.se1.userservice.domain.payload.ContactDtoForChat.User user = new com.se1.userservice.domain.payload.ContactDtoForChat.User();
+			BeanUtils.copyProperties(cd.getUserFriend(), user);
+			contactDtoForChat.setUserFriend(user);
 			List<ContactDtoForChat.Chat> chats = getListChatByTopicId(cd.getTopicContactId());
 			contactDtoForChat.setChats(chats);
 			return contactDtoForChat;
@@ -240,26 +256,6 @@ public class ContactService {
 		List<Contact> contactMerge = new ArrayList<>(contactIsValid);
 		contactMerge.addAll(contactValid);
 		List<ContactDto> contactResponses = generatorContactResponse(userId, contactMerge, null);
-//		List<Long> userFriendIds = contactMerge.stream()
-//				.map(c -> c.getUserReciverId().equals(userId) ? c.getUserSenderId() : c.getUserReciverId())
-//				.collect(Collectors.toList());
-//		List<User> userFriends = (List<User>) userRepository.findAllById(userFriendIds);
-//		List<com.se1.userservice.domain.payload.ContactDto.User> userFriendResponse = userFriends.stream().map(uf -> {
-//			com.se1.userservice.domain.payload.ContactDto.User ud = new com.se1.userservice.domain.payload.ContactDto.User();
-//			BeanUtils.copyProperties(uf, ud);
-//			return ud;
-//		}).collect(Collectors.toList());
-//		List<ContactDto> contactResponses = contactMerge.stream().map(ct -> {
-//			ContactDto contactDto = new ContactDto();
-//			BeanUtils.copyProperties(ct, contactDto);
-//			contactDto.setTopicContactId(ct.getTopicId());
-//			Long userFriendId = ct.getUserReciverId().equals(userId) ? ct.getUserSenderId() : ct.getUserReciverId();
-//			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream().filter(u -> userFriendId.equals(u.getId())).findFirst()
-//					.get();
-//			contactDto.setUserFriend(userFriend);
-//
-//			return contactDto;
-//		}).collect(Collectors.toList());
 
 		return contactResponses;
 	}
@@ -272,8 +268,9 @@ public class ContactService {
 
 	public void processFindContactByUserIdAndTopicIdGetListContact(Long userId, String topicId,
 			ApiResponseEntity apiResponseEntity) {
-		
-		List<com.se1.userservice.domain.db.dto.ContactDto> contactDtos = contactMapper.findContactByUserIdAndTopicId(userId, topicId);
+
+		List<com.se1.userservice.domain.db.dto.ContactDto> contactDtos = contactMapper
+				.findContactByUserIdAndTopicId(userId, topicId);
 		List<Long> userFriendIds = contactDtos.stream()
 				.map(c -> c.getUserReciverId().equals(userId) ? c.getUserSenderId() : c.getUserReciverId())
 				.collect(Collectors.toList());
@@ -288,17 +285,17 @@ public class ContactService {
 			BeanUtils.copyProperties(ct, contactDto);
 			contactDto.setTopicContactId(ct.getTopicId());
 			Long userFriendId = ct.getUserReciverId().equals(userId) ? ct.getUserSenderId() : ct.getUserReciverId();
-			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream().filter(u -> userFriendId.equals(u.getId())).findFirst()
-					.get();
+			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream()
+					.filter(u -> userFriendId.equals(u.getId())).findFirst().get();
 			contactDto.setUserFriend(userFriend);
 
 			return contactDto;
 		}).collect(Collectors.toList());
-		
+
 		apiResponseEntity.setData(contactResponses);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
-		
+
 	}
 
 	public List<ContactDto> generatorContactResponse(Long userId, List<Contact> contact, Integer status) {
@@ -312,37 +309,37 @@ public class ContactService {
 			return ud;
 		}).collect(Collectors.toList());
 
-		if(!Objects.isNull(status)) {
+		if (!Objects.isNull(status)) {
 			List<Contact> contactFriendReciver = contact.stream().filter(t -> t.getStatus() == status)
 					.filter(c -> c.getUserReciverId().equals(userId)).collect(Collectors.toList());
-		
+
 			List<ContactDto> contactResponsesReciver = contactFriendReciver.stream().map(ct -> {
 				ContactDto contactDto = new ContactDto();
 				BeanUtils.copyProperties(ct, contactDto);
 				contactDto.setTopicContactId(ct.getTopicId());
 				Long userFriendId = ct.getUserReciverId().equals(userId) ? ct.getUserSenderId() : ct.getUserReciverId();
-				com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream().filter(u -> userFriendId.equals(u.getId())).findFirst()
-						.get();
+				com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream()
+						.filter(u -> userFriendId.equals(u.getId())).findFirst().get();
 				contactDto.setUserFriend(userFriend);
 
 				return contactDto;
 			}).collect(Collectors.toList());
-			
+
 			return contactResponsesReciver;
 		}
-		
+
 		List<ContactDto> contactResponsesReciver = contact.stream().map(ct -> {
 			ContactDto contactDto = new ContactDto();
 			BeanUtils.copyProperties(ct, contactDto);
 			contactDto.setTopicContactId(ct.getTopicId());
 			Long userFriendId = ct.getUserReciverId().equals(userId) ? ct.getUserSenderId() : ct.getUserReciverId();
-			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream().filter(u -> userFriendId.equals(u.getId())).findFirst()
-					.get();
+			com.se1.userservice.domain.payload.ContactDto.User userFriend = userFriendResponse.stream()
+					.filter(u -> userFriendId.equals(u.getId())).findFirst().get();
 			contactDto.setUserFriend(userFriend);
 
 			return contactDto;
 		}).collect(Collectors.toList());
-		
+
 		return contactResponsesReciver;
 	}
 }

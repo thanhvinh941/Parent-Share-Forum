@@ -85,20 +85,20 @@ public class UserInternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 
-	@PostMapping("/find")
-	public ResponseEntity<?> find(@RequestBody FindRequest findRequest) {
-		String findRequestStr;
-		try {
-			findRequestStr = objectMapper.writeValueAsString(findRequest);
-			Map<String, Object> findRequestMap = objectMapper.readValue(findRequestStr, Map.class);
-			service.processFindUser(findRequestMap, apiResponseEntity);
-		} catch (JsonProcessingException e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
-		}
-		return ResponseEntity.ok().body(apiResponseEntity);
-	}
+//	@PostMapping("/find")
+//	public ResponseEntity<?> find(@RequestBody FindRequest findRequest) {
+//		String findRequestStr;
+//		try {
+//			findRequestStr = objectMapper.writeValueAsString(findRequest);
+//			Map<String, Object> findRequestMap = objectMapper.readValue(findRequestStr, Map.class);
+//			service.processFindUser(findRequestMap, apiResponseEntity);
+//		} catch (JsonProcessingException e) {
+//			apiResponseEntity.setData(null);
+//			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+//			apiResponseEntity.setStatus(0);
+//		}
+//		return ResponseEntity.ok().body(apiResponseEntity);
+//	}
 
 	@PostMapping("/findByName")
 	public ResponseEntity<?> findByName(@RequestParam("name") String name) {
@@ -129,6 +129,9 @@ public class UserInternalController {
 		try {
 			service.processUpdateStatus(id, status, apiResponseEntity);
 		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(1);
 		}
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}

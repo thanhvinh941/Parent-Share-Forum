@@ -12,6 +12,7 @@ import com.se1.systemservice.config.SCMConstant;
 import com.se1.systemservice.domain.payload.dto.ContactDto;
 import com.se1.systemservice.domain.payload.dto.NotifyDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.ChatDto;
+import com.se1.systemservice.domain.rabbitMQ.dto.ChatStatusDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.RabbitRequest;
 import com.se1.systemservice.domain.service.SystemListenerService;
 
@@ -51,6 +52,9 @@ public class SystemListener {
 			systemListenerService.processActionSystemChat(chatDto);
 			break;
 		case SCMConstant.SYSTEM_CHAT_STATUS:
+			ChatStatusDto chatStatusDto = new ChatStatusDto();
+			chatStatusDto = objectMapper.readValue(objectMapper.writeValueAsString(rabbitRequest.getData()), ChatStatusDto.class);
+			systemListenerService.processActionSystemChatStatus(chatStatusDto);
 			break;
 		default:
 			break;

@@ -38,11 +38,11 @@
 			*
 		FROM users
 		<where>
-			<foreach item="item" collection="conditions" open="" separator=" AND " close="">
+			<foreach item="item" collection="conditions" open="" separator=" OR " close="">
 				${item}
 			</foreach>
 		</where>
-		
+		Limit 10 Offset #{offset}
 	</select>
 
 </mapper>
