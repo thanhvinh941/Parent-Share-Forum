@@ -1,7 +1,9 @@
 package com.se1.postservice.domain.service.impl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -93,5 +95,27 @@ public class CommentService {
 		}
 
 		return userChatParent;
+	}
+
+	public void processGetAllComment(Long postId, ApiResponseEntity responseEntity, UserDetail userDetail) {
+		List<Comment> comments = commentRepository.findByPostId(postId);
+		List<CreateCommentResponse> commentResponses = comments.stream().map(c->{
+			CreateCommentResponse response = new CreateCommentResponse();
+			BeanUtils.copyProperties(c, response);
+			response.setUserId(getUSerComment(c.getUserId()));
+			if(c.getComemntParentId()!= null) {
+				CreateCommentResponse responseParent = new CreateCommentResponse();
+				Comment commentParent = commentRepository.findById(c.getComemntParentId()).get();
+				BeanUtils.copyProperties(commentParent, responseParent);
+				responseParent.setUserId(getUSerComment(commentParent.getUserId()));
+				response.setComemntParent(responseParent);
+			}
+			
+			return response;
+		}).collect(Collectors.toList());
+		
+		responseEntity.setData(commentResponses);
+		responseEntity.setStatus(1);
+		responseEntity.setErrorList(null);
 	}
 }

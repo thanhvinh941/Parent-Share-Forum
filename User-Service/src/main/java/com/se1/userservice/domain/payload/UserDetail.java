@@ -1,5 +1,10 @@
 package com.se1.userservice.domain.payload;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.se1.userservice.domain.payload.response.UserResponseForClient.ExpertInfo;
+
 import lombok.Data;
 
 @Data
@@ -10,7 +15,8 @@ public class UserDetail {
 	private String imageUrl;
 	private String role;
 	private Boolean isExpert;
-	private Double rating;
+	private ExpertInfo expertInfo;
 	private int status;
-	private String topicId;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date lastTime;
 }

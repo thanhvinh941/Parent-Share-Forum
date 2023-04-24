@@ -26,7 +26,7 @@ public class Rating {
 	
 	private Long userRatingId;
 	
-	private int rating;
+	private Double rating;
 	
 	@Column(nullable = false)
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

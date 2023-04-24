@@ -14,4 +14,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
 	Boolean existsByEmail(String email);
 
+	@Query("SELECT u FROM User u WHERE u.id = ?1 AND u.role = 'expert'")
+	User findExpertById(Long expertid);
+
 }

@@ -12,4 +12,6 @@ public interface RatingRepository extends CrudRepository<Rating, Long>{
 
 	List<Rating> findByUserRatedId(Long id);
 
+	Rating findByUserRatedIdAndUserRatingId(Long expertid, Long id);
+
 }

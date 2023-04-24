@@ -27,27 +27,25 @@ public class SubscribeService {
 
 	public void processDoSub(Long expertid, UserDetail userDetail, ApiResponseEntity apiResponseEntity)
 			throws Exception {
-		
-		//TODO check expert
-		Subscribe subscribe = new Subscribe();
-		subscribe.setCreateAt(new Date());
-		subscribe.setUserExpertId(expertid);
-		subscribe.setUserSubscriberId(userDetail.getId());
-
-		Subscribe subscribeSave = subscriberRepository.save(subscribe);
-		if (Objects.isNull(subscribeSave)) {
-			throw new Exception("Có lỗi xảy ra xin hãy thực hiện lại thao tác");
+		User user = userRepository.findExpertById(expertid);
+		if(user == null) {
+			throw new Exception("Chuyên gia không tồn tại hoặc người dùng không phải chuyên gia");
 		}
-
-		apiResponseEntity.setData(true);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-	}
-
-	public void processDoUnSub(Long expertid, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
-		List<Subscribe> subscribe = subscriberRepository.findByUserExpertIdAndUserSubscriberId(expertid,
-				userDetail.getId());
-		subscriberRepository.deleteById(subscribe.get(0).getId());
+		
+		Subscribe subscribeFind = subscriberRepository.findByUserExpertIdAndUserSubscriberId(expertid, userDetail.getId());
+		if(subscribeFind!= null) {
+			subscriberRepository.deleteById(subscribeFind.getId());
+		}else {
+			Subscribe subscribe = new Subscribe();
+			subscribe.setCreateAt(new Date());
+			subscribe.setUserExpertId(expertid);
+			subscribe.setUserSubscriberId(userDetail.getId());
+			Subscribe subscribeSave = subscriberRepository.save(subscribe);
+			if (Objects.isNull(subscribeSave)) {
+				throw new Exception("Có lỗi xảy ra xin hãy thực hiện lại thao tác");
+			}
+		}
+		
 		apiResponseEntity.setData(true);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);

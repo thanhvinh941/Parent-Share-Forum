@@ -2,9 +2,9 @@ package com.se1.userservice.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,30 +15,29 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.service.SubscribeService;
+import com.se1.userservice.domain.payload.request.DoRatingRequest;
+import com.se1.userservice.domain.service.RatingService;
 
 import lombok.RequiredArgsConstructor;
 
+@RequestMapping("/rating/external")
 @RestController
-@RequestMapping("/subscriber/external")
 @RequiredArgsConstructor
-public class SubscribeExternalController {
+public class RatingExternalController {
 
 	private final ApiResponseEntity apiResponseEntity;
-
 	private final ObjectMapper objectMapper;
-
-	private final SubscribeService subscribeService;
-
-	@PostMapping("/doSub")
-	public ResponseEntity<?> doSub(@RequestParam("expertId") Long expertid,
+	private final RatingService ratingService;
+	
+	@PostMapping("/doRating")
+	public ResponseEntity<?> doRating(@RequestBody DoRatingRequest request,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			subscribeService.processDoSub(expertid, userDetail, apiResponseEntity);
+			ratingService.processDoRating(request, userDetail.getId(), apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -48,15 +47,15 @@ public class SubscribeExternalController {
 		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
-	@PostMapping("/getAllSub")
-	public ResponseEntity<?> getAllSub(
+	@PostMapping("/getUesrRating")
+	public ResponseEntity<?> getUesrRating(@RequestParam("expertId") Long expertid,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			subscribeService.processGetAllExpertSubscribe(userDetail.getId(), apiResponseEntity);
+			ratingService.processGetUesrRating(expertid, userDetail.getId(), apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -65,5 +64,4 @@ public class SubscribeExternalController {
 
 		return ResponseEntity.ok(apiResponseEntity);
 	}
-
 }
