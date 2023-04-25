@@ -19,7 +19,7 @@ public class GetPostResponseDto {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 	private Date createAt;
 	private Integer likeCount;
-	private Integer disLikeCount;
+	private Integer dislikeCount;
 	private Integer commentCount;
 	private Integer shareCount;
 	

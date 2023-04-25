@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class SubscribeDto {
 	private Long id;
-	private SubscribeUser userExpert;
+	private SubscribeUser userExpertId;
 	private Date createAt;
 	
 	@Data

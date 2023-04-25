@@ -1,5 +1,7 @@
 package com.se1.userservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +28,9 @@ public class SubscribeInternalController {
 		try {
 			subscribeService.processGetAllExpertSubscribe(id, apiResponseEntity);
 		} catch (Exception e) {
-			// TODO: handle exception
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(1);
 		}
 		
 		return ResponseEntity.ok(apiResponseEntity);

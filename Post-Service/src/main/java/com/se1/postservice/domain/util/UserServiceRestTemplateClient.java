@@ -84,11 +84,7 @@ public class UserServiceRestTemplateClient {
                         "http://localhost:8088/subscriber/internal/getAllExpertSubscribe",
                         request,
                         ApiResponseEntity.class);
-		List<Object> objects = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), List.class);
-		List<SubscribeDto> subscribeDtos = new ArrayList<>();
-		for(Object object : objects) {
-			subscribeDtos.add(mapper.readValue(mapper.writeValueAsString(object), SubscribeDto.class));
-		}
+		List<SubscribeDto> subscribeDtos = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), new TypeReference<List<SubscribeDto>>(){});
         return subscribeDtos;
 	}
 

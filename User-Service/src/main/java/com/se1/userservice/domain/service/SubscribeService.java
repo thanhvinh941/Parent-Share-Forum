@@ -58,6 +58,7 @@ public class SubscribeService {
 		List<UserDetail> userFriendResponse = userFriends.stream().map(uf -> {
 			UserDetail ud = new UserDetail();
 			BeanUtils.copyProperties(uf, ud);
+			ud.setRole(uf.getRole().name());
 			return ud;
 		}).collect(Collectors.toList());
 		List<SubscribeDto> subscribeDtos = subscribe.stream().map(s->{
