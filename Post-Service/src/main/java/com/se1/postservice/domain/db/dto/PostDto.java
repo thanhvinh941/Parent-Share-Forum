@@ -25,4 +25,6 @@ public class PostDto {
 	private Integer dislikeCount;
 	private Integer commentCount;
 	private Integer shareCount;
+	private Integer isLike;
+	private Integer isDislike;
 }

@@ -24,9 +24,9 @@ public class GetPostResponseDto {
 	private Integer shareCount = 0;
 	private Boolean isLike = false;
 	private Boolean isDislike = false;
-	
 	private TopicTag topicTag;
 	private User user;
+	
 	@Data
 	public static class TopicTag {
 		private Integer id;

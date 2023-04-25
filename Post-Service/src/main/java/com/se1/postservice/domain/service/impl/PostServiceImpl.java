@@ -291,13 +291,15 @@ public class PostServiceImpl implements PostService {
 
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(
 				String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
-				offset);
+				offset, userId);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
 		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
 			postResponseDto.setImageList(List.of(p.getImageList()));
 			BeanUtils.copyProperties(p, postResponseDto);
+			postResponseDto.setIsLike((p.getIsLike() != null && p.getIsLike().equals(1)) ? true : false);
+			postResponseDto.setIsDislike((p.getIsDislike() != null && p.getIsDislike().equals(1)) ? true : false);
 			postResponseDto.setUser(getUSerPost(p.getUserId()));
 			postResponseDto.setTopicTag(
 					listTopicTagResponse.stream().filter(t -> p.getTopicTagId().equals(t.getId())).findFirst().get());
@@ -313,7 +315,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset) {
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(userId.toString(),
-				offset);
+				offset, userId);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
 		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
@@ -337,10 +339,11 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public void findAllPostByCondition(Map<String, Object> param, ApiResponseEntity apiResponseEntity, int offset) {
+	public void findAllPostByCondition(Long userId, Map<String, Object> param, ApiResponseEntity apiResponseEntity,
+			int offset) {
 		Map<String, String> paramConvert = convertMapToQuery(param);
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByCondition(paramConvert,
-				offset);
+				offset, userId);
 		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
 		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {

@@ -119,8 +119,11 @@ public class PostExternalController {
 		param.put("title", title);
 		param.put("context", title);
 		param.put("hashTag", title);
+		
+		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+		
 		try {
-			postService.findAllPostByCondition(param, apiResponseEntity, offset);
+			postService.findAllPostByCondition(detail.getId() ,param, apiResponseEntity, offset);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

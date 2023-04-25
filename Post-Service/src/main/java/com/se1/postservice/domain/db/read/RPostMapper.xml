@@ -22,6 +22,8 @@
 		<result column="dislike_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="dislikeCount" />
 		<result column="comment_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="commentCount" />
 		<result column="share_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="shareCount" />
+		<result column="is_like" jdbcType="INTEGER" javaType="java.lang.Integer" property="isLike" />
+		<result column="is_dislike" jdbcType="INTEGER" javaType="java.lang.Integer" property="isDislike" />
 	</resultMap>
 
 	<select id="findAllPostByUserId" resultMap="post_result">
@@ -55,7 +57,21 @@
             db02.comment cm
         WHERE
             cm.post_id = p.id AND cm.del_flg = 0
-        GROUP BY post_id) AS comment_count
+        GROUP BY post_id) AS comment_count,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 1 AND pl.user_id = #{userId}
+        GROUP BY post_id) AS is_like,
+   (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 2 AND pl.user_id = #{userId}
+        GROUP BY post_id) AS is_dislike
 FROM
     post p
 		WHERE
