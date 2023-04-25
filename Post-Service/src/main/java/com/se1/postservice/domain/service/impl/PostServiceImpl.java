@@ -296,6 +296,7 @@ public class PostServiceImpl implements PostService {
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
 		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
 			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			postResponseDto.setImageList(List.of(p.getImageList()));
 			BeanUtils.copyProperties(p, postResponseDto);
 			postResponseDto.setUser(getUSerPost(p.getUserId()));
 			postResponseDto.setTopicTag(
