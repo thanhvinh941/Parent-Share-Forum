@@ -13,10 +13,19 @@ public interface RPostMapper {
 
 	Object findPost(String query);
 	
+	List<PostDto> findAllPostByTitle(@Param("title") String title, @Param("offset") int offset, @Param("userId") Long userId);
+	
+	List<PostDto> findAllPostByHashTag(@Param("hashTag") String hashTag, @Param("offset") int offset, @Param("userId") Long userId);
+	
 	List<PostDto> findAllPostByUserId(@Param("userIds") String userIds, @Param("offset") int offset, @Param("userId") Long userId);
 
 	List<PostDto> findAllPostByCondition(@Param("conditionList") Map<String, String> conditionList, @Param("offset") int offset, @Param("userId") Long userId);
 	
 	List<PostDto> findPostById(@Param("ids") String ids, @Param("userId") Long userId);
 
+	List<PostDto> findPostMostLike(@Param("userId") Long userId);
+
+	List<PostDto> findPostMostComment(@Param("userId") Long userId);
+
+	List<PostDto> findPostMostView(@Param("userId") Long userId);
 }

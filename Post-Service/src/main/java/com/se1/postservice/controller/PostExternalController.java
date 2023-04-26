@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,20 +79,6 @@ public class PostExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 
-	@PostMapping("/findPost")
-	public ResponseEntity<?> findPostById(@RequestParam("post-id") Long postId)
-			throws JsonMappingException, JsonProcessingException {
-
-		try {
-			postService.findPostById(postId, apiResponseEntity);
-		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
-		}
-		return ResponseEntity.ok().body(apiResponseEntity);
-	}
-
 	@PostMapping("/create")
 	public ResponseEntity<?> save(@RequestBody PostRequest postRequest, @RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {
@@ -141,6 +126,23 @@ public class PostExternalController {
 
 		try {
 			postService.findById(id, detail.getId(), apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+
+	}
+	
+	@PostMapping("/findPostAllMost")
+	public ResponseEntity<?> findPostAllMost(@RequestHeader("user_detail") String userDetail)
+			throws JsonMappingException, JsonProcessingException {
+
+		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+
+		try {
+			postService.findPostAllMost(detail.getId(), apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

@@ -1,15 +1,11 @@
 package com.se1.userservice.domain.service;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,27 +14,20 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.se1.userservice.domain.common.CommonUtil;
 import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.db.read.RUserMapper;
 import com.se1.userservice.domain.db.write.WUserMapper;
 import com.se1.userservice.domain.model.AuthProvider;
 import com.se1.userservice.domain.model.FindAllUserRequest;
 import com.se1.userservice.domain.model.User;
-import com.se1.userservice.domain.model.UserDescription;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.payload.UserDto;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
-import com.se1.userservice.domain.payload.request.CreateUserRequest.Description;
 import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.payload.response.UserResponseForClient;
 import com.se1.userservice.domain.payload.response.UserResponseForClient.ExpertInfo;
-import com.se1.userservice.domain.repository.UserDescriptionRepository;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
@@ -54,8 +43,6 @@ public class UserService {
 	private final SystemServiceRestTemplateClient restTemplateClient;
 	private final WUserMapper wUserMapper;
 	private final PasswordEncoder passwordEncoder;
-	private final UserDescriptionRepository userDescriptionRepository;
-	private final ObjectMapper objectMapper;
 
 	public User save(User user) throws Exception {
 
@@ -108,19 +95,6 @@ public class UserService {
 		}
 
 		return result;
-	}
-
-	private String generateQueryContionFindByName(String name, Long userId) {
-		String query = "";
-		query += " WHERE ";
-		String[] nameArray = name.trim().split(" ");
-		String nameQuery = "('" + String.join("|", nameArray) + "')";
-		query += " name REGEXP " + nameQuery;
-		query += " OR ";
-		query += " email REGEXP " + nameQuery;
-		query += " AND id !=" + userId;
-		query += " AND role != 'admin'";
-		return query;
 	}
 
 	public void processFindUserByEmail(String email, ApiResponseEntity apiResponseEntity) throws Exception {
@@ -214,15 +188,9 @@ public class UserService {
 		BeanUtils.copyProperties(userFind, userResponseDto);
 
 		if (userFind.getIsExpert()) {
-			List<UserDescription> userDescription = userFind.getDescription();
-			Map<String, List<String>> descriptions = userDescription.stream()
-					.collect(Collectors.groupingBy(UserDescription::getTitle, TreeMap::new,
-							Collectors.mapping(UserDescription::getDescription, Collectors.toList())));
-
 			ExpertInfo expertInfo = new ExpertInfo();
 			BeanUtils.copyProperties(userFind, expertInfo);
 			expertInfo.setRating(rating);
-			expertInfo.setDescriptions(descriptions);
 
 			userResponseDto.setExpertInfo(expertInfo);
 		}
@@ -231,15 +199,14 @@ public class UserService {
 	}
 
 	public void processFindByName(Long userId, String name, ApiResponseEntity apiResponseEntity, Integer offset) {
-		String query = generateQueryContionFindByName(name, userId);
-		List<User> userList = rUserMapper.find(query, offset);
-		List<UserResponseDto> responseList = userList.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
+		List<User> users = repository.findByName(name, userId);
+		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
 					double rating = 0;
 					if (ul.getIsExpert()) {
 						rating = ratingService.getRatingByUserId(ul.getId());
 					}
-					UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
+					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
 					return userResponseDto;
 				}).collect(Collectors.toList());
 
@@ -251,34 +218,6 @@ public class UserService {
 	public void processUpdateStatus(Long id, Integer status, ApiResponseEntity apiResponseEntity) {
 		wUserMapper.updateUserStatus(id, status);
 	}
-
-//	public void processRegistExpert(UserDetail userDetail, String imageLicenceBase64,
-//			ApiResponseEntity apiResponseEntity) throws Exception {
-//		Long userId = userDetail.getId();
-//		Boolean isExpert = userDetail.getIsExpert();
-//		if (isExpert) {
-//			throw new Exception("Người dùng đã là chuyên gia");
-//		}
-//
-//		String[] imageBase64 = imageLicenceBase64.split(",");
-//
-//		boolean isImage = checkImage(imageBase64[0].split("/")[1]);
-//
-//		if (!isImage) {
-//			throw new Exception("Chỉ nhận file hình ảnh hoặc file pdf");
-//		}
-//
-//		String licenceFileName = restTemplateClient.uploadFile(imageLicenceBase64);
-//		if (Objects.isNull(licenceFileName)) {
-//			throw new Exception("Lưu bằng cấp thất bại. Xin hãy thử lại !!!");
-//		}
-//
-//		wUserMapper.updateLicenceImageToUser(licenceFileName, userId);
-//
-//		apiResponseEntity.setData(true);
-//		apiResponseEntity.setErrorList(null);
-//		apiResponseEntity.setStatus(1);
-//	}
 
 	private boolean checkImage(String extension) {
 		return extension.equals("jpeg;base64") || extension.equals("png;base64") || extension.equals("pdf;base64")
@@ -297,11 +236,6 @@ public class UserService {
 		User user = generatorCreateEntity(request, error);
 		if (error.size() > 0) {
 			return error;
-		}
-
-		if (user.getDescription() != null) {
-			List<UserDescription> userDescriptions = userDescriptionRepository.saveAll(user.getDescription());
-			user.setDescription(userDescriptions);
 		}
 
 		User userSave = repository.save(user);
@@ -347,25 +281,6 @@ public class UserService {
 			}
 
 			BeanUtils.copyProperties(expertInfo, user);
-			List<Description> description = request.getExpertInfo().getDescription();
-			List<List<UserDescription>> userDescriptions = description.stream().filter(des -> {
-				return (!Objects.isNull(des.getTitle()) || !Objects.isNull(des.getDescription()));
-			}).map(des -> {
-				List<UserDescription> userDescriptionsList = new ArrayList<>();
-				for (String descriptionStr : des.getDescription()) {
-					UserDescription userDescription = new UserDescription();
-					userDescription.setTitle(des.getTitle());
-					userDescription.setDescription(descriptionStr);
-
-					userDescriptionsList.add(userDescription);
-				}
-
-				return userDescriptionsList;
-			}).collect(Collectors.toList());
-
-			List<UserDescription> flat = userDescriptions.stream().flatMap(List::stream).collect(Collectors.toList());
-			user.setDescription(flat);
-
 		}
 
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -388,6 +303,7 @@ public class UserService {
 			ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
 
+		String userQuery = String.format(" id != %d", userId);
 		String nameQuery = !request.getName().isEmpty() ? " name like '% " + request.getName() + " %'" : "";
 		String emailQuery = !request.getEmail().isEmpty() ? " email like '% " + request.getEmail() + " %'" : "";
 		String providerQuery = (!Objects.isNull(request.getProvider()) && request.getProvider().size() > 0)
@@ -400,7 +316,7 @@ public class UserService {
 						request.getRole().stream().map(r -> String.format("'%s'", r)).collect(Collectors.toList()))
 				+ ")" : "";
 
-		List<String> mergeQuery = List.of(nameQuery, emailQuery, providerQuery, roleQuery);
+		List<String> mergeQuery = List.of(userQuery, nameQuery, emailQuery, providerQuery, roleQuery);
 
 		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
 		apiResponseEntity.setData(allUser);
@@ -448,31 +364,6 @@ public class UserService {
 			if(expertInfo.getWorkPlace() != null) {
 				userOld.setWorkPlace(expertInfo.getWorkPlace());
 			}
-			if(expertInfo.getDescription() != null && expertInfo.getDescription().size() > 0) {
-				List<com.se1.userservice.domain.payload.request.UpdateUserRequest.Description> description = expertInfo.getDescription();
-				List<List<UserDescription>> userDescriptions = description.stream().filter(des -> {
-					return (!Objects.isNull(des.getTitle()) || !Objects.isNull(des.getDescription()));
-				}).map(des -> {
-					List<UserDescription> userDescriptionsList = new ArrayList<>();
-					for (String descriptionStr : des.getDescription()) {
-						UserDescription userDescription = new UserDescription();
-						userDescription.setTitle(des.getTitle());
-						userDescription.setDescription(descriptionStr);
-
-						userDescriptionsList.add(userDescription);
-					}
-
-					return userDescriptionsList;
-				}).collect(Collectors.toList());
-
-				List<UserDescription> flat = userDescriptions.stream().flatMap(List::stream).collect(Collectors.toList());
-				userOld.setDescription(flat);
-			}
-		}
-		
-		if(userOld.getDescription() != null && userOld.getDescription().size() > 0) {
-			List<UserDescription> userDescriptions = userDescriptionRepository.saveAll(userOld.getDescription());
-			userOld.setDescription(userDescriptions);
 		}
 		
 		User userUpdate = repository.save(userOld);

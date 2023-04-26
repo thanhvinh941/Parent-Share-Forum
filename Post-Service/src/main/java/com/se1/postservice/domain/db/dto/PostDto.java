@@ -27,4 +27,5 @@ public class PostDto {
 	private Integer shareCount;
 	private Integer isLike;
 	private Integer isDislike;
+	private Integer viewCount;
 }

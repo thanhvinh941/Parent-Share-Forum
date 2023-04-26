@@ -15,7 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.db.read.RContactMapper;
@@ -25,9 +25,7 @@ import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.ContactDto;
 import com.se1.userservice.domain.payload.ContactDtoForChat;
 import com.se1.userservice.domain.payload.ContactDtoForChat.Chat;
-import com.se1.userservice.domain.payload.UserContactDto;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.payload.UserDto;
 import com.se1.userservice.domain.payload.response.RabbitRequest;
 import com.se1.userservice.domain.rabbitMQ.payload.ContactResponse;
 import com.se1.userservice.domain.repository.ContactRepository;
@@ -240,7 +238,7 @@ public class ContactService {
 			String apiResultStr;
 			try {
 				apiResultStr = objectMapper.writeValueAsString(userChatParentResult.getData());
-				result = objectMapper.readValue(apiResultStr, List.class);
+				result = objectMapper.readValue(apiResultStr, new TypeReference<List<Chat>>() {});
 			} catch (JsonProcessingException e1) {
 				e1.printStackTrace();
 			}

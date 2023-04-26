@@ -38,15 +38,15 @@ public class RatingService {
 		return 0.0;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({ "null", "removal" })
 	public void processDoRating(DoRatingRequest request, Long userId, ApiResponseEntity apiResponseEntity)
 			throws Exception {
 		Long expertId = request.getExpertId();
-		Double rate = new Double(0);
+		Double rate = new Double(0.0);
 		if (request.getRate() <= 5 && request.getRate() > 0) {
 			rate = request.getRate();
 		} else if (request.getRate() > 5) {
-			rate = new Double(5);
+			rate = new Double(5.0);
 		}
 		User user = userRepository.findExpertById(expertId);
 		if (user == null) {
