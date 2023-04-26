@@ -85,33 +85,6 @@ public class UserInternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 
-//	@PostMapping("/find")
-//	public ResponseEntity<?> find(@RequestBody FindRequest findRequest) {
-//		String findRequestStr;
-//		try {
-//			findRequestStr = objectMapper.writeValueAsString(findRequest);
-//			Map<String, Object> findRequestMap = objectMapper.readValue(findRequestStr, Map.class);
-//			service.processFindUser(findRequestMap, apiResponseEntity);
-//		} catch (JsonProcessingException e) {
-//			apiResponseEntity.setData(null);
-//			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-//			apiResponseEntity.setStatus(0);
-//		}
-//		return ResponseEntity.ok().body(apiResponseEntity);
-//	}
-
-	@PostMapping("/findByName")
-	public ResponseEntity<?> findByName(@RequestParam("name") String name) {
-		try {
-			service.processFindByName(name, apiResponseEntity);
-		} catch (Exception e) {
-			apiResponseEntity.setData(null);
-			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-			apiResponseEntity.setStatus(0);
-		}
-		return ResponseEntity.ok().body(apiResponseEntity);
-	}
-
 	@PostMapping("/existsByEmail")
 	public ResponseEntity<?> existsByEmail(@RequestParam("email") String email) {
 
@@ -149,11 +122,12 @@ public class UserInternalController {
 		user.setRole(UserRole.valueOf(userRequestDto.getRole()));
 		user.setTopicId(UUID.randomUUID().toString());
 		user.setIsExpert(false);
-		user.setStatus(new Byte("2"));
+		user.setStatus(new Byte("0"));
 		user.setDelFlg(false);
 		user.setCreateAt(new Date());
 		user.setUpdateAt(new Date());
-
+		user.setLastTime(new Date());
+		
 		return user;
 	}
 

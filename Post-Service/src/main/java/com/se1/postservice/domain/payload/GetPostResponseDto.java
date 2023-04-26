@@ -41,7 +41,7 @@ public class GetPostResponseDto {
     	private String email;
     	private String imageUrl;
     	private Boolean isExpert;
-    	private Double rating;
+    	private Double rating = 0.0;
     	private Byte status; // 1: online, 2 offline
     	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
         private Date lastTime;

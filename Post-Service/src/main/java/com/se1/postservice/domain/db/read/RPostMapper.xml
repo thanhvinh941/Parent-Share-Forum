@@ -82,6 +82,61 @@ FROM
 		LIMIT 10 OFFSET #{offset}
 	</select>
 	
+	<select id="findPostById" resultMap="post_result">
+		SELECT 
+    *,
+    (SELECT 
+            GROUP_CONCAT(image_list
+                    SEPARATOR ', ')
+        FROM
+            post_image_list
+        WHERE
+            post_id = p.id
+        GROUP BY post_id) AS image_list,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 1
+        GROUP BY post_id) AS like_count,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 2
+        GROUP BY post_id) AS dislike_count,
+    (SELECT 
+            COUNT(id)
+        FROM
+            db02.comment cm
+        WHERE
+            cm.post_id = p.id AND cm.del_flg = 0
+        GROUP BY post_id) AS comment_count,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 1 AND pl.user_id = #{userId}
+        GROUP BY post_id) AS is_like,
+   (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 2 AND pl.user_id = #{userId}
+        GROUP BY post_id) AS is_dislike
+FROM
+    post p
+		WHERE
+		    p.id IN (${ids})
+		        AND p.delflg = 0 
+		        AND p.status = 1
+		ORDER BY p.create_at DESC
+	</select>
+	
 	<select id="findAllPostByCondition" resultMap="post_result">
 		SELECT 
     *,

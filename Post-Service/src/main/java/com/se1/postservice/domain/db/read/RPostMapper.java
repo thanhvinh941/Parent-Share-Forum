@@ -16,5 +16,7 @@ public interface RPostMapper {
 	List<PostDto> findAllPostByUserId(@Param("userIds") String userIds, @Param("offset") int offset, @Param("userId") Long userId);
 
 	List<PostDto> findAllPostByCondition(@Param("conditionList") Map<String, String> conditionList, @Param("offset") int offset, @Param("userId") Long userId);
+	
+	List<PostDto> findPostById(@Param("ids") String ids, @Param("userId") Long userId);
 
 }

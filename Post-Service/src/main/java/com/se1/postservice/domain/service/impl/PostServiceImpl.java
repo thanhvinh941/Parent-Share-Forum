@@ -378,4 +378,29 @@ public class PostServiceImpl implements PostService {
 		return result;
 	}
 
+	@Override
+	public void findById(Long id, Long userId, ApiResponseEntity apiResponseEntity) {
+		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findPostById(id.toString(), userId);
+		List<Integer> topicTagIds = allPost.stream().map(ap -> ap.getTopicTagId()).collect(Collectors.toList());
+		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
+		List<GetPostResponseDto> getPostResponseDtos = allPost.stream().map(p -> {
+			GetPostResponseDto postResponseDto = new GetPostResponseDto();
+			BeanUtils.copyProperties(p, postResponseDto);
+			String imageListStr = p.getImageList();
+			if (imageListStr != null) {
+				String[] imageList = imageListStr.split(", ");
+				postResponseDto.setImageList(List.of(imageList));
+			}
+			postResponseDto.setUser(getUSerPost(p.getUserId()));
+			postResponseDto.setTopicTag(
+					listTopicTagResponse.stream().filter(t -> p.getTopicTagId().equals(t.getId())).findFirst().get());
+
+			return postResponseDto;
+		}).collect(Collectors.toList());
+
+		apiResponseEntity.setData(getPostResponseDtos);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
 }

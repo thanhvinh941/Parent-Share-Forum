@@ -119,11 +119,28 @@ public class PostExternalController {
 		param.put("title", title);
 		param.put("context", title);
 		param.put("hashTag", title);
-		
+
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
-		
+
 		try {
-			postService.findAllPostByCondition(detail.getId() ,param, apiResponseEntity, offset);
+			postService.findAllPostByCondition(detail.getId(), param, apiResponseEntity, offset);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+
+	}
+
+	@PostMapping("/findById")
+	public ResponseEntity<?> findById(@RequestParam("postId") Long id, @RequestHeader("user_detail") String userDetail)
+			throws JsonMappingException, JsonProcessingException {
+
+		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+
+		try {
+			postService.findById(id, detail.getId(), apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

@@ -10,9 +10,9 @@ import com.se1.userservice.domain.model.User;
 @Mapper
 public interface RUserMapper {
 
-	List<User> find(@Param("query") String query);
+	List<User> find(@Param("query") String query ,@Param("offset") Integer offset);
 
-	List<User> findAll(@Param("conditions") List<String> mapRequest, @Param("userId") Long userId,
+	List<User> findAll(@Param("conditions") List<String> mapRequest,
 			@Param("offset") Integer offset);
 
 }

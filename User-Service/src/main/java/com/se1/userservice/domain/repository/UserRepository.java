@@ -1,10 +1,13 @@
 package com.se1.userservice.domain.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.se1.userservice.domain.model.User;
+import com.se1.userservice.domain.model.UserRole;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
@@ -16,5 +19,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
 	@Query("SELECT u FROM User u WHERE u.id = ?1 AND u.role = 'expert'")
 	User findExpertById(Long expertid);
+
+	List<User> findAllByRole(UserRole expert);
 
 }

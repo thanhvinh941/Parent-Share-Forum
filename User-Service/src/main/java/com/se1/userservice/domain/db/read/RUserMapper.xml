@@ -26,11 +26,10 @@
 	<select id="find" parameterType="String" resultMap="ResultMap">
 		SELECT
 			*
-		FROM 
-			db04.users
-			
+		FROM users
 		${query}
 		
+		Limit 10 Offset #{offset}
 	</select>
 
 	<select id="findAll" resultMap="ResultMap">

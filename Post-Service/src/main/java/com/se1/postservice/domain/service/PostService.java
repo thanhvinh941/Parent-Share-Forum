@@ -33,4 +33,6 @@ public interface PostService {
 
 	void findAllPostByCondition(Long userId, Map<String, Object> param, ApiResponseEntity apiResponseEntity, int offset);
 
+	void findById(Long id, Long id2, ApiResponseEntity apiResponseEntity);
+
 }

@@ -18,6 +18,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.common.CommonUtil;
 import com.se1.userservice.domain.common.SCMConstant;
@@ -87,79 +88,6 @@ public class UserService {
 		return userFind;
 	}
 
-	public List<UserDto> find(Map<String, Object> findRequestMap) {
-
-		String query = generateQueryContionFind(findRequestMap);
-		List<User> userList = rUserMapper.find(query);
-
-		List<UserDto> userDtos = userList.stream().map(user -> {
-			UserDto userDto = new UserDto();
-			userDto.setId(user.getId());
-			userDto.setName(user.getName());
-			userDto.setEmail(user.getEmail());
-			userDto.setEmailVerified(user.getEmailVerified());
-			userDto.setRole(user.getRole().toString());
-			userDto.setProvider(user.getProvider().toString());
-			userDto.setStatus(user.getStatus());
-			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIsExpert(user.getIsExpert());
-			userDto.setDelFlg(user.getDelFlg());
-			userDto.setCreateAt(user.getCreateAt());
-			userDto.setUpdateAt(user.getUpdateAt());
-
-			return userDto;
-		}).collect(Collectors.toList());
-
-		return userDtos;
-	}
-
-	private String generateQueryContionFind(Map<String, Object> findRequestMap) {
-		String query = "";
-		query += " WHERE ";
-
-		List<String> queryList = findRequestMap.entrySet().stream().map(entry -> {
-			String key = camelToSnake(entry.getKey());
-			Object value = entry.getValue();
-
-			String valueStr = "";
-			String mapResult = "";
-
-			if (Objects.isNull(value)) {
-
-			} else if (value instanceof Boolean) {
-				valueStr = (boolean) value ? "1" : "0";
-				mapResult = key + " = " + valueStr;
-			} else if (value instanceof String) {
-				valueStr = String.format("%s", value);
-				valueStr = valueStr.trim();
-				String[] valueArray = valueStr.split(" ");
-				if (valueArray.length > 1) {
-
-					mapResult = key + " REGEXP ";
-					mapResult += "'";
-					mapResult += String.join("|", valueArray);
-					mapResult += "'";
-				} else {
-					mapResult = key + " LIKE '%" + valueStr + "%'";
-				}
-			} else if (value instanceof Timestamp) {
-				String timestampStr = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(value);
-				valueStr = String.format("'%s'", timestampStr);
-				mapResult = key + valueStr;
-			} else {
-				mapResult = key + " = " + value.toString();
-			}
-			return mapResult;
-		}).collect(Collectors.toList());
-
-		queryList = queryList.stream().filter(x -> {
-			return !x.isBlank() && !x.equals(null) && !x.isEmpty();
-		}).collect(Collectors.toList());
-		query += String.join(" AND ", queryList);
-
-		return query;
-	}
-
 	public static String camelToSnake(String str) {
 		String result = "";
 
@@ -182,31 +110,7 @@ public class UserService {
 		return result;
 	}
 
-	public List<UserDto> findByName(String name) {
-		String query = generateQueryContionFindByName(name);
-		List<User> userList = rUserMapper.find(query);
-		List<UserDto> userDtos = userList.stream().map(user -> {
-			UserDto userDto = new UserDto();
-			userDto.setId(user.getId());
-			userDto.setName(user.getName());
-			userDto.setEmail(user.getEmail());
-			userDto.setEmailVerified(user.getEmailVerified());
-			userDto.setRole(user.getRole().toString());
-			userDto.setProvider(user.getProvider().toString());
-			userDto.setStatus(user.getStatus());
-			userDto.setPhoneNumber(user.getPhoneNumber());
-			userDto.setIsExpert(user.getIsExpert());
-			userDto.setDelFlg(user.getDelFlg());
-			userDto.setCreateAt(user.getCreateAt());
-			userDto.setUpdateAt(user.getUpdateAt());
-
-			return userDto;
-		}).collect(Collectors.toList());
-
-		return userDtos;
-	}
-
-	private String generateQueryContionFindByName(String name) {
+	private String generateQueryContionFindByName(String name, Long userId) {
 		String query = "";
 		query += " WHERE ";
 		String[] nameArray = name.trim().split(" ");
@@ -214,6 +118,8 @@ public class UserService {
 		query += " name REGEXP " + nameQuery;
 		query += " OR ";
 		query += " email REGEXP " + nameQuery;
+		query += " AND id !=" + userId;
+		query += " AND role != 'admin'";
 		return query;
 	}
 
@@ -324,27 +230,9 @@ public class UserService {
 		return userResponseDto;
 	}
 
-//	public void processFindUser(Map<String, Object> findRequestMap, ApiResponseEntity apiResponseEntity) {
-//
-//		String query = generateQueryContionFind(findRequestMap);
-//		List<User> userList = rUserMapper.find(query);
-//		List<UserResponseDto> responseList = userList.stream().map(ul -> {
-//			double rating = 0;
-//			if (ul.getIsExpert()) {
-//				rating = ratingService.getRatingByUserId(ul.getId());
-//			}
-//			UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(ul, rating);
-//			return userResponseDto;
-//		}).collect(Collectors.toList());
-//
-//		apiResponseEntity.setData(responseList);
-//		apiResponseEntity.setErrorList(null);
-//		apiResponseEntity.setStatus(1);
-//	}
-
-	public void processFindByName(String name, ApiResponseEntity apiResponseEntity) {
-		String query = generateQueryContionFindByName(name);
-		List<User> userList = rUserMapper.find(query);
+	public void processFindByName(Long userId, String name, ApiResponseEntity apiResponseEntity, Integer offset) {
+		String query = generateQueryContionFindByName(name, userId);
+		List<User> userList = rUserMapper.find(query, offset);
 		List<UserResponseDto> responseList = userList.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
 					double rating = 0;
@@ -514,7 +402,7 @@ public class UserService {
 
 		List<String> mergeQuery = List.of(nameQuery, emailQuery, providerQuery, roleQuery);
 
-		List<User> allUser = rUserMapper.findAll(mergeQuery, userId, offset);
+		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
 		apiResponseEntity.setData(allUser);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
@@ -594,5 +482,23 @@ public class UserService {
 			apiResponseEntity.setStatus(1);
 		}
 
+	}
+
+	public void findAllExpert(UserDetail userDetail, Integer offset, ApiResponseEntity apiResponseEntity) {
+		List<User> users = repository.findAllByRole(UserRole.expert);
+		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
+				.map(ul -> {
+					double rating = 0;
+					if (ul.getIsExpert()) {
+						rating = ratingService.getRatingByUserId(ul.getId());
+					}
+					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
+					return userResponseDto;
+				}).collect(Collectors.toList());
+
+		apiResponseEntity.setData(responseList);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+		
 	}
 }
