@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -98,7 +99,7 @@ public class CommentService {
 	}
 
 	public void processGetAllComment(Long postId, ApiResponseEntity responseEntity, UserDetail userDetail) {
-		List<Comment> comments = commentRepository.findByPostId(postId);
+		List<Comment> comments = commentRepository.findByPostId(postId, Sort.by(Sort.Direction.DESC, "createAt"));
 		List<CreateCommentResponse> commentResponses = comments.stream().map(c->{
 			CreateCommentResponse response = new CreateCommentResponse();
 			BeanUtils.copyProperties(c, response);

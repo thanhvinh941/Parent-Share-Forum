@@ -41,7 +41,7 @@ public class NotifyController {
 		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
-	@PostMapping("/deleteAllByUserId")
+	@PostMapping("/deleteAll")
 	public ResponseEntity<?> deleteAllByUserId(@RequestHeader("user_detail") String userDetailHeader){
 		UserDetail userDetail;
 		try {
@@ -56,7 +56,7 @@ public class NotifyController {
 		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
-	@PostMapping("/updateAllByUserId")
+	@PostMapping("/updateAllStatus")
 	public ResponseEntity<?> updateAllByUserId(@RequestHeader("user_detail") String userDetailHeader){
 		UserDetail userDetail;
 		try {
@@ -71,7 +71,7 @@ public class NotifyController {
 		return ResponseEntity.ok(apiResponseEntity);
 	}
 	
-	@PostMapping("/updateById")
+	@PostMapping("/updateStatus")
 	public ResponseEntity<?> updateAllByUserId(@RequestParam("notifyId") Long notifyId){
 		try {
 			notifyService.processUpdate(notifyId, apiResponseEntity);
