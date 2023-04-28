@@ -15,19 +15,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.se1.userservice.domain.common.SCMConstant;
+import com.se1.userservice.domain.db.dto.ReportUserDto;
 import com.se1.userservice.domain.db.read.RUserMapper;
 import com.se1.userservice.domain.db.write.WUserMapper;
 import com.se1.userservice.domain.model.AuthProvider;
 import com.se1.userservice.domain.model.FindAllUserRequest;
+import com.se1.userservice.domain.model.ReportUser;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.FindAllReportRequest;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
 import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.payload.response.UserResponseForClient;
 import com.se1.userservice.domain.payload.response.UserResponseForClient.ExpertInfo;
+import com.se1.userservice.domain.repository.ReportUserRepository;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
@@ -43,6 +47,7 @@ public class UserService {
 	private final SystemServiceRestTemplateClient restTemplateClient;
 	private final WUserMapper wUserMapper;
 	private final PasswordEncoder passwordEncoder;
+	private final ReportUserRepository reportUserRepository;
 
 	public User save(User user) throws Exception {
 
@@ -299,26 +304,15 @@ public class UserService {
 
 	}
 
-	public void findAll(FindAllUserRequest request, UserDetail userDetail, Integer offset,
+	public void findAllReport(FindAllReportRequest request, UserDetail userDetail, Integer offset,
 			ApiResponseEntity apiResponseEntity) {
-		Long userId = userDetail.getId();
+		String nameQuery = !request.getName().isEmpty() ? " u.name like '% " + request.getName() + " %'" : "";
+		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '% " + request.getEmail() + " %'" : "";
 
-		String userQuery = String.format(" id != %d", userId);
-		String nameQuery = !request.getName().isEmpty() ? " name like '% " + request.getName() + " %'" : "";
-		String emailQuery = !request.getEmail().isEmpty() ? " email like '% " + request.getEmail() + " %'" : "";
-		String providerQuery = (!Objects.isNull(request.getProvider()) && request.getProvider().size() > 0)
-				? " provider in (" + String.join(", ",
-						request.getProvider().stream().map(p -> String.format("'%s'", p)).collect(Collectors.toList()))
-						+ ")"
-				: "";
-		String roleQuery = (!Objects.isNull(request.getRole()) && request.getRole().size() > 0) ? " role in ("
-				+ String.join(", ",
-						request.getRole().stream().map(r -> String.format("'%s'", r)).collect(Collectors.toList()))
-				+ ")" : "";
+		List<String> mergeQuery = List.of(nameQuery, emailQuery);
 
-		List<String> mergeQuery = List.of(userQuery, nameQuery, emailQuery, providerQuery, roleQuery);
+		List<ReportUserDto> allUser = rUserMapper.findAllHaveReport(mergeQuery, offset);
 
-		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
 		apiResponseEntity.setData(allUser);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
@@ -327,8 +321,7 @@ public class UserService {
 	public void update(UpdateUserRequest request, UserDetail userDetail, ApiResponseEntity apiResponseEntity)
 			throws Exception {
 		Boolean isCurrenUser = userDetail.getId().equals(request.getId());
-		if (!userDetail.getRole().equals("admin") && 
-				!isCurrenUser) {
+		if (!userDetail.getRole().equals("admin") && !isCurrenUser) {
 			throw new Exception("Hành đông không cho phép");
 		}
 		Optional<User> userFind = repository.findById(request.getId());
@@ -337,37 +330,38 @@ public class UserService {
 		}
 
 		User userOld = userFind.get();
-		if(request.getName() != null) {
+		if (request.getName() != null) {
 			userOld.setName(request.getName());
 		}
 		String imageUrl = "";
 		if (request.getImageUrlBase64() != null) {
 			imageUrl = restTemplateClient.uploadFile(request.getImageUrlBase64());
 		}
-		if(imageUrl != null && !imageUrl.isEmpty() && !imageUrl.isBlank()) {
+		if (imageUrl != null && !imageUrl.isEmpty() && !imageUrl.isBlank()) {
 			userOld.setImageUrl(imageUrl);
 		}
-		if(request.getPassword()!= null) {
+		if (request.getPassword() != null) {
 			userOld.setPassword(passwordEncoder.encode(request.getPassword()));
 		}
-		if(userOld.getRole().name().equals("expert") && request.getExpertInfo() != null){
-			com.se1.userservice.domain.payload.request.UpdateUserRequest.ExpertInfo expertInfo = request.getExpertInfo();
-			if(expertInfo.getPhoneNumber() != null) {
+		if (userOld.getRole().name().equals("expert") && request.getExpertInfo() != null) {
+			com.se1.userservice.domain.payload.request.UpdateUserRequest.ExpertInfo expertInfo = request
+					.getExpertInfo();
+			if (expertInfo.getPhoneNumber() != null) {
 				userOld.setPhoneNumber(expertInfo.getPhoneNumber());
 			}
-			if(expertInfo.getJobTitle() != null) {
+			if (expertInfo.getJobTitle() != null) {
 				userOld.setJobTitle(expertInfo.getJobTitle());
 			}
-			if(expertInfo.getSpecialist() != null) {
+			if (expertInfo.getSpecialist() != null) {
 				userOld.setSpecialist(expertInfo.getSpecialist());
 			}
-			if(expertInfo.getWorkPlace() != null) {
+			if (expertInfo.getWorkPlace() != null) {
 				userOld.setWorkPlace(expertInfo.getWorkPlace());
 			}
 		}
-		
+
 		User userUpdate = repository.save(userOld);
-		if(userUpdate != null) {
+		if (userUpdate != null) {
 			apiResponseEntity.setData(userUpdate.getId());
 			apiResponseEntity.setErrorList(null);
 			apiResponseEntity.setStatus(1);
@@ -390,6 +384,49 @@ public class UserService {
 		apiResponseEntity.setData(responseList);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
-		
+
+	}
+
+	public void delete(Long id, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+		repository.deleteById(id);
+
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	public void report(Long id, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+		ReportUser reportUser = new ReportUser();
+		reportUser.setUserId(id);
+
+		reportUserRepository.save(reportUser);
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	public void findAll(FindAllUserRequest request, UserDetail userDetail, Integer offset,
+			ApiResponseEntity apiResponseEntity) {
+		Long userId = userDetail.getId();
+
+		String userQuery = String.format(" id != %d", userId);
+		String nameQuery = !request.getName().isEmpty() ? " name like '% " + request.getName() + " %'" : "";
+		String emailQuery = !request.getEmail().isEmpty() ? " email like '% " + request.getEmail() + " %'" : "";
+		String providerQuery = (!Objects.isNull(request.getProvider()) && request.getProvider().size() > 0)
+				? " provider in (" + String.join(", ",
+						request.getProvider().stream().map(p -> String.format("'%s'", p)).collect(Collectors.toList()))
+						+ ")"
+				: "";
+		String roleQuery = (!Objects.isNull(request.getRole()) && request.getRole().size() > 0) ? " role in ("
+				+ String.join(", ",
+						request.getRole().stream().map(r -> String.format("'%s'", r)).collect(Collectors.toList()))
+				+ ")" : "";
+
+		List<String> mergeQuery = List.of(userQuery, nameQuery, emailQuery, providerQuery, roleQuery);
+		mergeQuery = mergeQuery.stream().filter(s-> !s.isEmpty()).collect(Collectors.toList());
+		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
+		apiResponseEntity.setData(allUser);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 }

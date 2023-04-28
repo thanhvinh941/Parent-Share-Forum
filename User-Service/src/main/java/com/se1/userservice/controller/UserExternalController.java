@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.model.FindAllUserRequest;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
+import com.se1.userservice.domain.payload.FindAllReportRequest;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
 import com.se1.userservice.domain.payload.request.UpdateUserRequest;
@@ -90,6 +92,21 @@ public class UserExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 	
+	@PostMapping("/findAllReport")
+	public ResponseEntity<?> findAllReport(@RequestBody FindAllReportRequest request,
+			@RequestHeader("user_detail") String userDetailHeader, @RequestParam("offset") Integer offset)
+			throws JsonMappingException, JsonProcessingException {
+		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+		try {
+			service.findAllReport(request, userDetail, offset, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
 	@PostMapping("/findAllExpert")
 	public ResponseEntity<?> findAllExpert(
 			@RequestHeader("user_detail") String userDetailHeader, @RequestParam("offset") Integer offset)
@@ -113,6 +130,38 @@ public class UserExternalController {
 
 		try {
 			service.update(request, userDetail, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
+	@PostMapping("/delete")
+	public ResponseEntity<?> delete(@RequestParam("id") Long id,
+			@RequestHeader("user_detail") String userDetailHeader)
+			throws JsonMappingException, JsonProcessingException {
+		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+		try {
+			service.delete(id, userDetail, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
+	@PostMapping("/report/{id}")
+	public ResponseEntity<?> report(@PathVariable("id") Long id,
+			@RequestHeader("user_detail") String userDetailHeader)
+			throws JsonMappingException, JsonProcessingException {
+		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+		try {
+			service.report(id, userDetail, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

@@ -69,7 +69,6 @@ public class ContactExternalController {
 	public ResponseEntity<?> updateContact(@RequestParam("user_id") long userId,
 			@RequestParam(name = "action", required = false) String action,
 			@RequestHeader("user_detail") String userDetailHeader) {
-		// 0: unfriend, 1:request, 2:friend
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);

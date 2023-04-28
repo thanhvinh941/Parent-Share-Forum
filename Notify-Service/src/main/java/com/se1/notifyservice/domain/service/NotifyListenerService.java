@@ -50,12 +50,13 @@ public class NotifyListenerService {
 			String apiResultStr = objectMapper.writeValueAsString(apiResponseEntityResult.getData());
 			user = objectMapper.readValue(apiResultStr, NotifyResponse.User.class);
 		}
-		notifyResponse.setUser(user);
-		
-		RabbitRequest rabbitRequest = new RabbitRequest();
-		rabbitRequest.setAction(SCMConstant.SYSTEM_NOTIFY);
-		rabbitRequest.setData(notifyResponse);
-		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE ,MqConfig.SYSTEM_ROUTING_KEY, rabbitRequest);
+		if(user != null) {
+			notifyResponse.setUser(user);
+			RabbitRequest rabbitRequest = new RabbitRequest();
+			rabbitRequest.setAction(SCMConstant.SYSTEM_NOTIFY);
+			rabbitRequest.setData(notifyResponse);
+			rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE ,MqConfig.SYSTEM_ROUTING_KEY, rabbitRequest);
+		}
 	
 	}
 

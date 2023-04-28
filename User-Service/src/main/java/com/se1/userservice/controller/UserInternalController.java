@@ -1,10 +1,8 @@
 package com.se1.userservice.controller;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -14,13 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.model.AuthProvider;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
-import com.se1.userservice.domain.payload.FindRequest;
 import com.se1.userservice.domain.payload.UserRequestDto;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.repository.UserRepository;
@@ -37,11 +33,7 @@ public class UserInternalController {
 
 	private final UserRepository repository;
 
-	private DateTimeFormatter localDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 	private final ApiResponseEntity apiResponseEntity;
-
-	private final ObjectMapper objectMapper;
 
 	@PostMapping("/save")
 	public ResponseEntity<?> save(@RequestBody UserRequestDto userRequestDto) {

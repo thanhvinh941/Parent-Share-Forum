@@ -2,11 +2,8 @@ package com.se1.chatservice.service;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,7 +11,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,12 +18,10 @@ import com.se1.chatservice.config.MqConfig;
 import com.se1.chatservice.config.SCMConstant;
 import com.se1.chatservice.config.UrlConstant;
 import com.se1.chatservice.domain.db.read.RChatMapper;
-import com.se1.chatservice.domain.db.write.WChatMapper;
 import com.se1.chatservice.model.Chat;
 import com.se1.chatservice.payload.ApiResponseEntity;
 import com.se1.chatservice.payload.ChatDto;
 import com.se1.chatservice.payload.ContactDto;
-import com.se1.chatservice.payload.CreateChatRequest;
 import com.se1.chatservice.payload.GetAllChatRequest;
 import com.se1.chatservice.payload.RabbitRequest;
 import com.se1.chatservice.payload.UpdateChatRequest;
@@ -43,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatService {
 
 	private final ChatRepository chatRepository;
-	private final WChatMapper chatMapper;
 	private final RabbitTemplate rabbitTemplate;
 	private final ObjectMapper objectMapper;
 	private final RChatMapper rChatMapper;
@@ -62,67 +55,26 @@ public class ChatService {
 			Chat chatNew = chatRepository.save(chat);
 			ChatDto chatDto = new ChatDto();
 			BeanUtils.copyProperties(chatNew, chatDto);
-			chatDto.setUser(getUSerChat(chatNew.getUserId()));
-			
-			if (chatRequest.getChatParentId() != null) {
-				Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
-				ChatDto chatParentDto = new ChatDto();
-				BeanUtils.copyProperties(chatParent, chatParentDto);
-				chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
-				chatDto.setChatParent(chatParentDto);
+			if(getUSerChat(chatNew.getUserId()) != null) {
+				chatDto.setUser(getUSerChat(chatNew.getUserId()));
+					if (chatRequest.getChatParentId() != null) {
+						Chat chatParent = chatRepository.findById(chatRequest.getChatParentId()).get();
+						ChatDto chatParentDto = new ChatDto();
+						BeanUtils.copyProperties(chatParent, chatParentDto);
+						if(getUSerChat(chatParent.getUserId()) == null) {
+							return;
+						}
+						chatParentDto.setUser(getUSerChat(chatParent.getUserId()));
+						chatDto.setChatParent(chatParentDto);
+					}
+					
+					RabbitRequest request = new RabbitRequest();
+					request.setAction(SCMConstant.SYSTEM_CHAT);
+					request.setData(chatDto);
+					rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 			}
 			
-			RabbitRequest request = new RabbitRequest();
-			request.setAction(SCMConstant.SYSTEM_CHAT);
-			request.setData(chatDto);
-			rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 		}
-	}
-
-	public void processChangeStatus(UpdateChatRequest chatRequest) {
-		log.info("processChangeStatus ");
-		Long userId = null;
-		String content = "";
-		switch (chatRequest.getAction()) {
-		case "delete":
-			userId = chatRequest.getUserId();
-			processUDelete(chatRequest.getId(), content, userId, chatRequest.getAction());
-			break;
-		case "revoke":
-			content = "Tin nhắn đã được thu hồi";
-			processUDelete(chatRequest.getId(), content, userId, chatRequest.getAction());
-			break;
-		default:
-			break;
-		}
-
-		
-	}
-	
-
-	void processUDelete(Long id, String content, Long userId, String action){
-		chatMapper.updateStatus(id, content, userId);
-		Chat updateChat = chatRepository.findById(id).get();
-		Map<String, Object> chatStatus = new HashMap<>();
-		chatStatus.put("chatId", id);
-		chatStatus.put("chatStatus", action);
-		chatStatus.put("topicId", updateChat.getTopicId());
-
-		if(action.equals("revoke")) {
-			ChatDto chatDto = new ChatDto();
-			BeanUtils.copyProperties(updateChat, chatDto);
-			chatDto.setUser(getUSerChat(updateChat.getUserId()));
-			chatStatus.put("chat", chatDto);
-		}else {
-			ChatDto chatDto = new ChatDto();
-			BeanUtils.copyProperties(updateChat, chatDto);
-			chatStatus.put("chat", chatDto);
-		}
-		
-		RabbitRequest request = new RabbitRequest();
-		request.setAction(SCMConstant.SYSTEM_CHAT_STATUS);
-		request.setData(chatStatus);
-		rabbitTemplate.convertAndSend(MqConfig.SYSTEM_EXCHANGE, MqConfig.SYSTEM_ROUTING_KEY, request);
 	}
 
 	public void processExistChat(String topicId, ApiResponseEntity apiResponseEntity) {
@@ -147,7 +99,7 @@ public class ChatService {
 			}
 
 			return chatDto;
-		}).collect(Collectors.toList());
+		}).filter(res->res.getUser() != null).collect(Collectors.toList());
 
 		apiResponseEntity.setData(listChatResponse);
 		apiResponseEntity.setErrorList(null);
@@ -204,7 +156,7 @@ public class ChatService {
 			}
 
 			return chatDto;
-		}).collect(Collectors.toList());
+		}).filter(res->res.getUser() != null).collect(Collectors.toList());
 
 		apiResponseEntity.setData(listChatResponse);
 		apiResponseEntity.setErrorList(null);

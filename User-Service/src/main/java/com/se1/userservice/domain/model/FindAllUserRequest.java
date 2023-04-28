@@ -11,4 +11,5 @@ public class FindAllUserRequest {
 	private String email;
 	private List<String> provider;
 	private List<String> role;
+	private Boolean isReport;
 }

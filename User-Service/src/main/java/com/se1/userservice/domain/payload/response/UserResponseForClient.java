@@ -19,14 +19,14 @@ public class UserResponseForClient {
 	private int status;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastTime;
-
+	private String topicId;
+	
 	@Data
 	public static class ExpertInfo {
 		private String jobTitle;
 		private String specialist;
 		private String workPlace;
 		private Double rating;
-		private Map<String, List<String>> descriptions;
 	}
 	
 }
