@@ -14,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.se1.postservice.common.SCMConstant;
 import com.se1.postservice.common.UrlConstant;
 import com.se1.postservice.domain.entity.Comment;
 import com.se1.postservice.domain.entity.Post;
@@ -21,9 +22,13 @@ import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.CreateCommentRequest;
 import com.se1.postservice.domain.payload.CreateCommentResponse;
 import com.se1.postservice.domain.payload.UserDetail;
+import com.se1.postservice.domain.payload.dto.PostDto;
+import com.se1.postservice.domain.payload.request.RabbitRequest;
 import com.se1.postservice.domain.repository.CommentRepository;
 import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.service.CallApiService;
+import com.se1.postservice.domain.service.RabbitSenderService;
+import com.se1.postservice.domain.util.UserServiceRestTemplateClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +41,9 @@ public class CommentService {
 	private final PostRepository postRepository;
 	private final ObjectMapper objectMapper;
 	private final CallApiService<CreateCommentResponse.User> callApiService;
-
+	private final UserServiceRestTemplateClient restTemplateClient;
+	private final RabbitSenderService rabbitSenderService;
+	
 	public void processCreat(CreateCommentRequest request, ApiResponseEntity responseEntity, UserDetail userDetail)
 			throws Exception {
 		Long postId = request.getPostId();
@@ -73,6 +80,8 @@ public class CommentService {
 				response.setComemntParent(responseParent);
 			}
 			
+			sendNotify(post.get(), commentSave);
+			
 			responseEntity.setData(response);
 			responseEntity.setStatus(1);
 			responseEntity.setErrorList(null);
@@ -80,6 +89,36 @@ public class CommentService {
 			throw new Exception(e.getMessage());
 		}
 
+	}
+
+	private void sendNotify(Post post, Comment commentSave) {
+		PostDto postDto = new PostDto();
+		postDto.setPostId(post.getId());
+		postDto.setUserReciver(getUser(commentSave.getUserId()));
+		postDto.setUserSender(getUser(post.getUserId()));
+		postDto.setAction(SCMConstant.POST_COMMNET);
+		postDto.setCommentId(commentSave.getId());
+		
+		RabbitRequest rabbitRequest = new RabbitRequest();
+		rabbitRequest.setAction(SCMConstant.SYSTEM_POST);
+		rabbitRequest.setData(postDto);
+		
+		rabbitSenderService.convertAndSendSysTem(rabbitRequest);
+	}
+	
+	private PostDto.UserDetail getUser(Long userId) {
+		PostDto.UserDetail user = new PostDto.UserDetail();
+		ApiResponseEntity userResult = (ApiResponseEntity) restTemplateClient.findById(userId);
+		if (userResult.getStatus() == 1) {
+			String apiResultStr;
+			try {
+				apiResultStr = objectMapper.writeValueAsString(userResult.getData());
+				user = objectMapper.readValue(apiResultStr, PostDto.UserDetail.class);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return user;
 	}
 
 	private CreateCommentResponse.User getUSerComment(Long userId) {

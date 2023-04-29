@@ -12,11 +12,15 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.common.SCMConstant;
+import com.se1.postservice.common.UrlConstant;
 import com.se1.postservice.domain.db.read.RPostMapper;
 import com.se1.postservice.domain.entity.Post;
 import com.se1.postservice.domain.entity.PostView;
@@ -31,10 +35,13 @@ import com.se1.postservice.domain.payload.PostDto.PostUser;
 import com.se1.postservice.domain.payload.PostRequest;
 import com.se1.postservice.domain.payload.SubscribeDto;
 import com.se1.postservice.domain.payload.UserDetail;
+import com.se1.postservice.domain.payload.request.RabbitRequest;
 import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.PostViewRepository;
 import com.se1.postservice.domain.repository.TopicTagRepository;
+import com.se1.postservice.domain.service.CallApiService;
 import com.se1.postservice.domain.service.PostService;
+import com.se1.postservice.domain.service.RabbitSenderService;
 import com.se1.postservice.domain.util.CommonUtil;
 import com.se1.postservice.domain.util.SystemServiceRestTemplateClient;
 import com.se1.postservice.domain.util.UserServiceRestTemplateClient;
@@ -53,6 +60,8 @@ public class PostServiceImpl implements PostService {
 	private final UserServiceRestTemplateClient restTemplateClient;
 	private final SystemServiceRestTemplateClient serviceRestTemplateClient;
 	private final PostViewRepository viewRepository;
+	private final CallApiService<List<GetPostResponseDto.User>> callApiService;
+	private final RabbitSenderService rabbitSenderService;
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 
 	@Override
@@ -76,7 +85,15 @@ public class PostServiceImpl implements PostService {
 		Post postRegist = convertPostRequestToPostEntity(request, userId, userName);
 
 		try {
-			postRepository.save(postRegist);
+			Post postSave = postRepository.save(postRegist);
+			
+			if(detail.getIsExpert()) {
+				List<GetPostResponseDto.User> users = getUserSubscriber(postSave.getUserId());
+				for(GetPostResponseDto.User user : users) {
+					sendNotify(user, postSave);
+				}
+			}
+			
 			apiResponseEntity.setData(true);
 			apiResponseEntity.setErrorList(null);
 			apiResponseEntity.setStatus(1);
@@ -86,6 +103,51 @@ public class PostServiceImpl implements PostService {
 
 	}
 
+	private void sendNotify(User users, Post postSave) {
+		com.se1.postservice.domain.payload.dto.PostDto postDto = new com.se1.postservice.domain.payload.dto.PostDto();
+		postDto.setPostId(postSave.getId());
+		postDto.setUserReciver(getUser(postSave.getUserId()));
+		postDto.setUserSender(getUser(users.getId()));
+		postDto.setAction(SCMConstant.POST_NEW);
+		
+		RabbitRequest rabbitRequest = new RabbitRequest();
+		rabbitRequest.setAction(SCMConstant.SYSTEM_POST);
+		rabbitRequest.setData(postDto);
+		
+		rabbitSenderService.convertAndSendSysTem(rabbitRequest);
+	}
+
+	private com.se1.postservice.domain.payload.dto.PostDto.UserDetail getUser(Long userId) {
+		com.se1.postservice.domain.payload.dto.PostDto.UserDetail user = new com.se1.postservice.domain.payload.dto.PostDto.UserDetail();
+		ApiResponseEntity userResult = (ApiResponseEntity) restTemplateClient.findById(userId);
+		if (userResult.getStatus() == 1) {
+			String apiResultStr;
+			try {
+				apiResultStr = objectMapper.writeValueAsString(userResult.getData());
+				user = objectMapper.readValue(apiResultStr, com.se1.postservice.domain.payload.dto.PostDto.UserDetail.class);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return user;
+	}
+	
+	private List<GetPostResponseDto.User> getUserSubscriber(Long userId) {
+
+		MultiValueMap<String, String> request = new LinkedMultiValueMap<String, String>();
+		request.add("id", userId.toString());
+
+		List<GetPostResponseDto.User> userChatParent = null;
+		try {
+			userChatParent = objectMapper.readValue(callApiService.callPostMenthodForParam(request,
+					CallApiService.USER_SERVICE, UrlConstant.SUBSCRIPER_GETALLSUB), new TypeReference<List<GetPostResponseDto.User>>() {});
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
+		return userChatParent;
+	}
+	
 	private String getFileName(String file) {
 		return serviceRestTemplateClient.uploadFile(file);
 	}

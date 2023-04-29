@@ -10,27 +10,27 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MqConfig {
-	public static final String QUEUE = "Notification-Queue";
-    public static final String EXCHANGE = "Notification-Exchange";
-    public static final String ROUTING_KEY = "Notification-Routing-Key";
+	public static final String SYSTEM_EXCHANGE = "System-Exchange";
+	public static final String SYSTEM_QUEUE = "System-Queue";
+	public static final String SYSTEM_ROUTING_KEY = "System-Routing-Key";
 
-
+	//SYSTEM
     @Bean
-    public Queue queue() {
-        return new Queue(QUEUE);
+    public Queue queueSystem() {
+        return new Queue(SYSTEM_QUEUE);
     }
 
     @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE);
+    public TopicExchange exchangeSystem() {
+        return new TopicExchange(SYSTEM_EXCHANGE);
     }
 
     @Bean
-    public Binding bindings(Queue queue, TopicExchange topicExchange) {
+    public Binding bindingsSystem() {
         return BindingBuilder
-                .bind(queue)
-                .to(topicExchange)
-                .with(ROUTING_KEY);
+                .bind(queueSystem())
+                .to(exchangeSystem())
+                .with(SYSTEM_EXCHANGE);
     }
 
     @Bean

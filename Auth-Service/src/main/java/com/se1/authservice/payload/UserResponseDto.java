@@ -10,4 +10,6 @@ public class UserResponseDto {
     private String imageUrl;
     private Boolean emailVerified;
     private String role;
+    private String topicId;
 }
+

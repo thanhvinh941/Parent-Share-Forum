@@ -20,4 +20,6 @@ public interface SubscriberRepository extends JpaRepository<Subscribe, Long>{
 	@Query("DELETE Subscribe s WHERE s.id = ?1")
 	void deleteById(Long id);
 
+	List<Subscribe> findByUserExpertId(Long id);
+
 }

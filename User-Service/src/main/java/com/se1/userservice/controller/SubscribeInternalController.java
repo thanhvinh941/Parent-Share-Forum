@@ -35,4 +35,17 @@ public class SubscribeInternalController {
 		
 		return ResponseEntity.ok(apiResponseEntity);
 	}
+	
+	@PostMapping("/getAllSubscribeForExpert")
+	public ResponseEntity<?> getAllSubscribeForExpert(@RequestParam("id") Long id){
+		try {
+			subscribeService.getAllSubscribeForExpert(id, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(1);
+		}
+		
+		return ResponseEntity.ok(apiResponseEntity);
+	}
 }

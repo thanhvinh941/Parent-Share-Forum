@@ -12,6 +12,8 @@ public interface SCMConstant {
 
 	// RABBIT ACTION
 	public static final String SYSTEM_CONTACT = "contact";
+	public static final String SYSTEM_POST = "post";
+	public static final String SYSTEM_SUBCRIBER = "subscriber";
 	public static final String SYSTEM_CHAT = "chat";
 	public static final String SYSTEM_CHAT_STATUS = "chat-status";
 	public static final String SYSTEM_NOTIFY = "notify";

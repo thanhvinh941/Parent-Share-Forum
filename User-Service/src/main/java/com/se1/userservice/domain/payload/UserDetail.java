@@ -16,6 +16,7 @@ public class UserDetail {
 	private String role;
 	private Boolean isExpert;
 	private ExpertInfo expertInfo;
+	private String topicId;
 	private int status;
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastTime;

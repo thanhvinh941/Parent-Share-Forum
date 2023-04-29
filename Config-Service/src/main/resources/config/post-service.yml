@@ -7,7 +7,21 @@ spring:
     hibernate: 
       format_sql: true
       dialect: org.hibernate.dialect.MySQL8Dialect
-
+      
+  rabbitmq:
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3s
+          max-attempts: 6
+          max-interval: 10s
+          multiplier: 2
+    host: localhost
+    port: 5672
+    username: admin
+    password: Zaq12wsx1234
+    
 server:
   port: 8082
 
@@ -22,6 +36,8 @@ lombok:
   anyConstructor:
     addConstructorProperties: true
     
+  
+
 micro-service:
   system-service: http://localhost:8081
   post-service: http://localhost:8082

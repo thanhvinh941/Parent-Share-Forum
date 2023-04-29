@@ -22,6 +22,7 @@ public class UserDto {
 	private String identifyNo;
 	private Boolean isExpert;
 	private Boolean delFlg;
+	private String topicId;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createAt;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

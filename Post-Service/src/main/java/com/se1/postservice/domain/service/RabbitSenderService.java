@@ -1,9 +1,9 @@
-package com.se1.userservice.domain.service;
+package com.se1.postservice.domain.service;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import com.se1.userservice.config.MqConfig;
+import com.se1.postservice.common.MqConfig;
 
 import lombok.RequiredArgsConstructor;
 

@@ -12,6 +12,7 @@ public interface SCMConstant {
 
 	// RABBIT ACTION
 	public static final String SYSTEM_CONTACT = "contact";
+	public static final String SYSTEM_SUBCRIBER = "subscriber";
 	public static final String USER_UPDATE_STATUS = "update-status";
 
 	public static final Byte VALID_FLG = 1;

@@ -29,30 +29,28 @@ import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.response.RabbitRequest;
 import com.se1.userservice.domain.rabbitMQ.payload.ContactResponse;
 import com.se1.userservice.domain.repository.ContactRepository;
+import com.se1.userservice.domain.repository.SubscriberRepository;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.ChatServiceRestTemplate;
 
+import lombok.RequiredArgsConstructor;
+
 @Transactional
 @Service
+@RequiredArgsConstructor
 public class ContactService {
 
-	@Autowired
-	private RabbitSenderService rabbitSenderService;
+	private final RabbitSenderService rabbitSenderService;
 
-	@Autowired
-	private ContactRepository contactRepository;
+	private final ContactRepository contactRepository;
 
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
-	@Autowired
-	private ChatServiceRestTemplate restTemplate;
+	private final ChatServiceRestTemplate restTemplate;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-	@Autowired
-	private RContactMapper contactMapper;
+	private final RContactMapper contactMapper;
 
 	public void processCreate(Contact contactCreate, ApiResponseEntity apiResponseEntity) throws Exception {
 		User userReciver = userRepository.findById(contactCreate.getUserReciverId()).orElse(null);
@@ -76,18 +74,19 @@ public class ContactService {
 			User userSender = userRepository.findById(contact.getUserSenderId()).orElse(null);
 
 			if (userSender != null && userReciver != null) {
-				UserDetail userSenderDto = new UserDetail();
-				BeanUtils.copyProperties(userSender, userSenderDto);
-
-				UserDetail userReciverDto = new UserDetail();
-				BeanUtils.copyProperties(userReciver, userReciverDto);
-
-				ContactResponse contactResponse = new ContactResponse();
-				BeanUtils.copyProperties(contact, contactResponse);
-				contactResponse.setUserReciver(userReciverDto);
-				contactResponse.setUserSender(userSenderDto);
 
 				if (contact.getStatus() == 1) {
+					UserDetail userSenderDto = new UserDetail();
+					BeanUtils.copyProperties(userSender, userSenderDto);
+					
+					UserDetail userReciverDto = new UserDetail();
+					BeanUtils.copyProperties(userReciver, userReciverDto);
+					
+					ContactResponse contactResponse = new ContactResponse();
+					BeanUtils.copyProperties(contact, contactResponse);
+					contactResponse.setUserReciver(userReciverDto);
+					contactResponse.setUserSender(userSenderDto);
+					
 					RabbitRequest rabbitResponse = new RabbitRequest();
 					rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
 					rabbitResponse.setData(contactResponse);
@@ -124,10 +123,29 @@ public class ContactService {
 			if (contactUpdate != null) {
 
 				if (contactUpdate.getStatus() != 0) {
-					RabbitRequest rabbitResponse = new RabbitRequest();
-					rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
-					rabbitResponse.setData(contactUpdate);
-					rabbitSenderService.convertAndSendSysTem(rabbitResponse);
+					User userReciver = userRepository.findById(contactUpdate.getUserReciverId()).orElse(null);
+					User userSender = userRepository.findById(contactUpdate.getUserSenderId()).orElse(null);
+					
+					UserDetail userSenderDto = new UserDetail();
+					BeanUtils.copyProperties(userSender, userSenderDto);
+					
+					UserDetail userReciverDto = new UserDetail();
+					BeanUtils.copyProperties(userReciver, userReciverDto);
+					
+					ContactResponse contactResponse = new ContactResponse();
+					BeanUtils.copyProperties(contactUpdate, contactResponse);
+					contactResponse.setUserReciver(userSenderDto);
+					contactResponse.setUserSender(userReciverDto);
+					
+					try {
+						RabbitRequest rabbitResponse = new RabbitRequest();
+						rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
+						rabbitResponse.setData(contactResponse);
+
+						rabbitSenderService.convertAndSendSysTem(rabbitResponse);
+					} catch (Exception e) {
+						e.getMessage();
+					}
 
 				}
 				apiResponseEntity.setData(true);
@@ -215,7 +233,7 @@ public class ContactService {
 		return result;
 	}
 
-	public void processGetListContactForChat(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public ApiResponseEntity processGetListContactForChat(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
 
 		List<ContactDto> contactDtos = getContactResponse(userId);
@@ -232,6 +250,7 @@ public class ContactService {
 		apiResponseEntity.setData(contactDtoForChats);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
+		return apiResponseEntity;
 	}
 
 	private List<Chat> getListChatByTopicId(String topicContactId) {

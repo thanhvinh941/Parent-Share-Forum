@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,14 +22,17 @@ import com.se1.userservice.domain.service.ContactService;
 @RequestMapping("/contact/external")
 public class ContactExternalController {
 
-	@Autowired
-	private ObjectMapper objectMapper;
+	public ContactExternalController(ObjectMapper objectMapper, ContactService contactService,
+			ApiResponseEntity apiResponseEntity) {
+		super();
+		this.objectMapper = objectMapper;
+		this.contactService = contactService;
+		this.apiResponseEntity = apiResponseEntity;
+	}
 
-	@Autowired
-	private ContactService contactService;
-
-	@Autowired
-	private ApiResponseEntity apiResponseEntity;
+	private final ObjectMapper objectMapper;
+	private final ContactService contactService;
+	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createContact(@RequestParam("reciver_id") long userReciverId,
@@ -40,11 +42,11 @@ public class ContactExternalController {
 		try {
 			int status = 0;
 			switch (action) {
-				case SCMConstant.CONTACT_REQUEST:
-					status = 1;
-					break;
-				default:
-					break;
+			case SCMConstant.CONTACT_REQUEST:
+				status = 1;
+				break;
+			default:
+				break;
 			}
 
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -77,18 +79,18 @@ public class ContactExternalController {
 			long userReciverId = 0;
 			long userSenderId = 0;
 			switch (action) {
-				case SCMConstant.CONTACT_FRIEND:
-					statusUpdate = 2;
-					userReciverId = userDetail.getId();
-					userSenderId = userId;
-					break;
-				case SCMConstant.CONTACT_UNFRIEND:
-					statusUpdate = 0;
-					userReciverId = userDetail.getId();
-					userSenderId = userId;
-					break;
-				default:
-					break;
+			case SCMConstant.CONTACT_FRIEND:
+				statusUpdate = 2;
+				userReciverId = userDetail.getId();
+				userSenderId = userId;
+				break;
+			case SCMConstant.CONTACT_UNFRIEND:
+				statusUpdate = 0;
+				userReciverId = userDetail.getId();
+				userSenderId = userId;
+				break;
+			default:
+				break;
 			}
 
 			contactService.processUpdate(userReciverId, userSenderId, statusUpdate, apiResponseEntity);
@@ -107,7 +109,7 @@ public class ContactExternalController {
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
-			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
+			return ResponseEntity.ok().body(contactService.processGetListContactForChat(userDetail, apiResponseEntity));
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -132,20 +134,4 @@ public class ContactExternalController {
 
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
-
-//	@PostMapping("/getListContactForChat")
-//	public ResponseEntity<?> getListContactForChat(@RequestHeader("user_detail") String userDetailHeader) {
-//		UserDetail userDetail;
-//		try {
-//			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-//
-//			contactService.processGetListContactForChat(userDetail, apiResponseEntity);
-//		} catch (Exception e) {
-//			apiResponseEntity.setData(null);
-//			apiResponseEntity.setErrorList(List.of(e.getMessage()));
-//			apiResponseEntity.setStatus(0);
-//		}
-//
-//		return ResponseEntity.ok().body(apiResponseEntity);
-//	}
 }

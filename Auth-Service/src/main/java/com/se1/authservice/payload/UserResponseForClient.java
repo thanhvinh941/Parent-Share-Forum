@@ -16,6 +16,7 @@ public class UserResponseForClient {
     private int status;
     private Boolean isExpert;
 	private Double rating;
+	private String topicId;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date lastTime;
 }
