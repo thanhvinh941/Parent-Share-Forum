@@ -363,4 +363,17 @@ public class ContactService {
 
 		return contactResponsesReciver;
 	}
+
+	public Object processGetListContact(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+		List<Contact> contact = contactRepository.findByUserId(userDetail.getId(), 2);
+		List<Contact> contactIsValid = contact.stream().filter(c -> c.getStatus() == 2).collect(Collectors.toList());
+		List<Contact> contactMerge = new ArrayList<>(contactIsValid);
+		List<ContactDto> contactResponses = generatorContactResponse(userDetail.getId(), contactMerge, null);
+
+		apiResponseEntity.setData(contactResponses);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+		
+		return apiResponseEntity;
+	}
 }

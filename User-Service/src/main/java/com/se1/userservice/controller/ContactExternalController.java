@@ -103,13 +103,29 @@ public class ContactExternalController {
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
 
+	@PostMapping("/getListFriendChat")
+	public ResponseEntity<?> getListFriendChat(@RequestHeader("user_detail") String userDetailHeader) {
+		UserDetail userDetail;
+		try {
+			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+
+			return ResponseEntity.ok().body(contactService.processGetListContactForChat(userDetail, apiResponseEntity));
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
 	@PostMapping("/getListFriend")
 	public ResponseEntity<?> getListFriend(@RequestHeader("user_detail") String userDetailHeader) {
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
-			return ResponseEntity.ok().body(contactService.processGetListContactForChat(userDetail, apiResponseEntity));
+			return ResponseEntity.ok().body(contactService.processGetListContact(userDetail, apiResponseEntity));
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
