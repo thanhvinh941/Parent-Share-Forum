@@ -47,27 +47,25 @@ public class RatingService {
 		return Map.of("rating", 0.0, "count", Integer.valueOf(0), "isRate", false);
 	}
 
-	@SuppressWarnings({ "null", "removal" })
 	public void processDoRating(DoRatingRequest request, Long userId, ApiResponseEntity apiResponseEntity)
 			throws Exception {
 		Long expertId = request.getExpertId();
-		Double rate = new Double(0.0);
+		Double rate = 0.0;
 		if (request.getRate() <= 5 && request.getRate() > 0) {
 			rate = request.getRate();
 		} else if (request.getRate() > 5) {
-			rate = new Double(5.0);
+			rate = 5.0;
 		}
 		User user = userRepository.findExpertById(expertId);
 		if (user == null) {
 			throw new Exception("Chuyên gia không tồn tại hoặc người dùng không phải chuyên gia");
 		}
-		Rating rating = null;
+		Rating rating = new Rating();
 		Rating ratingFind = ratingRepository.findByUserRatedIdAndUserRatingId(expertId, userId);
 		if (ratingFind != null) {
 			BeanUtils.copyProperties(ratingFind, rating);
 			rating.setRating(rate);
 		} else {
-			rating = new Rating();
 			rating.setCreateAt(new Date());
 			rating.setRating(rate);
 			rating.setUserRatedId(expertId);
