@@ -54,7 +54,7 @@ public class UserService {
 	private final ReportUserRepository reportUserRepository;
 	private final ContactRepository contactRepository;
 	private final SubscriberRepository subscriberRepository;
-	
+
 	public User save(User user) throws Exception {
 
 		User userSave = null;
@@ -190,7 +190,7 @@ public class UserService {
 		Integer ratingCount = null;
 		Boolean isRate = false;
 		if (userFind.getIsExpert()) {
-			rating = (Double) ratingService.getRatingByUserId(userFind.getId(),currentUserId).get("rating");
+			rating = (Double) ratingService.getRatingByUserId(userFind.getId(), currentUserId).get("rating");
 			ratingCount = (Integer) ratingService.getRatingByUserId(userFind.getId(), currentUserId).get("count");
 			isRate = (Boolean) ratingService.getRatingByUserId(userFind.getId(), currentUserId).get("isRate");
 		}
@@ -224,15 +224,16 @@ public class UserService {
 				contactInfo.setTopicContactId(contact.getTopicId());
 				userResponseDto.setContactInfo(contactInfo);
 			}
-			
+
 		}
 
 		if (userFind.getIsExpert()) {
 			ExpertInfo expertInfo = new ExpertInfo();
-			if (currentUserId != null) {				
-				Subscribe subscribe = subscriberRepository.findByUserExpertIdAndUserSubscriberId(userFind.getId(), currentUserId);
+			if (currentUserId != null) {
+				Subscribe subscribe = subscriberRepository.findByUserExpertIdAndUserSubscriberId(userFind.getId(),
+						currentUserId);
 				Boolean isSubscriber = false;
-				if(subscribe != null) {
+				if (subscribe != null) {
 					isSubscriber = true;
 				}
 				expertInfo.setIsSub(isSubscriber);
@@ -250,7 +251,8 @@ public class UserService {
 	public void processFindByName(Long currentUserId, String name, ApiResponseEntity apiResponseEntity,
 			Integer offset) {
 		List<User> users = repository.findByName(name, currentUserId);
-		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin)).collect(Collectors.toList());
+		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin))
+				.filter(u -> !u.getId().equals(currentUserId)).collect(Collectors.toList());
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
 					Double rating = 0.0;
@@ -429,8 +431,10 @@ public class UserService {
 					Boolean isRate = false;
 					if (ul.getIsExpert()) {
 						rating = (Double) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("rating");
-						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("count");
-						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("isRate");
+						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetail.getId())
+								.get("count");
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetail.getId())
+								.get("isRate");
 					}
 					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating,
 							userDetail.getId(), ratingCount, isRate);
