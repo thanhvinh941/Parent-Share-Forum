@@ -213,8 +213,8 @@ public class UserService {
 				Integer status = 0;
 				if (contact.getStatus() == 1 && contact.getUserReciverId().equals(currentUserId)) {
 					status = 3;
-				} else if (contact.getStatus() == 1 && contact.getUserSenderId().equals(currentUserId)) {
-					status = 0;
+				} else if (contact.getStatus() == 1) {
+					status = 1;
 				} else if (contact.getStatus() == 2) {
 					status = 2;
 				}

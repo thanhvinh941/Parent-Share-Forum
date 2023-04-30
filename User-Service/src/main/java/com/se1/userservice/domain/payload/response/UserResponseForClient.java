@@ -1,8 +1,6 @@
 package com.se1.userservice.domain.payload.response;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
