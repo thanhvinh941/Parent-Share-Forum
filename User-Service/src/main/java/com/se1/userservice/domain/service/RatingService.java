@@ -29,13 +29,22 @@ public class RatingService {
 	private final UserRepository userRepository;
 	private final ObjectMapper objectMapper;
 
-	Double getRatingByUserId(long userId) {
+	Map<String, Object> getRatingByUserId(Long userId, Long currentId) {
 		List<Rating> expertRatings = ratingRepository.findByUserRatedId(userId);
 		if (expertRatings != null && expertRatings.size() > 0) {
 			List<Double> ratings = expertRatings.stream().map(ex -> ex.getRating()).collect(Collectors.toList());
-			return ratings.stream().mapToDouble(d -> d).average().getAsDouble();
+			Boolean isRate = false;
+			if (currentId != null) {
+				List<Rating> isRateList = expertRatings.stream().filter(r -> r.getUserRatingId().equals(currentId))
+						.collect(Collectors.toList());
+				if (isRateList.size() > 0) {
+					isRate = true;
+				}
+			}
+			return Map.of("rating", ratings.stream().mapToDouble(d -> d).average().getAsDouble(), "count",
+					Integer.valueOf(ratings.size()), "isRate", isRate);
 		}
-		return 0.0;
+		return Map.of("rating", 0.0, "count", Integer.valueOf(0), "isRate", false);
 	}
 
 	@SuppressWarnings({ "null", "removal" })

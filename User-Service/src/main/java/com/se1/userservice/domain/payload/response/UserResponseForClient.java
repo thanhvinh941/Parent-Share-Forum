@@ -34,6 +34,9 @@ public class UserResponseForClient {
 		private String specialist;
 		private String workPlace;
 		private Double rating;
+		private Boolean isRate;
+		private Boolean isSub;
+		private Integer ratingCount;
 	}
 	
 }

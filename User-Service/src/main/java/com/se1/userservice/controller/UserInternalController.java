@@ -68,7 +68,7 @@ public class UserInternalController {
 	public ResponseEntity<?> findById(@RequestParam("id") Long id) throws Exception {
 
 		try {
-			service.processFindUserById(id, apiResponseEntity);
+			service.processFindUserById(null, id, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

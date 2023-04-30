@@ -34,10 +34,13 @@ public class UserExternalController {
 	private final ObjectMapper objectMapper;
 
 	@PostMapping("/findById")
-	public ResponseEntity<?> findById(@RequestParam("id") Long id) throws Exception {
+	public ResponseEntity<?> findById(@RequestHeader("user_detail") String userDetailHeader,
+			@RequestParam("id") Long id) throws Exception {
+
+		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			service.processFindUserById(id, apiResponseEntity);
+			service.processFindUserById(userDetail.getId(), id, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -47,12 +50,14 @@ public class UserExternalController {
 	}
 
 	@PostMapping("/findByName")
-	public ResponseEntity<?> findByName(@RequestParam("name") String name, @RequestParam("offset") Integer offset,@RequestHeader("user_detail") String userDetailHeader) throws JsonMappingException, JsonProcessingException {
-		
+	public ResponseEntity<?> findByName(@RequestParam("name") String name, @RequestParam("offset") Integer offset,
+			@RequestHeader("user_detail") String userDetailHeader)
+			throws JsonMappingException, JsonProcessingException {
+
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-		
+
 		try {
-			service.processFindByName(userDetail.getId() ,name, apiResponseEntity, offset);
+			service.processFindByName(userDetail.getId(), name.trim(), apiResponseEntity, offset);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -62,9 +67,8 @@ public class UserExternalController {
 	}
 
 	@PostMapping("/findAllExpert")
-	public ResponseEntity<?> findAllExpert(
-			@RequestHeader("user_detail") String userDetailHeader, @RequestParam("offset") Integer offset)
-			throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<?> findAllExpert(@RequestHeader("user_detail") String userDetailHeader,
+			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 		try {
 			service.findAllExpert(userDetail, offset, apiResponseEntity);
@@ -75,10 +79,9 @@ public class UserExternalController {
 		}
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
-	
+
 	@PostMapping("/report/{id}")
-	public ResponseEntity<?> report(@PathVariable("id") Long id,
-			@RequestHeader("user_detail") String userDetailHeader)
+	public ResponseEntity<?> report(@PathVariable("id") Long id, @RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 

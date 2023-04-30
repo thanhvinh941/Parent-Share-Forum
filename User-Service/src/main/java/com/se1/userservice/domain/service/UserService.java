@@ -19,8 +19,10 @@ import com.se1.userservice.domain.db.dto.ReportUserDto;
 import com.se1.userservice.domain.db.read.RUserMapper;
 import com.se1.userservice.domain.db.write.WUserMapper;
 import com.se1.userservice.domain.model.AuthProvider;
+import com.se1.userservice.domain.model.Contact;
 import com.se1.userservice.domain.model.FindAllUserRequest;
 import com.se1.userservice.domain.model.ReportUser;
+import com.se1.userservice.domain.model.Subscribe;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
@@ -31,7 +33,9 @@ import com.se1.userservice.domain.payload.request.CreateUserRequest;
 import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.payload.response.UserResponseForClient;
 import com.se1.userservice.domain.payload.response.UserResponseForClient.ExpertInfo;
+import com.se1.userservice.domain.repository.ContactRepository;
 import com.se1.userservice.domain.repository.ReportUserRepository;
+import com.se1.userservice.domain.repository.SubscriberRepository;
 import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
@@ -48,7 +52,9 @@ public class UserService {
 	private final WUserMapper wUserMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final ReportUserRepository reportUserRepository;
-
+	private final ContactRepository contactRepository;
+	private final SubscriberRepository subscriberRepository;
+	
 	public User save(User user) throws Exception {
 
 		User userSave = null;
@@ -115,7 +121,7 @@ public class UserService {
 		generatorResponse(userFind, apiResponseEntity);
 	}
 
-	public void processFindUserById(Long id, ApiResponseEntity apiResponseEntity) throws Exception {
+	public void processFindUserById(Long currentUserId, Long id, ApiResponseEntity apiResponseEntity) throws Exception {
 		User userFind = null;
 		try {
 			userFind = repository.findById(id).orElse(null);
@@ -125,7 +131,7 @@ public class UserService {
 
 		validationUser(userFind);
 
-		generatorResponseForClient(userFind, apiResponseEntity);
+		generatorResponseForClient(userFind, apiResponseEntity, currentUserId);
 	}
 
 	private void validationUser(User userFind) throws Exception {
@@ -142,7 +148,7 @@ public class UserService {
 		}
 	}
 
-	private UserResponseDto convertUserEntityToUserResponseEntity(User user, Double rating) {
+	private UserResponseDto convertUserEntityToUserResponseEntity(User user, Double rating, Long ratingCount) {
 		UserResponseDto userResponseDto = null;
 		if (user != null) {
 			userResponseDto = new UserResponseDto();
@@ -159,59 +165,104 @@ public class UserService {
 			userResponseDto.setRating(rating);
 			userResponseDto.setIsExpert(user.getIsExpert());
 			userResponseDto.setTopicId(user.getTopicId());
+			userResponseDto.setRatingCount(ratingCount);
 		}
 
 		return userResponseDto;
 	}
 
 	private void generatorResponse(User userFind, ApiResponseEntity apiResponseEntity) {
-		double rating = 0;
+		Double rating = 0.0;
+		Long ratingCount = null;
 		if (userFind.getIsExpert()) {
-			rating = ratingService.getRatingByUserId(userFind.getId());
+			rating = (Double) ratingService.getRatingByUserId(userFind.getId(), null).get("rating");
+			ratingCount = (Long) ratingService.getRatingByUserId(userFind.getId(), null).get("count");
 		}
-		UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind, rating);
+		UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind, rating, ratingCount);
 
 		apiResponseEntity.setData(userResponseDto);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
 
-	private void generatorResponseForClient(User userFind, ApiResponseEntity apiResponseEntity) {
-		double rating = 0;
+	private void generatorResponseForClient(User userFind, ApiResponseEntity apiResponseEntity, Long currentUserId) {
+		Double rating = 0.0;
+		Integer ratingCount = null;
+		Boolean isRate = false;
 		if (userFind.getIsExpert()) {
-			rating = ratingService.getRatingByUserId(userFind.getId());
+			rating = (Double) ratingService.getRatingByUserId(userFind.getId(),currentUserId).get("rating");
+			ratingCount = (Integer) ratingService.getRatingByUserId(userFind.getId(), currentUserId).get("count");
+			isRate = (Boolean) ratingService.getRatingByUserId(userFind.getId(), currentUserId).get("isRate");
 		}
-		UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(userFind, rating);
+		UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(userFind, rating,
+				currentUserId, ratingCount, isRate);
 
 		apiResponseEntity.setData(userResponseDto);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
 
-	private UserResponseForClient convertUserEntityToUserResponseForClient(User userFind, double rating) {
+	private UserResponseForClient convertUserEntityToUserResponseForClient(User userFind, double rating,
+			Long currentUserId, Integer ratingCount, Boolean isRate) {
 		UserResponseForClient userResponseDto = new UserResponseForClient();
 		BeanUtils.copyProperties(userFind, userResponseDto);
 
+		if (currentUserId != null) {
+			Contact contact = contactRepository.findByUserReciverIdAndUserSenderId(userFind.getId(), currentUserId);
+			if (contact != null) {
+				Integer status = 0;
+				if (contact.getStatus() == 1 && contact.getUserReciverId().equals(currentUserId)) {
+					status = 3;
+				} else if (contact.getStatus() == 1 && contact.getUserSenderId().equals(currentUserId)) {
+					status = 0;
+				} else if (contact.getStatus() == 2) {
+					status = 2;
+				}
+
+				UserResponseForClient.ContactInfo contactInfo = new UserResponseForClient.ContactInfo();
+				contactInfo.setStatus(status);
+				contactInfo.setTopicContactId(contact.getTopicId());
+				userResponseDto.setContactInfo(contactInfo);
+			}
+			
+		}
+
 		if (userFind.getIsExpert()) {
 			ExpertInfo expertInfo = new ExpertInfo();
+			if (currentUserId != null) {				
+				Subscribe subscribe = subscriberRepository.findByUserExpertIdAndUserSubscriberId(userFind.getId(), currentUserId);
+				Boolean isSubscriber = false;
+				if(subscribe != null) {
+					isSubscriber = true;
+				}
+				expertInfo.setIsSub(isSubscriber);
+			}
 			BeanUtils.copyProperties(userFind, expertInfo);
 			expertInfo.setRating(rating);
-
+			expertInfo.setRatingCount(ratingCount);
+			expertInfo.setIsRate(isRate);
 			userResponseDto.setExpertInfo(expertInfo);
 		}
 
 		return userResponseDto;
 	}
 
-	public void processFindByName(Long userId, String name, ApiResponseEntity apiResponseEntity, Integer offset) {
-		List<User> users = repository.findByName(name, userId);
+	public void processFindByName(Long currentUserId, String name, ApiResponseEntity apiResponseEntity,
+			Integer offset) {
+		List<User> users = repository.findByName(name, currentUserId);
+		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin)).collect(Collectors.toList());
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
-					double rating = 0;
+					Double rating = 0.0;
+					Integer ratingCount = null;
+					Boolean isRate = false;
 					if (ul.getIsExpert()) {
-						rating = ratingService.getRatingByUserId(ul.getId());
+						rating = (Double) ratingService.getRatingByUserId(ul.getId(), currentUserId).get("rating");
+						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), currentUserId).get("count");
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), currentUserId).get("isRate");
 					}
-					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
+					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating,
+							currentUserId, ratingCount, isRate);
 					return userResponseDto;
 				}).collect(Collectors.toList());
 
@@ -373,11 +424,16 @@ public class UserService {
 		List<User> users = repository.findAllByRole(UserRole.expert);
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
-					double rating = 0;
+					Double rating = 0.0;
+					Integer ratingCount = null;
+					Boolean isRate = false;
 					if (ul.getIsExpert()) {
-						rating = ratingService.getRatingByUserId(ul.getId());
+						rating = (Double) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("rating");
+						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("count");
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("isRate");
 					}
-					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
+					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating,
+							userDetail.getId(), ratingCount, isRate);
 					return userResponseDto;
 				}).collect(Collectors.toList());
 
@@ -423,7 +479,7 @@ public class UserService {
 				+ ")" : "";
 
 		List<String> mergeQuery = List.of(userQuery, nameQuery, emailQuery, providerQuery, roleQuery);
-		mergeQuery = mergeQuery.stream().filter(s-> !s.isEmpty()).collect(Collectors.toList());
+		mergeQuery = mergeQuery.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
 		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
 		apiResponseEntity.setData(allUser);
 		apiResponseEntity.setErrorList(null);

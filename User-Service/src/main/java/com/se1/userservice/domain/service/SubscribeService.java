@@ -112,9 +112,13 @@ public class SubscribeService {
 		List<User> userSubscris = (List<User>) userRepository.findAllById(userSubscriIds);
 		List<UserResponseForClient> responseList = userSubscris.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
-					double rating = 0;
+					Double rating = 0.0;
+					Long ratingCount = null;
+					Boolean isRate = false;
 					if (ul.getIsExpert()) {
-						rating = ratingService.getRatingByUserId(ul.getId());
+						rating = (Double) ratingService.getRatingByUserId(ul.getId(), null).get("rating");
+						ratingCount = (Long) ratingService.getRatingByUserId(ul.getId(), null).get("count");
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), null).get("isRate");
 					}
 					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
 					return userResponseDto;

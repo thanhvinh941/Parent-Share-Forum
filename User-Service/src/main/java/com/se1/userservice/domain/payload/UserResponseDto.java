@@ -23,6 +23,7 @@ public class UserResponseDto {
     private Boolean isExpert;
     private String topicId;
 	private Double rating;
+	private Long ratingCount;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date lastTime;
 }
