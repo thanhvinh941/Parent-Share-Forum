@@ -117,7 +117,6 @@ public class UserService {
 		}
 
 		validationUser(userFind);
-
 		generatorResponse(userFind, apiResponseEntity);
 	}
 
@@ -148,7 +147,7 @@ public class UserService {
 		}
 	}
 
-	private UserResponseDto convertUserEntityToUserResponseEntity(User user, Double rating, Long ratingCount) {
+	private UserResponseDto convertUserEntityToUserResponseEntity(User user, Double rating, Integer ratingCount) {
 		UserResponseDto userResponseDto = null;
 		if (user != null) {
 			userResponseDto = new UserResponseDto();
@@ -173,10 +172,10 @@ public class UserService {
 
 	private void generatorResponse(User userFind, ApiResponseEntity apiResponseEntity) {
 		Double rating = 0.0;
-		Long ratingCount = null;
+		Integer ratingCount = 0;
 		if (userFind.getIsExpert()) {
 			rating = (Double) ratingService.getRatingByUserId(userFind.getId(), null).get("rating");
-			ratingCount = (Long) ratingService.getRatingByUserId(userFind.getId(), null).get("count");
+			ratingCount = (Integer) ratingService.getRatingByUserId(userFind.getId(), null).get("count");
 		}
 		UserResponseDto userResponseDto = convertUserEntityToUserResponseEntity(userFind, rating, ratingCount);
 

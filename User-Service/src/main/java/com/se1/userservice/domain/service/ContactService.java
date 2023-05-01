@@ -134,8 +134,8 @@ public class ContactService {
 					
 					ContactResponse contactResponse = new ContactResponse();
 					BeanUtils.copyProperties(contactUpdate, contactResponse);
-					contactResponse.setUserReciver(userSenderDto);
-					contactResponse.setUserSender(userReciverDto);
+					contactResponse.setUserReciver(userReciverDto);
+					contactResponse.setUserSender(userSenderDto);
 					
 					try {
 						RabbitRequest rabbitResponse = new RabbitRequest();
