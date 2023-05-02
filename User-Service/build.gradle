@@ -7,6 +7,7 @@ plugins {
 group = 'com.se.71'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+compileJava.options.encoding = 'utf-8'
 
 processResources {
 	from('src/main/java') {
