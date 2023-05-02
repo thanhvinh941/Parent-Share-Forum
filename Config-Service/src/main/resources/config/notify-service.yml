@@ -29,7 +29,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-
   rabbitmq:
     listener:
       simple:
@@ -43,7 +42,12 @@ spring:
     port: 5672
     username: admin
     password: Zaq12wsx1234
-
+  mandatory-file-encoding: UTF-8
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      
 management:
   endpoints:
     web:
