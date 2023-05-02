@@ -5,7 +5,8 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class PostRequest {
+public class UpdatePostRequest {
+	private Long postId;
 	private String title;
 	private String context;
 	private String hashTag;

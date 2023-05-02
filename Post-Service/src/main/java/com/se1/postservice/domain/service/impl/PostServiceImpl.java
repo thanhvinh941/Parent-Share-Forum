@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -32,8 +33,9 @@ import com.se1.postservice.domain.payload.GetPostResponseDto.User;
 import com.se1.postservice.domain.payload.PostDto;
 import com.se1.postservice.domain.payload.PostDto.PostTopicTag;
 import com.se1.postservice.domain.payload.PostDto.PostUser;
-import com.se1.postservice.domain.payload.PostRequest;
+import com.se1.postservice.domain.payload.CreatePostRequest;
 import com.se1.postservice.domain.payload.SubscribeDto;
+import com.se1.postservice.domain.payload.UpdatePostRequest;
 import com.se1.postservice.domain.payload.UserDetail;
 import com.se1.postservice.domain.payload.request.RabbitRequest;
 import com.se1.postservice.domain.repository.PostRepository;
@@ -65,7 +67,7 @@ public class PostServiceImpl implements PostService {
 	SimpleDateFormat dateFormatYYYYMMDDHHMMSS = new SimpleDateFormat(SCMConstant.DATE_YYYYMMDD_HHMMSS);
 
 	@Override
-	public void processSavePost(PostRequest request, UserDetail detail, ApiResponseEntity apiResponseEntity)
+	public void processSavePost(CreatePostRequest request, UserDetail detail, ApiResponseEntity apiResponseEntity)
 			throws Exception {
 		long userId = detail.getId();
 		String userName = detail.getName();
@@ -152,7 +154,7 @@ public class PostServiceImpl implements PostService {
 		return serviceRestTemplateClient.uploadFile(file);
 	}
 
-	Post convertPostRequestToPostEntity(PostRequest request, long userId, String userName) {
+	Post convertPostRequestToPostEntity(CreatePostRequest request, long userId, String userName) {
 		Post post = new Post();
 		BeanUtils.copyProperties(request, post);
 		post.setSummary(request.getTitle());
@@ -347,6 +349,66 @@ public class PostServiceImpl implements PostService {
 		postResponseDto.setViewCount(p.getViewCount()+1);
 		
 		return postResponseDto;
+	}
+
+	@Override
+	public void update(UpdatePostRequest postRequest, UserDetail detail, ApiResponseEntity apiResponseEntity) throws Exception {
+		Optional<Post> postFind = postRepository.findById(postRequest.getPostId());
+		if(postFind.isEmpty()) {
+			throw new Exception("Bài viết không tồn tại");
+		}
+		
+		Post postOld = postFind.get();
+		Boolean isCurrenUser = detail.getId().equals(postOld.getUserId());
+		if (!detail.getRole().equals("admin") && !isCurrenUser) {
+			throw new Exception("Hành đông không cho phép");
+		}
+		if(postRequest.getContext() != null) {
+			postOld.setContext(postRequest.getContext());
+		}
+		if(postRequest.getHashTag() != null) {
+			postOld.setHashTag(postRequest.getHashTag());
+		}
+		if(postRequest.getTitle() != null) {
+			postOld.setTitle(postRequest.getTitle());
+		}
+		if(postRequest.getTopicTagId() != null) {
+			Optional<TopicTag> topicTag = topicTagRepository.findById(postRequest.getTopicTagId());
+			if (topicTag.isEmpty()) {
+				throw new Exception("Chủ đề không hợp lệ");
+			}
+			postOld.setTopicTagId(postRequest.getTopicTagId());
+		}
+		if(postRequest.getImageList() != null && postRequest.getImageList().size() > 0) {
+			List<String> imageList = postRequest.getImageList();
+			List<String> imageNameList = new ArrayList<>();
+			for (String image : imageList) {
+				imageNameList.add(getFileName(image));
+			}
+			postOld.setImageList(imageNameList);
+		}
+		Post postUpdate = postRepository.save(postOld);
+		apiResponseEntity.setData(postUpdate.getId());
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
+	}
+
+	@Override
+	public void delete(Long postId, UserDetail detail, ApiResponseEntity apiResponseEntity) throws Exception {
+		Optional<Post> postFind = postRepository.findById(postId);
+		if(postFind.isEmpty()) {
+			throw new Exception("Bài viết không tồn tại");
+		}
+		
+		Post postOld = postFind.get();
+		Boolean isCurrenUser = detail.getId().equals(postOld.getUserId());
+		if (!detail.getRole().equals("admin") && !isCurrenUser) {
+			throw new Exception("Hành đông không cho phép");
+		}
+		postRepository.deleteById(postId);
+		apiResponseEntity.setData(true);
+		apiResponseEntity.setErrorList(null);
+		apiResponseEntity.setStatus(1);
 	}
 
 }

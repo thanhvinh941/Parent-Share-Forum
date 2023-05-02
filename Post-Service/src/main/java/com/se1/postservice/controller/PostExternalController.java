@@ -17,8 +17,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.postservice.domain.payload.ApiResponseEntity;
-import com.se1.postservice.domain.payload.PostRequest;
+import com.se1.postservice.domain.payload.CreatePostRequest;
 import com.se1.postservice.domain.payload.UserDetail;
+import com.se1.postservice.domain.payload.UpdatePostRequest;
 import com.se1.postservice.domain.service.PostService;
 import com.se1.postservice.domain.service.impl.LikePostService;
 
@@ -80,7 +81,7 @@ public class PostExternalController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<?> save(@RequestBody PostRequest postRequest, @RequestHeader("user_detail") String userDetail)
+	public ResponseEntity<?> save(@RequestBody CreatePostRequest postRequest, @RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {
 
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
@@ -175,6 +176,40 @@ public class PostExternalController {
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 		try {
 			likePostService.dislikePost(postId, apiResponseEntity, detail);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+
+	}
+	
+	@PostMapping("/update")
+	public ResponseEntity<?> update(@RequestHeader("user_detail") String userDetail, @RequestBody UpdatePostRequest postRequest)
+			throws JsonMappingException, JsonProcessingException {
+
+		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+
+		try {
+			postService.update(postRequest, detail, apiResponseEntity);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+
+	}
+	
+	@PostMapping("/delete")
+	public ResponseEntity<?> delete(@RequestHeader("user_detail") String userDetail, @RequestParam("postId") Long postId)
+			throws JsonMappingException, JsonProcessingException {
+
+		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
+
+		try {
+			postService.delete(postId, detail, apiResponseEntity);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
