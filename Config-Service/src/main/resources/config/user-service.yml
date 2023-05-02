@@ -42,11 +42,7 @@ spring:
     port: 5672
     username: admin
     password: Zaq12wsx1234
-  mandatory-file-encoding: UTF-8
-  http:
-    encoding:
-      charset: UTF-8
-      enabled: true
+
 front-end:
   url:
     login: localhost:3000/login
