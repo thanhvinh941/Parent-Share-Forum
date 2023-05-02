@@ -1,6 +1,10 @@
 package com.se1.userservice.domain.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,9 +248,32 @@ public class ContactService {
 			BeanUtils.copyProperties(cd.getUserFriend(), user);
 			contactDtoForChat.setUserFriend(user);
 			List<ContactDtoForChat.Chat> chats = getListChatByTopicId(cd.getTopicContactId());
+			Collections.sort(chats, new Comparator<ContactDtoForChat.Chat>() {
+
+				@Override
+				public int compare(ContactDtoForChat.Chat o1, ContactDtoForChat.Chat o2) {
+					Date lastTimeChat1 = o1.getCreateAt();
+					Date lastTimeChat2 = o2.getCreateAt();
+					return lastTimeChat1.compareTo(lastTimeChat2);
+				}
+				
+			});
+			Collections.reverse(chats);
 			contactDtoForChat.setChats(chats);
 			return contactDtoForChat;
 		}).filter(c -> c.getUserFriend() != null).collect(Collectors.toList());
+		Collections.sort(contactDtoForChats, new Comparator<ContactDtoForChat>() {
+
+			@Override
+			public int compare(ContactDtoForChat o1, ContactDtoForChat o2) {
+				Date lastTimeChat1 = (o1.getChats() != null && o1.getChats().size() > 0) ? o1.getChats().get(0).getCreateAt() : o1.getCreateAt();
+				Date lastTimeChat2 = (o2.getChats() != null && o2.getChats().size() > 0) ? o2.getChats().get(0).getCreateAt() : o2.getCreateAt();
+				return lastTimeChat1.compareTo(lastTimeChat2);
+			}
+			
+		});
+		Collections.reverse(contactDtoForChats);
+		
 		apiResponseEntity.setData(contactDtoForChats);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
