@@ -28,4 +28,6 @@ public interface RPostMapper {
 	List<PostDto> findPostMostComment(@Param("userId") Long userId);
 
 	List<PostDto> findPostMostView(@Param("userId") Long userId);
+
+	List<PostDto> findAll(@Param("offset") int offset);
 }

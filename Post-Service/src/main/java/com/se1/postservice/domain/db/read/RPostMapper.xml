@@ -26,8 +26,54 @@
 		<result column="is_dislike" jdbcType="INTEGER" javaType="java.lang.Integer" property="isDislike" />
 		<result column="view_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="viewCount" />
 	</resultMap>
+	<select id="findAll" resultMap="post_result">
+		SELECT 
+    *,
+    (SELECT 
+            GROUP_CONCAT(image_list
+                    SEPARATOR ', ')
+        FROM
+            post_image_list
+        WHERE
+            post_id = p.id
+        GROUP BY post_id) AS image_list,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 1
+        GROUP BY post_id) AS like_count,
+    (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_like pl
+        WHERE
+            pl.post_id = p.id AND pl.status = 2
+        GROUP BY post_id) AS dislike_count,
+    (SELECT 
+            COUNT(id)
+        FROM
+            db02.comment cm
+        WHERE
+            cm.post_id = p.id AND cm.del_flg = 0
+        GROUP BY post_id) AS comment_count,
+   (SELECT 
+            COUNT(pl.user_id)
+        FROM
+            db02.post_view pl
+        WHERE
+            pl.post_id = p.id) AS view_count
+FROM
+    post p
+		WHERE		    
+		         p.delflg = 0 
+		        AND p.status = 1
+		ORDER BY p.create_at DESC
+		LIMIT 10 OFFSET #{offset}
+	</select>
 
-<select id="findAllPostByTitle" resultMap="post_result">
+	<select id="findAllPostByTitle" resultMap="post_result">
 		SELECT 
     *,
     (SELECT 
@@ -88,7 +134,7 @@ FROM
 		ORDER BY p.create_at DESC
 		LIMIT 10 OFFSET #{offset}
 	</select>
-	
+
 	<select id="findAllPostByHashTag" resultMap="post_result">
 		SELECT 
     *,
@@ -459,7 +505,7 @@ FROM
 		ORDER BY comment_count desc
 		LIMIT 5 OFFSET 0
 	</select>
-	
+
 	<select id="findPostMostView" resultMap="post_result">
 	SELECT 
     *,
@@ -520,5 +566,5 @@ FROM
 		ORDER BY view_count desc
 		LIMIT 5 OFFSET 0
 	</select>
-	
+
 </mapper>

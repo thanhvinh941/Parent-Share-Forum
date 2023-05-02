@@ -213,27 +213,42 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public void findAllPost(UserDetail userDetail, ApiResponseEntity apiResponseEntity, int offset)
 			throws JsonMappingException, JsonProcessingException {
-		Long userId = userDetail.getId();
-		List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
-		List<SubscribeDto> subscribeDtos = restTemplateClient.getAllExpertSubscribe(userId);
-		List<Long> userFriendId = contactDtos.stream().map(c -> c.getUserFriend().getId()).collect(Collectors.toList());
-		List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpertId().getId())
-				.collect(Collectors.toList());
-		List<Long> allIdUserId = new ArrayList<>(userFriendId);
-		allIdUserId.addAll(listExpertId);
-		allIdUserId.add(userId);
-
-		List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
-
-		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(
-				String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
-				offset, userId);
-		List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
-		doViewPost(postIds, userId);
-
-		apiResponseEntity.setData(getResponseList(allPost));
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		if(userDetail == null) {
+			List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAll(
+					offset);
+			List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+			doViewPost(postIds, new Long("0"));
+			apiResponseEntity.setData(getResponseList(allPost));
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}else {			
+			Long userId = userDetail.getId();
+			List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
+			List<SubscribeDto> subscribeDtos = restTemplateClient.getAllExpertSubscribe(userId);
+			List<Long> userFriendId = contactDtos.stream().map(c -> c.getUserFriend().getId()).collect(Collectors.toList());
+			List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpertId().getId())
+					.collect(Collectors.toList());
+			List<Long> allIdUserId = new ArrayList<>(userFriendId);
+			allIdUserId.addAll(listExpertId);
+			allIdUserId.add(userId);
+			
+			List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
+			List<com.se1.postservice.domain.db.dto.PostDto> allPost = new ArrayList<>();
+			if(allIdUserIdDistinct != null) {
+				allPost = rPostMapper.findAllPostByUserId(
+						String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
+						offset, userId);
+			}else {
+				allPost = rPostMapper.findAll(
+						offset);
+			}
+			List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+			doViewPost(postIds, userId);
+			
+			apiResponseEntity.setData(getResponseList(allPost));
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}
 	}
 
 	@Override
