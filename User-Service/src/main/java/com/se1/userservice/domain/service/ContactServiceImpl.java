@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class ContactServiceImpl implements ContactService{
+public class ContactServiceImpl {
 
 	private final RabbitSenderService rabbitSenderService;
 
@@ -178,17 +178,15 @@ public class ContactServiceImpl implements ContactService{
 		}
 	}
 
-	public ApiResponseEntity processGetListFriend(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public void processGetListFriend(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
-		apiResponseEntity = new ApiResponseEntity();
+
 		apiResponseEntity.setData(getContactResponse(userId));
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
-		return apiResponseEntity;
 	}
 
-	public ApiResponseEntity processGetContactRequest(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
-		apiResponseEntity = new ApiResponseEntity();
+	public void processGetContactRequest(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
 		List<Contact> contact = contactRepository.findByUserId(userId, 1);
 		List<Long> userFriendIds = contact.stream()
@@ -220,8 +218,7 @@ public class ContactServiceImpl implements ContactService{
 		apiResponseEntity.setData(mapResult);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
-		
-		return apiResponseEntity;
+
 	}
 
 	boolean checkValidContact(String topicId) {
@@ -242,7 +239,7 @@ public class ContactServiceImpl implements ContactService{
 
 	public ApiResponseEntity processGetListContactForChat(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
 		Long userId = userDetail.getId();
-		apiResponseEntity = new ApiResponseEntity();
+
 		List<ContactDto> contactDtos = getContactResponse(userId);
 		List<ContactDtoForChat> contactDtoForChats = contactDtos.stream().map(cd -> {
 			ContactDtoForChat contactDtoForChat = new ContactDtoForChat();
@@ -317,9 +314,9 @@ public class ContactServiceImpl implements ContactService{
 		apiResponseEntity.setStatus(1);
 	}
 
-	public ApiResponseEntity processFindContactByUserIdAndTopicIdGetListContact(Long userId, String topicId,
+	public void processFindContactByUserIdAndTopicIdGetListContact(Long userId, String topicId,
 			ApiResponseEntity apiResponseEntity) {
-		apiResponseEntity = new ApiResponseEntity();
+
 		List<com.se1.userservice.domain.db.dto.ContactDto> contactDtos = contactMapper
 				.findContactByUserIdAndTopicId(userId, topicId);
 		List<Long> userFriendIds = contactDtos.stream()
@@ -346,7 +343,7 @@ public class ContactServiceImpl implements ContactService{
 		apiResponseEntity.setData(contactResponses);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
-		return apiResponseEntity;
+
 	}
 
 	public List<ContactDto> generatorContactResponse(Long userId, List<Contact> contact, Integer status) {
@@ -395,7 +392,6 @@ public class ContactServiceImpl implements ContactService{
 	}
 
 	public Object processGetListContact(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
-		apiResponseEntity = new ApiResponseEntity();
 		List<Contact> contact = contactRepository.findByUserId(userDetail.getId(), 2);
 		List<Contact> contactIsValid = contact.stream().filter(c -> c.getStatus() == 2).collect(Collectors.toList());
 		List<Contact> contactMerge = new ArrayList<>(contactIsValid);

@@ -16,13 +16,13 @@ import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.model.Contact;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.service.ContactService;
+import com.se1.userservice.domain.service.ContactServiceImpl;
 
 @RestController
 @RequestMapping("/contact/external")
 public class ContactExternalController {
 
-	public ContactExternalController(ObjectMapper objectMapper, ContactService contactService,
+	public ContactExternalController(ObjectMapper objectMapper, ContactServiceImpl contactService,
 			ApiResponseEntity apiResponseEntity) {
 		super();
 		this.objectMapper = objectMapper;
@@ -31,7 +31,7 @@ public class ContactExternalController {
 	}
 
 	private final ObjectMapper objectMapper;
-	private final ContactService contactService;
+	private final ContactServiceImpl contactService;
 	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/create")

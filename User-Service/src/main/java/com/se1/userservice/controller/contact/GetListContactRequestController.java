@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.service.ContactService;
+import com.se1.userservice.domain.service.ContactServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GetListContactRequestController {
 	private final ObjectMapper objectMapper;
-	private final ContactService contactService;
+	private final ContactServiceImpl contactService;
 	private final ApiResponseEntity apiResponseEntity;
 	
 	@PostMapping("/getListContactRequest")
