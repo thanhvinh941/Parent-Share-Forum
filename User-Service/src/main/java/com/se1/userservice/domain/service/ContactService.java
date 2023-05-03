@@ -10,7 +10,7 @@ public interface ContactService {
 
 	void processUpdate(long userReciverId, long userSenderId, int statusUpdate, ApiResponseEntity apiResponseEntity) throws Exception;
 
-	void processGetContactRequest(UserDetail userDetail, ApiResponseEntity apiResponseEntity) throws Exception;
+	ApiResponseEntity processGetContactRequest(UserDetail userDetail, ApiResponseEntity apiResponseEntity) throws Exception;
 
 	Object processGetListContactForChat(UserDetail userDetail, ApiResponseEntity apiResponseEntity) throws Exception;
 
