@@ -1,4 +1,4 @@
-package com.se1.userservice.controller;
+package com.se1.userservice.controller.contact;
 
 import java.util.List;
 
