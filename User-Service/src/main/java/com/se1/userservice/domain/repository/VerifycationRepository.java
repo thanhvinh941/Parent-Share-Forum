@@ -8,4 +8,6 @@ import com.se1.userservice.domain.model.Verification;
 @Repository
 public interface VerifycationRepository extends CrudRepository<Verification, Long>{
 
+	Verification findByToken(String token);
+
 }

@@ -29,7 +29,26 @@ public class VerifycationInternalController {
 	public ResponseEntity<?> save(@RequestParam("user_id") Long userId, @RequestParam("email") String mail, @RequestParam("name") String name) {
 
 		try {
-			verifycationService.processCreate(userId, mail, name, apiResponseEntity);
+			Object response = verifycationService.processCreate(userId, mail, name);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of());
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok(apiResponseEntity);
+	}
+	
+	@PostMapping("/findVerifyByToken")
+	public ResponseEntity<?> findVerifyByToken(@RequestParam("token") String token){
+		try {
+			Object response = verifycationService.findVerifyByToken(token);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of());

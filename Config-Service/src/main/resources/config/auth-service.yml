@@ -46,7 +46,7 @@ spring:
 
 front-end:
   url:
-    login: localhost:3000/login
+    login: localhost:3000/auth/login
  
 
 app:

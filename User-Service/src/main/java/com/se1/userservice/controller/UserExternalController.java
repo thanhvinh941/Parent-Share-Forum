@@ -35,7 +35,10 @@ public class UserExternalController {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			service.processFindUserById(userDetail.getId(), id, apiResponseEntity);
+			Object response = service.processFindUserById(userDetail.getId(), id);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -52,7 +55,10 @@ public class UserExternalController {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			service.processFindByName(userDetail.getId(), name.trim(), apiResponseEntity, offset);
+			Object response = service.processFindByName(userDetail.getId(), name.trim(), offset);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -66,7 +72,10 @@ public class UserExternalController {
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 		try {
-			service.findAllExpert(userDetail, offset, apiResponseEntity);
+			Object response = service.findAllExpert(userDetail, offset);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

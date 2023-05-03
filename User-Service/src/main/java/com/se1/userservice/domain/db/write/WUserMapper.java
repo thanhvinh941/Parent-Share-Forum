@@ -8,7 +8,6 @@ public interface WUserMapper {
 
 	void updateUserStatus(@Param("userId") Long userId,@Param("status") int status);
 	
-	void updateLicenceImageToUser(String licenceFileName, Long userId);
+	void updateEmailStatus(@Param("userId") Long userId);
 
-	void updateLicenceToUser(Long licenceId, Long userId);
 }

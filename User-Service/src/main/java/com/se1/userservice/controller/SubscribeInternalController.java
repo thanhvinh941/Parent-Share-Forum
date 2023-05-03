@@ -26,7 +26,10 @@ public class SubscribeInternalController {
 	@PostMapping("/getAllExpertSubscribe")
 	public ResponseEntity<?> getAllExpertSubscribe(@RequestParam("id") Long id){
 		try {
-			subscribeService.processGetAllExpertSubscribe(id, apiResponseEntity);
+			Object resonse = subscribeService.processGetAllExpertSubscribe(id);
+			apiResponseEntity.setData(resonse);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -39,7 +42,10 @@ public class SubscribeInternalController {
 	@PostMapping("/getAllSubscribeForExpert")
 	public ResponseEntity<?> getAllSubscribeForExpert(@RequestParam("id") Long id){
 		try {
-			subscribeService.getAllSubscribeForExpert(id, apiResponseEntity);
+			Object resonse = subscribeService.getAllSubscribeForExpert(id);
+			apiResponseEntity.setData(resonse);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

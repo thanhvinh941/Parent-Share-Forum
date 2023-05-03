@@ -14,14 +14,9 @@
 		where id = #{userId}
 	</update>
 
-	<update id="updateLicenceImageToUser">
-		update users Set image_licence = ${licenceFileName}
-		where id = ${userId}
-	</update>
-
-	<update id="updateLicenceToUser">
-		update users Set licence_id = ${licenceId}
-		where id = ${userId}
+	<update id="updateEmailStatus">
+		update users Set email_verified = 1
+		where id = #{userId}
 	</update>
 
 </mapper>

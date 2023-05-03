@@ -29,7 +29,10 @@ public class GetListContactRequestController {
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
-			contactService.processGetContactRequest(userDetail, apiResponseEntity);
+			Object response = contactService.processGetContactRequest(userDetail);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

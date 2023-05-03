@@ -1,30 +1,24 @@
 package com.se1.authservice.controller;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,37 +38,32 @@ import com.se1.authservice.payload.MailRequest;
 import com.se1.authservice.payload.SignUpRequest;
 import com.se1.authservice.payload.SignUpResponseDto;
 import com.se1.authservice.payload.UserDetail;
-import com.se1.authservice.payload.UserResponseDto;
 import com.se1.authservice.payload.UserResponseForClient;
+import com.se1.authservice.payload.Verification;
 import com.se1.authservice.security.TokenProvider;
 import com.se1.authservice.security.UserPrincipal;
 import com.se1.authservice.service.UserDetailService;
+import com.se1.authservice.service.VerifyService;
 import com.se1.authservice.util.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-	@Autowired
-	UserDetailService service;
+	private final UserService userService;
+	private final UserDetailService service;
+	private final VerifyService verifyService;
+	private final PasswordEncoder passwordEncoder;
+	private final TokenProvider tokenProvider;
+	private final ApiResponseEntity apiResponseEntity;
+	private final AuthenticationManager authenticationManager;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private TokenProvider tokenProvider;
-
-	@Autowired
-	ApiResponseEntity apiResponseEntity;
-
-	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	private 
-	
 	@Value("${front-end.url.login}")
 	String urlFronEnd;
-	
+
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		String email = loginRequest.getEmail();
@@ -111,10 +100,25 @@ public class AuthController {
 	}
 
 	@GetMapping("/verify-email")
-	public ResponseEntity<?> verifyEmail(@RequestParam("token") String token){
-		return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(urlFronEnd)).build();
+	public ResponseEntity<?> verifyEmail(@RequestParam("token") String token)
+			throws JsonMappingException, JsonProcessingException, URISyntaxException {
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("token", token);
+		Verification verification = verifyService.findByToken(map);
+		Boolean isVerify = false;
+		if (verification != null) {
+			MultiValueMap<String, String> map2 = new LinkedMultiValueMap<String, String>();
+			map2.add("id", verification.getUserId().toString());
+			isVerify = userService.updateEmailStatus(map2);
+		}
+		if (!isVerify) {
+			urlFronEnd = urlFronEnd + "?verify=false";
+		}
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setLocation(new URI("http://" + urlFronEnd));
+		return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
 	}
-	
+
 	@PostMapping("/getUserInfoByToken")
 	public ResponseEntity<?> getUserEmailByToken(@RequestHeader("Authorization") String token) {
 		Boolean isTokenValid = tokenProvider.validateToken(token);
@@ -169,9 +173,9 @@ public class AuthController {
 				MailRequest mailRequest = new MailRequest();
 				mailRequest.setMailTemplate("signup-template");
 				mailRequest.setTo(result.getEmail());
-				
-				service.sendMail(result.getId(),result.getEmail(),result.getName());
-				
+
+				service.sendMail(result.getId(), result.getEmail(), result.getName());
+
 				signUpResponseDto.setMessage(List.of("Please check your email to login"));
 				signUpResponseDto.setSignUp(true);
 			} else {

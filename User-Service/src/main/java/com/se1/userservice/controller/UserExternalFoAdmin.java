@@ -54,7 +54,10 @@ public class UserExternalFoAdmin {
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 		try {
-			service.findAll(request, userDetail, offset, apiResponseEntity);
+			Object response = service.findAll(request, userDetail, offset);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

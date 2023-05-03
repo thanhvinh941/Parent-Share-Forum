@@ -55,7 +55,10 @@ public class SubscribeExternalController {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			subscribeService.processGetAllExpertSubscribe(userDetail.getId(), apiResponseEntity);
+			Object resonse = subscribeService.processGetAllExpertSubscribe(userDetail.getId());
+			apiResponseEntity.setData(resonse);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

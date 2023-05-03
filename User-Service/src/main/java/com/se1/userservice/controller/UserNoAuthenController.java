@@ -32,7 +32,10 @@ public class UserNoAuthenController {
 		UserDetail userDetail = new UserDetail();
 		userDetail.setId(new Long(0));
 		try {
-			service.findAllExpert(userDetail, offset, apiResponseEntity);
+			Object response = service.findAllExpert(userDetail, offset);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

@@ -34,5 +34,10 @@ public class UserService {
 		String resultStr = apiService.callPostMenthodForParam(request, CallApiService.USER_SERVICE, UrlConstance.USER_EXIST_BY_EMAIL);
 		return mapper.readValue(resultStr, Boolean.class);
 	}
+	
+	public Boolean updateEmailStatus(MultiValueMap<String, String> request) throws JsonProcessingException {
+		String resultStr = apiService.callPostMenthodForParam(request, CallApiService.USER_SERVICE, UrlConstance.USER_UPDATE_EMAIL_STATUS);
+		return mapper.readValue(resultStr, Boolean.class);
+	}
 
 }

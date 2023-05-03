@@ -82,7 +82,7 @@ public class SubscribeService {
 		rabbitSenderService.convertAndSendSysTem(rabbitResponse);
 	}
 
-	public void processGetAllExpertSubscribe(Long id, ApiResponseEntity apiResponseEntity) {
+	public Object processGetAllExpertSubscribe(Long id) {
 		List<Subscribe> subscribe = subscriberRepository.findByUserSubscriberId(id);
 		List<Long> expertIds = subscribe.stream().map(s->s.getUserExpertId()).collect(Collectors.toList());
 		List<User> userFriends = (List<User>) userRepository.findAllById(expertIds);
@@ -101,12 +101,10 @@ public class SubscribeService {
 			subscribeDto.setUserExpertId(userDetail);
 			return subscribeDto;
 		}).collect(Collectors.toList());
-		apiResponseEntity.setData(subscribeDtos);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return subscribeDtos;
 	}
 
-	public void getAllSubscribeForExpert(Long id, ApiResponseEntity apiResponseEntity) {
+	public Object getAllSubscribeForExpert(Long id) {
 		List<Subscribe> subscribe = subscriberRepository.findByUserExpertId(id);
 		List<Long> userSubscriIds = subscribe.stream().map(s->s.getUserSubscriberId()).collect(Collectors.toList());
 		List<User> userSubscris = (List<User>) userRepository.findAllById(userSubscriIds);
@@ -123,9 +121,8 @@ public class SubscribeService {
 					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating);
 					return userResponseDto;
 				}).collect(Collectors.toList());
-		apiResponseEntity.setData(responseList);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		
+		return responseList;
 	}
 
 	private UserResponseForClient convertUserEntityToUserResponseForClient(User userFind, double rating) {

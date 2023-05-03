@@ -82,15 +82,15 @@ public class ContactServiceImpl {
 				if (contact.getStatus() == 1) {
 					UserDetail userSenderDto = new UserDetail();
 					BeanUtils.copyProperties(userSender, userSenderDto);
-					
+
 					UserDetail userReciverDto = new UserDetail();
 					BeanUtils.copyProperties(userReciver, userReciverDto);
-					
+
 					ContactResponse contactResponse = new ContactResponse();
 					BeanUtils.copyProperties(contact, contactResponse);
 					contactResponse.setUserReciver(userReciverDto);
 					contactResponse.setUserSender(userSenderDto);
-					
+
 					RabbitRequest rabbitResponse = new RabbitRequest();
 					rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
 					rabbitResponse.setData(contactResponse);
@@ -129,18 +129,18 @@ public class ContactServiceImpl {
 				if (contactUpdate.getStatus() != 0) {
 					User userReciver = userRepository.findById(contactUpdate.getUserReciverId()).orElse(null);
 					User userSender = userRepository.findById(contactUpdate.getUserSenderId()).orElse(null);
-					
+
 					UserDetail userSenderDto = new UserDetail();
 					BeanUtils.copyProperties(userSender, userSenderDto);
-					
+
 					UserDetail userReciverDto = new UserDetail();
 					BeanUtils.copyProperties(userReciver, userReciverDto);
-					
+
 					ContactResponse contactResponse = new ContactResponse();
 					BeanUtils.copyProperties(contactUpdate, contactResponse);
 					contactResponse.setUserReciver(userReciverDto);
 					contactResponse.setUserSender(userSenderDto);
-					
+
 					try {
 						RabbitRequest rabbitResponse = new RabbitRequest();
 						rabbitResponse.setAction(SCMConstant.SYSTEM_CONTACT);
@@ -186,7 +186,7 @@ public class ContactServiceImpl {
 		apiResponseEntity.setStatus(1);
 	}
 
-	public void processGetContactRequest(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public Object processGetContactRequest(UserDetail userDetail) {
 		Long userId = userDetail.getId();
 		List<Contact> contact = contactRepository.findByUserId(userId, 1);
 		List<Long> userFriendIds = contact.stream()
@@ -215,10 +215,8 @@ public class ContactServiceImpl {
 
 		Map<String, List<ContactDto>> mapResult = new HashMap<>();
 		mapResult.put("Reciver", contactResponsesReciver);
-		apiResponseEntity.setData(mapResult);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
 
+		return mapResult;
 	}
 
 	boolean checkValidContact(String topicId) {
@@ -237,7 +235,7 @@ public class ContactServiceImpl {
 		return result;
 	}
 
-	public ApiResponseEntity processGetListContactForChat(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public Object processGetListContactForChat(UserDetail userDetail) {
 		Long userId = userDetail.getId();
 
 		List<ContactDto> contactDtos = getContactResponse(userId);
@@ -256,7 +254,7 @@ public class ContactServiceImpl {
 					Date lastTimeChat2 = o2.getCreateAt();
 					return lastTimeChat1.compareTo(lastTimeChat2);
 				}
-				
+
 			});
 			Collections.reverse(chats);
 			contactDtoForChat.setChats(chats);
@@ -266,18 +264,18 @@ public class ContactServiceImpl {
 
 			@Override
 			public int compare(ContactDtoForChat o1, ContactDtoForChat o2) {
-				Date lastTimeChat1 = (o1.getChats() != null && o1.getChats().size() > 0) ? o1.getChats().get(0).getCreateAt() : o1.getCreateAt();
-				Date lastTimeChat2 = (o2.getChats() != null && o2.getChats().size() > 0) ? o2.getChats().get(0).getCreateAt() : o2.getCreateAt();
+				Date lastTimeChat1 = (o1.getChats() != null && o1.getChats().size() > 0)
+						? o1.getChats().get(0).getCreateAt()
+						: o1.getCreateAt();
+				Date lastTimeChat2 = (o2.getChats() != null && o2.getChats().size() > 0)
+						? o2.getChats().get(0).getCreateAt()
+						: o2.getCreateAt();
 				return lastTimeChat1.compareTo(lastTimeChat2);
 			}
-			
+
 		});
 		Collections.reverse(contactDtoForChats);
-		
-		apiResponseEntity.setData(contactDtoForChats);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-		return apiResponseEntity;
+		return contactDtoForChats;
 	}
 
 	private List<Chat> getListChatByTopicId(String topicContactId) {
@@ -308,14 +306,11 @@ public class ContactServiceImpl {
 		return contactResponses;
 	}
 
-	public void processGetListContact(Long userId, ApiResponseEntity apiResponseEntity) {
-		apiResponseEntity.setData(getContactResponse(userId));
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+	public Object processGetListContact(Long userId) {
+		return getContactResponse(userId);
 	}
 
-	public void processFindContactByUserIdAndTopicIdGetListContact(Long userId, String topicId,
-			ApiResponseEntity apiResponseEntity) {
+	public Object processFindContactByUserIdAndTopicIdGetListContact(Long userId, String topicId) {
 
 		List<com.se1.userservice.domain.db.dto.ContactDto> contactDtos = contactMapper
 				.findContactByUserIdAndTopicId(userId, topicId);
@@ -339,11 +334,7 @@ public class ContactServiceImpl {
 
 			return contactDto;
 		}).filter(c -> c.getUserFriend() != null).collect(Collectors.toList());
-
-		apiResponseEntity.setData(contactResponses);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-
+		return contactResponses;
 	}
 
 	public List<ContactDto> generatorContactResponse(Long userId, List<Contact> contact, Integer status) {
@@ -391,16 +382,12 @@ public class ContactServiceImpl {
 		return contactResponsesReciver;
 	}
 
-	public Object processGetListContact(UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public Object processGetListContact(UserDetail userDetail) {
 		List<Contact> contact = contactRepository.findByUserId(userDetail.getId(), 2);
 		List<Contact> contactIsValid = contact.stream().filter(c -> c.getStatus() == 2).collect(Collectors.toList());
 		List<Contact> contactMerge = new ArrayList<>(contactIsValid);
 		List<ContactDto> contactResponses = generatorContactResponse(userDetail.getId(), contactMerge, null);
 
-		apiResponseEntity.setData(contactResponses);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-		
-		return apiResponseEntity;
+		return contactResponses;
 	}
 }

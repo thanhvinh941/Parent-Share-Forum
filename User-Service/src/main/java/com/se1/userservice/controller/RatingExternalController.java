@@ -37,7 +37,10 @@ public class RatingExternalController {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			ratingService.processDoRating(request, userDetail.getId(), apiResponseEntity);
+			Object response = ratingService.processDoRating(request, userDetail.getId());
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -55,7 +58,10 @@ public class RatingExternalController {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			ratingService.processGetUesrRating(expertid, userDetail.getId(), apiResponseEntity);
+			Object response = ratingService.processGetUesrRating(expertid, userDetail.getId());
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(false);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

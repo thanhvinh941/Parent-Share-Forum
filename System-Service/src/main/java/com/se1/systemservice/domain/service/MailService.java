@@ -9,7 +9,6 @@ import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.messaging.MessagingException;
@@ -42,9 +41,13 @@ public class MailService {
  
         	Mail mail = mailRepository.findByMailTemplate(mailRequest.getMailTemplate());
         	
-            // Creating a simple mail message
-            SimpleMailMessage mailMessage
-                = new SimpleMailMessage();
+    		MimeMessage message = javaMailSender.createMimeMessage();
+    		MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+    		
+    		helper.setTo(mailRequest.getTo());
+    		helper.setSubject(mail.getSubject());
+    				
+        	
             
             String body = mail.getBody();
             
@@ -59,14 +62,9 @@ public class MailService {
             body = body.replace("tableborder", "table border");
             body = body.replace("bodystyle", "body style");
             
-            // Setting up necessary details
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(mailRequest.getTo());
-            mailMessage.setText(body);
-            mailMessage.setSubject(mail.getSubject());
- 
+            helper.setText(body, true);
             // Sending the mail
-            javaMailSender.send(mailMessage);
+            javaMailSender.send(message);
             return "Mail Sent Successfully...";
         }
  

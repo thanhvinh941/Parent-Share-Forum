@@ -14,7 +14,7 @@ import com.se1.authservice.model.AuthProvider;
 import com.se1.authservice.model.User;
 import com.se1.authservice.payload.UserRequestDto;
 import com.se1.authservice.util.UserService;
-import com.se1.authservice.util.VerifyService;
+import com.se1.authservice.util.VerifyServiceUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class UserDetailService {
 
 	private final UserService userService;
-	private final VerifyService verifyService;
+	private final VerifyServiceUtils verifyService;
 
 	public User save(User userSave) throws JsonMappingException, JsonProcessingException {
 		UserRequestDto userRequestDto = convertUserToUserRequestDto(userSave);

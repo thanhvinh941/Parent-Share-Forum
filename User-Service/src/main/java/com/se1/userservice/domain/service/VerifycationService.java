@@ -20,9 +20,7 @@ import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 @Service
 public class VerifycationService {
 
-	private final String VERIFYCATION_URL = "verify";
-	private final String VERIFYCATION_EXTERNAL = "external";
-	private final String VERIFYCATION_MAPPING = "accept-tokent";
+	private final String VERIFYCATION_URL = "auth/verify-email";
 
 	@Autowired
 	private VerifycationRepository repository;
@@ -36,7 +34,7 @@ public class VerifycationService {
 	@Autowired
 	private SystemServiceRestTemplateClient restTemplateClient;
 	
-	public void processCreate(Long userId, String mail, String userName, ApiResponseEntity apiResponseEntity) throws JsonProcessingException {
+	public Boolean processCreate(Long userId, String mail, String userName) throws JsonProcessingException {
 
 		Verification verification = new Verification();
 		verification.setValidFlg(SCMConstant.VALID_FLG);
@@ -45,8 +43,7 @@ public class VerifycationService {
 		verification.setToken(UUID.randomUUID().toString());
 
 		Verification verificationSave = repository.save(verification);
-		String verificationLink = String.format("%s/%s/%s/%s?token=%s", apigatewayServiceUrl, VERIFYCATION_URL,
-				VERIFYCATION_EXTERNAL, VERIFYCATION_MAPPING, verificationSave.getToken());
+		String verificationLink = String.format("%s/%s?token=%s", apigatewayServiceUrl, VERIFYCATION_URL, verificationSave.getToken());
 
 		MailRequest mailRequest = new MailRequest();
 		mailRequest.setMailTemplate("regist_user");
@@ -54,10 +51,7 @@ public class VerifycationService {
 		mailRequest.setData(Map.of("__VERIFY_LINK__", verificationLink, "__MY_DOMAIN__" , urlFronEnd));
 		
 		restTemplateClient.sendMail(mailRequest);
-		
-		apiResponseEntity.setData(true);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return true;
 	}
 
 	private Date getExpirationTime() {
@@ -65,6 +59,11 @@ public class VerifycationService {
 		calendar.setTime(new Date());
 		calendar.add(Calendar.HOUR_OF_DAY, 3);
 		return calendar.getTime();
+	}
+
+	public Object findVerifyByToken(String token) {
+		Verification verificationFind = repository.findByToken(token);
+		return verificationFind;
 	}
 
 }

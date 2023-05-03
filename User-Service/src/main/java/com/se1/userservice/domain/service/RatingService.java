@@ -3,6 +3,7 @@ package com.se1.userservice.domain.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -47,8 +48,7 @@ public class RatingService {
 		return Map.of("rating", 0.0, "count", Integer.valueOf(0), "isRate", false);
 	}
 
-	public void processDoRating(DoRatingRequest request, Long userId, ApiResponseEntity apiResponseEntity)
-			throws Exception {
+	public Boolean processDoRating(DoRatingRequest request, Long userId) throws Exception {
 		Long expertId = request.getExpertId();
 		Double rate = 0.0;
 		if (request.getRate() <= 5 && request.getRate() > 0) {
@@ -76,13 +76,10 @@ public class RatingService {
 		if (ratingSave == null) {
 			throw new Exception("Đánh giá chuyên gia thất bại");
 		}
-
-		apiResponseEntity.setData(true);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return true;
 	}
 
-	public void processGetUesrRating(Long expertid, Long id, ApiResponseEntity apiResponseEntity) throws Exception {
+	public List<Map<String, Object>> processGetUesrRating(Long expertid, Long id) throws Exception {
 		User userExpert = userRepository.findExpertById(expertid);
 		if (userExpert == null) {
 			throw new Exception("Chuyên gia không tồn tại hoặc người dùng không phải chuyên gia");
@@ -102,9 +99,6 @@ public class RatingService {
 			return map;
 		}).collect(Collectors.toList());
 
-		apiResponseEntity.setData(response);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-
+		return response;
 	}
 }

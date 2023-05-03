@@ -1,6 +1,5 @@
 package com.se1.userservice.controller;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.model.AuthProvider;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
@@ -68,7 +66,10 @@ public class UserInternalController {
 	public ResponseEntity<?> findById(@RequestParam("id") Long id) throws Exception {
 
 		try {
-			service.processFindUserById(null, id, apiResponseEntity);
+			Object response = service.processFindUserById(null, id);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
@@ -96,7 +97,22 @@ public class UserInternalController {
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
+	
+	@PostMapping("/updateEmailStatus")
+	public ResponseEntity<?> updateEmailStatus(@RequestParam("id") Long id){
+		try {
+			Object response = service.processUpdateEmailStatus(id);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
 			apiResponseEntity.setStatus(1);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
 		}
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}

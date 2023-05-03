@@ -28,8 +28,10 @@ public class GetListFriendChatController {
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-
-			return ResponseEntity.ok().body(contactService.processGetListContactForChat(userDetail, apiResponseEntity));
+			Object response = contactService.processGetListContactForChat(userDetail);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

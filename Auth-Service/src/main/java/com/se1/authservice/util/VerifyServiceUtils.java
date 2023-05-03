@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class VerifyService {
+public class VerifyServiceUtils {
 
 	private final ObjectMapper mapper;
 	private final CallApiService<User> apiService;

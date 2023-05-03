@@ -120,7 +120,7 @@ public class UserService {
 		generatorResponse(userFind, apiResponseEntity);
 	}
 
-	public void processFindUserById(Long currentUserId, Long id, ApiResponseEntity apiResponseEntity) throws Exception {
+	public Object processFindUserById(Long currentUserId, Long id) throws Exception {
 		User userFind = null;
 		try {
 			userFind = repository.findById(id).orElse(null);
@@ -130,7 +130,7 @@ public class UserService {
 
 		validationUser(userFind);
 
-		generatorResponseForClient(userFind, apiResponseEntity, currentUserId);
+		return generatorResponseForClient(userFind, currentUserId);
 	}
 
 	private void validationUser(User userFind) throws Exception {
@@ -184,7 +184,7 @@ public class UserService {
 		apiResponseEntity.setStatus(1);
 	}
 
-	private void generatorResponseForClient(User userFind, ApiResponseEntity apiResponseEntity, Long currentUserId) {
+	private Object generatorResponseForClient(User userFind, Long currentUserId) {
 		Double rating = 0.0;
 		Integer ratingCount = null;
 		Boolean isRate = false;
@@ -196,9 +196,7 @@ public class UserService {
 		UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(userFind, rating,
 				currentUserId, ratingCount, isRate);
 
-		apiResponseEntity.setData(userResponseDto);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return userResponseDto;
 	}
 
 	private UserResponseForClient convertUserEntityToUserResponseForClient(User userFind, double rating,
@@ -247,8 +245,7 @@ public class UserService {
 		return userResponseDto;
 	}
 
-	public void processFindByName(Long currentUserId, String name, ApiResponseEntity apiResponseEntity,
-			Integer offset) {
+	public Object processFindByName(Long currentUserId, String name, Integer offset) {
 		List<User> users = repository.findByName(name, currentUserId);
 		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin))
 				.filter(u -> !u.getId().equals(currentUserId)).collect(Collectors.toList());
@@ -267,9 +264,7 @@ public class UserService {
 					return userResponseDto;
 				}).collect(Collectors.toList());
 
-		apiResponseEntity.setData(responseList);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return responseList;
 	}
 
 	public void processUpdateStatus(Long id, Integer status, ApiResponseEntity apiResponseEntity) {
@@ -421,7 +416,7 @@ public class UserService {
 
 	}
 
-	public void findAllExpert(UserDetail userDetail, Integer offset, ApiResponseEntity apiResponseEntity) {
+	public Object findAllExpert(UserDetail userDetail, Integer offset) {
 		List<User> users = repository.findAllByRole(UserRole.expert);
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
@@ -440,10 +435,7 @@ public class UserService {
 					return userResponseDto;
 				}).collect(Collectors.toList());
 
-		apiResponseEntity.setData(responseList);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
-
+		return responseList;
 	}
 
 	public void delete(Long id, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
@@ -464,8 +456,7 @@ public class UserService {
 		apiResponseEntity.setStatus(1);
 	}
 
-	public void findAll(FindAllUserRequest request, UserDetail userDetail, Integer offset,
-			ApiResponseEntity apiResponseEntity) {
+	public Object findAll(FindAllUserRequest request, UserDetail userDetail, Integer offset) {
 		Long userId = userDetail.getId();
 
 		String userQuery = String.format(" id != %d", userId);
@@ -484,8 +475,11 @@ public class UserService {
 		List<String> mergeQuery = List.of(userQuery, nameQuery, emailQuery, providerQuery, roleQuery);
 		mergeQuery = mergeQuery.stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
 		List<User> allUser = rUserMapper.findAll(mergeQuery, offset);
-		apiResponseEntity.setData(allUser);
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+		return allUser;
+	}
+
+	public Object processUpdateEmailStatus(Long id) {
+		wUserMapper.updateEmailStatus(id);
+		return true;
 	}
 }
