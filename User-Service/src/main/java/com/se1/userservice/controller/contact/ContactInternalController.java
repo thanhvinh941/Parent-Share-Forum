@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
-import com.se1.userservice.domain.service.ContactService;
+import com.se1.userservice.domain.service.ContactServiceImpl;
 
 @RestController
 @RequestMapping("/contact/internal")
 public class ContactInternalController {
 
 	@Autowired
-	ContactService contactService;
+	ContactServiceImpl contactService;
 	
 	@Autowired
 	ApiResponseEntity apiResponseEntity;
