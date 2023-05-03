@@ -171,6 +171,7 @@ public class UserService {
 	}
 
 	private void generatorResponse(User userFind, ApiResponseEntity apiResponseEntity) {
+		apiResponseEntity = new ApiResponseEntity();
 		Double rating = 0.0;
 		Integer ratingCount = 0;
 		if (userFind.getIsExpert()) {
@@ -185,6 +186,7 @@ public class UserService {
 	}
 
 	private void generatorResponseForClient(User userFind, ApiResponseEntity apiResponseEntity, Long currentUserId) {
+		apiResponseEntity = new ApiResponseEntity();
 		Double rating = 0.0;
 		Integer ratingCount = null;
 		Boolean isRate = false;
@@ -249,6 +251,7 @@ public class UserService {
 
 	public void processFindByName(Long currentUserId, String name, ApiResponseEntity apiResponseEntity,
 			Integer offset) {
+		apiResponseEntity = new ApiResponseEntity();
 		List<User> users = repository.findByName(name, currentUserId);
 		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin))
 				.filter(u -> !u.getId().equals(currentUserId)).collect(Collectors.toList());
@@ -283,6 +286,7 @@ public class UserService {
 
 	public Map<Integer, String> processcreate(CreateUserRequest request, UserDetail userDetail,
 			ApiResponseEntity apiResponseEntity) throws Exception {
+		apiResponseEntity = new ApiResponseEntity();
 		Map<Integer, String> error = new HashMap<>();
 		String userRole = userDetail.getRole();
 		if (!userRole.equals("admin")) {
@@ -358,6 +362,7 @@ public class UserService {
 
 	public void findAllReport(FindAllReportRequest request, UserDetail userDetail, Integer offset,
 			ApiResponseEntity apiResponseEntity) {
+		apiResponseEntity = new ApiResponseEntity();
 		String nameQuery = !request.getName().isEmpty() ? " u.name like '% " + request.getName() + " %'" : "";
 		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '% " + request.getEmail() + " %'" : "";
 
@@ -422,6 +427,7 @@ public class UserService {
 	}
 
 	public void findAllExpert(UserDetail userDetail, Integer offset, ApiResponseEntity apiResponseEntity) {
+		apiResponseEntity = new ApiResponseEntity();
 		List<User> users = repository.findAllByRole(UserRole.expert);
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
