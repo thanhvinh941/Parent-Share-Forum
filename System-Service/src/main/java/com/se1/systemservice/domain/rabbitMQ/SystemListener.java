@@ -1,5 +1,6 @@
 package com.se1.systemservice.domain.rabbitMQ;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -33,7 +34,7 @@ public class SystemListener {
 	private SystemListenerService systemListenerService;
 
 	@RabbitListener(queues = MqConfig.SYSTEM_QUEUE)
-	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException, MalformedURLException {
+	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException, MalformedURLException, UnsupportedEncodingException {
 		log.info("SYSTEM_QUEUE listener message:  {}", objectMapper.writeValueAsString(rabbitRequest));
 
 		String action = rabbitRequest.getAction();

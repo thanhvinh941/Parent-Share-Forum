@@ -1,5 +1,6 @@
 package com.se1.systemservice.domain.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class SystemListenerService {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public void processActionSystemContact(ContactDto data) throws JsonProcessingException {
+	public void processActionSystemContact(ContactDto data) throws JsonProcessingException, UnsupportedEncodingException {
 		int status = data.getStatus();
 		UserDetail userReciver = data.getUserReciver();
 		UserDetail userSender = data.getUserSender();
@@ -66,9 +67,9 @@ public class SystemListenerService {
 	}
 
 	private NotifyDtoRequest generatorNotifyDtoForContact(UserDetail userFrom, UserDetail userTo, String TopicId, int status,
-			String type) throws JsonProcessingException {
+			String type) throws JsonProcessingException, UnsupportedEncodingException {
 		Map<String, Object> notifyValue = new HashMap<>();
-		notifyValue.put("user", objectMapper.writeValueAsString(userFrom));
+		notifyValue.put("user", new String(objectMapper.writeValueAsBytes(userFrom),"utf-8"));
 		notifyValue.put("action", SCMConstant.getContactActionByStatus(status));
 		String notifyContactParam = String.format("topicId=%s", TopicId);
 		String notifyStatusParam = String.format("status=%d", status);
@@ -76,7 +77,7 @@ public class SystemListenerService {
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		notifyDto.setUserId(userTo.getId());
 		notifyDto.setParam(String.join("&", List.of(notifyStatusParam, notifyContactParam)));
-		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
+		notifyDto.setValue(new String(objectMapper.writeValueAsBytes(notifyValue),"utf-8"));
 		notifyDto.setType(type);
 
 		return notifyDto;
@@ -131,7 +132,7 @@ public class SystemListenerService {
 		websocketService.sendMessageChat(chatStatusDto.getTopicId(), mapChat);
 	}
 
-	public void processActionSystemPost(PostDto postDto) throws JsonProcessingException {
+	public void processActionSystemPost(PostDto postDto) throws JsonProcessingException, UnsupportedEncodingException {
 		UserDetail userReciver = postDto.getUserReciver();
 		UserDetail userSender = postDto.getUserSender();
 		String type = "post";
@@ -142,10 +143,10 @@ public class SystemListenerService {
 	}
 
 	private NotifyDtoRequest generatorNotifyDtoForPost(UserDetail userReciver, UserDetail userSender, PostDto postDto,
-			String type) throws JsonProcessingException {
+			String type) throws JsonProcessingException, UnsupportedEncodingException {
 		
 		Map<String, Object> notifyValue = new HashMap<>();
-		notifyValue.put("user", objectMapper.writeValueAsString(userReciver));
+		notifyValue.put("user", new String(objectMapper.writeValueAsBytes(userReciver), "utf-8"));
 		notifyValue.put("action", postDto.getAction());
 		List<String> param = new ArrayList<>();
 		if(postDto.getPostId() != null) {
@@ -161,13 +162,13 @@ public class SystemListenerService {
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		notifyDto.setUserId(userSender.getId());
 		notifyDto.setParam(String.join("&", param));
-		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
+		notifyDto.setValue(new String(objectMapper.writeValueAsBytes(notifyValue), "utf-8"));
 		notifyDto.setType(type);
 
 		return notifyDto;
 	}
 
-	public void processActionSystemSub(SubScriberDto subScriberDto) throws JsonProcessingException {
+	public void processActionSystemSub(SubScriberDto subScriberDto) throws JsonProcessingException, UnsupportedEncodingException {
 		UserDetail userReciver = subScriberDto.getUserReciver();
 		UserDetail userSender = subScriberDto.getUserSender();
 		String type = "subscriber";
@@ -178,9 +179,9 @@ public class SystemListenerService {
 	}
 
 	private NotifyDtoRequest generatorNotifyDtoForSub(UserDetail userReciver, UserDetail userSender,
-			SubScriberDto subScriberDto, String type) throws JsonProcessingException {
+			SubScriberDto subScriberDto, String type) throws JsonProcessingException, UnsupportedEncodingException {
 		Map<String, Object> notifyValue = new HashMap<>();
-		notifyValue.put("user", objectMapper.writeValueAsString(userReciver));
+		notifyValue.put("user", new String(objectMapper.writeValueAsBytes(userReciver), "utf-8"));
 		notifyValue.put("action", "subscriber");
 		
 		List<String> param = new ArrayList<>();
@@ -191,7 +192,7 @@ public class SystemListenerService {
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		notifyDto.setUserId(userSender.getId());
 		notifyDto.setParam(String.join("&", param));
-		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
+		notifyDto.setValue(new String(objectMapper.writeValueAsBytes(notifyValue), "utf-8"));
 		notifyDto.setType(type);
 		
 		return notifyDto;

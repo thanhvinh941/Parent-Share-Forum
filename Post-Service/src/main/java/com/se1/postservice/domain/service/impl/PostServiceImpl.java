@@ -236,7 +236,7 @@ public class PostServiceImpl implements PostService {
 			
 			List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
 			List<com.se1.postservice.domain.db.dto.PostDto> allPost = new ArrayList<>();
-			if(allIdUserIdDistinct != null) {
+			if(allIdUserIdDistinct != null && allIdUserIdDistinct.size() > 0) {
 				allPost = rPostMapper.findAllPostByUserId(
 						String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
 						offset, userId);
@@ -244,8 +244,15 @@ public class PostServiceImpl implements PostService {
 				allPost = rPostMapper.findAll(
 						offset);
 			}
-			List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
-			doViewPost(postIds, userId);
+			if(allPost!= null && allPost.size() > 0) {				
+				List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+				doViewPost(postIds, userId);
+			}else {
+				allPost = rPostMapper.findAll(
+						offset);
+				List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+				doViewPost(postIds, userId);
+			}
 			
 			apiResponseEntity.setData(getResponseList(allPost));
 			apiResponseEntity.setErrorList(null);
