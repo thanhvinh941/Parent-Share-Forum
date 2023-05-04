@@ -71,12 +71,11 @@ public class SystemListenerService {
 		Map<String, Object> notifyValue = new HashMap<>();
 		notifyValue.put("user", new String(objectMapper.writeValueAsBytes(userFrom),"utf-8"));
 		notifyValue.put("action", SCMConstant.getContactActionByStatus(status));
-		String notifyContactParam = String.format("topicId=%s", TopicId);
-		String notifyStatusParam = String.format("status=%d", status);
+		String notifyContactParam = String.format("%s", TopicId);
 
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
 		notifyDto.setUserId(userTo.getId());
-		notifyDto.setParam(String.join("&", List.of(notifyStatusParam, notifyContactParam)));
+		notifyDto.setParam(String.join("&", List.of(notifyContactParam)));
 		notifyDto.setValue(new String(objectMapper.writeValueAsBytes(notifyValue),"utf-8"));
 		notifyDto.setType(type);
 
@@ -150,13 +149,8 @@ public class SystemListenerService {
 		notifyValue.put("action", postDto.getAction());
 		List<String> param = new ArrayList<>();
 		if(postDto.getPostId() != null) {
-			String notifyPostParam = String.format("post=%s", postDto.getPostId());
+			String notifyPostParam = String.format("%s", postDto.getPostId());
 			param.add(notifyPostParam);
-		}
-		
-		if(postDto.getCommentId() != null) {
-			String notifyCommnetParam = String.format("comment=%s", postDto.getCommentId());
-			param.add(notifyCommnetParam);
 		}
 		
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
@@ -186,7 +180,7 @@ public class SystemListenerService {
 		
 		List<String> param = new ArrayList<>();
 		if(subScriberDto.getUserId() != null) {
-			String notifyPostParam = String.format("userId=%s", subScriberDto.getUserId());
+			String notifyPostParam = String.format("%s", subScriberDto.getUserId());
 			param.add(notifyPostParam);
 		}
 		NotifyDtoRequest notifyDto = new NotifyDtoRequest();
