@@ -54,4 +54,20 @@ public class ContactInternalController {
 		
 		return ResponseEntity.ok().body(apiResponseEntity);
 	}
+	
+	@PostMapping("/getContactByTopicId")
+	public ResponseEntity<?> getContactByTopicId(@RequestParam("topicId") String topicId){
+		try {
+			Object response = contactService.processGetContactByTopicId(topicId);
+			apiResponseEntity.setData(response);
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		} catch (Exception e) {
+			apiResponseEntity.setData(null);
+			apiResponseEntity.setErrorList(List.of(e.getMessage()));
+			apiResponseEntity.setStatus(0);
+		}
+		
+		return ResponseEntity.ok().body(apiResponseEntity);
+	}
 }

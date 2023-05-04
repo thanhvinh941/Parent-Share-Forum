@@ -1,5 +1,7 @@
 package com.se1.systemservice.domain.rabbitMQ;
 
+import java.net.MalformedURLException;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public class SystemListener {
 	private SystemListenerService systemListenerService;
 
 	@RabbitListener(queues = MqConfig.SYSTEM_QUEUE)
-	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException {
+	public void listener(RabbitRequest rabbitRequest) throws JsonProcessingException, MalformedURLException {
 		log.info("SYSTEM_QUEUE listener message:  {}", objectMapper.writeValueAsString(rabbitRequest));
 
 		String action = rabbitRequest.getAction();

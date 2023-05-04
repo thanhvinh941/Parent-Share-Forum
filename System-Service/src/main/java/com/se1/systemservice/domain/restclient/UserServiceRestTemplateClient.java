@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,24 +26,8 @@ public class UserServiceRestTemplateClient {
 	@Autowired
 	ObjectMapper mapper;
 	
-	
-	public Object findById(Long id) {
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-		MultiValueMap<String, Long> map= new LinkedMultiValueMap<String, Long>();
-		map.add("id", id);
-
-		HttpEntity<MultiValueMap<String, Long>> request = new HttpEntity<MultiValueMap<String, Long>>(map, headers);
-		
-		ResponseEntity<?> restExchange =
-                restTemplate.postForEntity(
-                        "http://localhost:8081/user/internal/findById",
-                        request,
-                        ApiResponseEntity.class);
-        return restExchange.getBody();
-	}
+	@Value("${micro-service.user-service}")
+	String userHost;
 	
 	public Object updateStatus(Long id, int status) throws MalformedURLException {
 		HttpHeaders headers = new HttpHeaders();
@@ -56,7 +41,24 @@ public class UserServiceRestTemplateClient {
 		
 		ResponseEntity<?> restExchange =
                 restTemplate.postForEntity(
-                        "http://localhost:8088/user/internal/updateStatus",
+                		userHost + "/user/internal/updateStatus",
+                        request,
+                        ApiResponseEntity.class);
+        return restExchange.getBody();
+	}
+	
+	public Object getContactByTopicId(String topicId) throws MalformedURLException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, Object> map= new LinkedMultiValueMap<String, Object>();
+		map.add("topicId", topicId);
+		
+		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<MultiValueMap<String, Object>>(map, headers);
+		
+		ResponseEntity<?> restExchange =
+                restTemplate.postForEntity(
+                		userHost + "/contact/internal/getContactByTopicId",
                         request,
                         ApiResponseEntity.class);
         return restExchange.getBody();

@@ -1,5 +1,6 @@
 package com.se1.systemservice.domain.service;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.systemservice.config.SCMConstant;
+import com.se1.systemservice.domain.payload.ApiResponseEntity;
+import com.se1.systemservice.domain.payload.Contact;
 import com.se1.systemservice.domain.payload.dto.ContactDto;
 import com.se1.systemservice.domain.payload.dto.NotifyDto;
 import com.se1.systemservice.domain.payload.dto.UserDetail;
@@ -19,6 +22,7 @@ import com.se1.systemservice.domain.rabbitMQ.dto.ChatStatusDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.NotifyDtoRequest;
 import com.se1.systemservice.domain.rabbitMQ.dto.PostDto;
 import com.se1.systemservice.domain.rabbitMQ.dto.SubScriberDto;
+import com.se1.systemservice.domain.restclient.UserServiceRestTemplateClient;
 
 @Service
 public class SystemListenerService {
@@ -29,6 +33,9 @@ public class SystemListenerService {
 	@Autowired
 	private RabbitSenderService rabbitSenderService;
 
+	@Autowired
+	private UserServiceRestTemplateClient restTemplateClient;
+	
 	@Autowired
 	private ObjectMapper objectMapper;
 
@@ -78,11 +85,22 @@ public class SystemListenerService {
 		websocketService.sendUser(notifyDto.getUser().getTopicId(), notifyDto);
 	}
 
-	public void processActionSystemChat(ChatDto chatDto) {
+	public void processActionSystemChat(ChatDto chatDto) throws MalformedURLException, JsonProcessingException {
+		String topicId = chatDto.getTopicId();
 		Map<String, Object> mapChat = new HashMap<>();
 		mapChat.put("action", "");
 		mapChat.put("data", chatDto);
-		websocketService.sendMessageChat(chatDto.getTopicId(), mapChat);
+		websocketService.sendMessageChat(topicId, mapChat);
+		
+		ApiResponseEntity apiResponseEntity = (ApiResponseEntity) restTemplateClient.getContactByTopicId(topicId);
+		ContactDto contact = objectMapper.convertValue(apiResponseEntity.getData(), ContactDto.class) ;
+		
+		NotifyDto notifyDto = new NotifyDto();
+		Map<String, Object> notifyValue = new HashMap<>();
+		notifyValue.put("action", "new-message");
+		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
+		websocketService.sendUser(contact.getUserSender().getTopicId(), notifyDto);
+		websocketService.sendUser(contact.getUserReciver().getTopicId(), notifyDto);
 	}
 
 	public void processActionSystemChatStatus(ChatStatusDto chatStatusDto) {

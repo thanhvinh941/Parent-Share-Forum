@@ -390,4 +390,21 @@ public class ContactServiceImpl {
 
 		return contactResponses;
 	}
+
+	public Object processGetContactByTopicId(String topicId) {
+		Contact contact = contactRepository.findByTopicId(topicId);
+		
+		User userReciver = userRepository.findById(contact.getUserReciverId()).orElse(null);
+		User userSender = userRepository.findById(contact.getUserSenderId()).orElse(null);
+		UserDetail userSenderDto = new UserDetail();
+		BeanUtils.copyProperties(userSender, userSenderDto);
+		UserDetail userReciverDto = new UserDetail();
+		BeanUtils.copyProperties(userReciver, userReciverDto);
+		
+		ContactResponse contactResponse = new ContactResponse();
+		BeanUtils.copyProperties(contact, contactResponse);
+		contactResponse.setUserReciver(userReciverDto);
+		contactResponse.setUserSender(userSenderDto);
+		return contactResponse;
+	}
 }

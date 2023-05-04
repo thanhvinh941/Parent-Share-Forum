@@ -35,4 +35,6 @@ public interface ContactRepository extends CrudRepository<Contact, Long> {
 	void updateContactV2(Long userReciverId, Long userSenderId, Long id,
 			int status);
 
+	Contact findByTopicId(String topicId);
+
 }
