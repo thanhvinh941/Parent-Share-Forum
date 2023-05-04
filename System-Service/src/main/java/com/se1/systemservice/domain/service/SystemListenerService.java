@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -94,13 +95,23 @@ public class SystemListenerService {
 		
 		ApiResponseEntity apiResponseEntity = (ApiResponseEntity) restTemplateClient.getContactByTopicId(topicId);
 		ContactDto contact = objectMapper.convertValue(apiResponseEntity.getData(), ContactDto.class) ;
-		
+		Long userReciverId = contact.getUserReciver().getId();
+		UserDetail userSendMessage = contact.getUserSender();
+		UserDetail userReciverMessage = contact.getUserReciver();
+		if(chatDto.getUser().getId().equals(userReciverId)) {
+			userSendMessage = contact.getUserReciver();
+			userReciverMessage = contact.getUserSender();
+		}
 		NotifyDto notifyDto = new NotifyDto();
+		NotifyDto.User user = new NotifyDto.User();
+		BeanUtils.copyProperties(userSendMessage, user);
 		Map<String, Object> notifyValue = new HashMap<>();
+		notifyValue.put("user", objectMapper.writeValueAsString(userReciverMessage));
 		notifyValue.put("action", "new-message");
+		notifyDto.setUser(user);
+		notifyDto.setType("new-message");
 		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
-		websocketService.sendUser(contact.getUserSender().getTopicId(), notifyDto);
-		websocketService.sendUser(contact.getUserReciver().getTopicId(), notifyDto);
+		websocketService.sendUser(userReciverMessage.getTopicId(), notifyDto);
 	}
 
 	public void processActionSystemChatStatus(ChatStatusDto chatStatusDto) {
