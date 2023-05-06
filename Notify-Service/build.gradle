@@ -8,6 +8,10 @@ group = 'com.se.71'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
 processResources {
 	from('src/main/java') {
 		include '**/*.xml'
