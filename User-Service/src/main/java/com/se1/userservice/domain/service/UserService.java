@@ -460,8 +460,8 @@ public class UserService {
 		Long userId = userDetail.getId();
 
 		String userQuery = String.format(" id != %d", userId);
-		String nameQuery = !request.getName().isEmpty() ? " name like '% " + request.getName() + " %'" : "";
-		String emailQuery = !request.getEmail().isEmpty() ? " email like '% " + request.getEmail() + " %'" : "";
+		String nameQuery = !request.getName().isEmpty() ? " name like '%" + request.getName() + "%'" : "";
+		String emailQuery = !request.getEmail().isEmpty() ? " email like '%" + request.getEmail() + "%'" : "";
 		String providerQuery = (!Objects.isNull(request.getProvider()) && request.getProvider().size() > 0)
 				? " provider in (" + String.join(", ",
 						request.getProvider().stream().map(p -> String.format("'%s'", p)).collect(Collectors.toList()))
