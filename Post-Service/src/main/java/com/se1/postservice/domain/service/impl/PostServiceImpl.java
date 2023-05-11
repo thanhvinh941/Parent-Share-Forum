@@ -335,7 +335,7 @@ public class PostServiceImpl implements PostService {
 		List<GetPostResponseDto.TopicTag> listTopicTagResponse = getTopicTag(topicTagIds);
 		List<GetPostResponseDto> getPostResponseDtos = allMerge.stream().map(p -> {
 			return getPostResponseObejct(p,listTopicTagResponse);
-		}).filter(res -> res.getUser() != null).collect(Collectors.toList());
+		}).filter(res -> res.getUser().getName() != null || res.getUser().getName().isEmpty() || res.getUser().getName().isBlank()).collect(Collectors.toList());
 		
 		return getPostResponseDtos;
 	}

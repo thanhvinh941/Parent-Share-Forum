@@ -99,8 +99,8 @@ public class SystemListenerService {
 		UserDetail userSendMessage = contact.getUserSender();
 		UserDetail userReciverMessage = contact.getUserReciver();
 		if(chatDto.getUser().getId().equals(userReciverId)) {
-			userSendMessage = contact.getUserReciver();
-			userReciverMessage = contact.getUserSender();
+			userReciverMessage = contact.getUserReciver();
+			userSendMessage = contact.getUserSender();
 		}
 		NotifyDto notifyDto = new NotifyDto();
 		NotifyDto.User user = new NotifyDto.User();
