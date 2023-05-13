@@ -37,6 +37,7 @@ import com.se1.postservice.domain.payload.CreatePostRequest;
 import com.se1.postservice.domain.payload.SubscribeDto;
 import com.se1.postservice.domain.payload.UpdatePostRequest;
 import com.se1.postservice.domain.payload.UserDetail;
+import com.se1.postservice.domain.payload.UserDto;
 import com.se1.postservice.domain.payload.request.RabbitRequest;
 import com.se1.postservice.domain.repository.PostRepository;
 import com.se1.postservice.domain.repository.PostViewRepository;
@@ -225,32 +226,47 @@ public class PostServiceImpl implements PostService {
 			apiResponseEntity.setStatus(1);
 		}else {			
 			Long userId = userDetail.getId();
+			List<UserDto> userDtos = restTemplateClient.getAllExpert();
+			List<Long> userIds = userDtos.stream()
+					.map(c -> c.getId())
+					.collect(Collectors.toList());
 			List<ContactDto> contactDtos = restTemplateClient.getListFriend(userId);
 			List<SubscribeDto> subscribeDtos = restTemplateClient.getAllExpertSubscribe(userId);
-			List<Long> userFriendId = contactDtos.stream().map(c -> c.getUserFriend().getId()).collect(Collectors.toList());
-			List<Long> listExpertId = subscribeDtos.stream().map(s -> s.getUserExpertId().getId())
+			List<Long> userFriendId = contactDtos.stream()
+					.map(c -> c.getUserFriend().getId())
+					.collect(Collectors.toList());
+			List<Long> listExpertId = subscribeDtos.stream()
+					.map(s -> s.getUserExpertId().getId())
 					.collect(Collectors.toList());
 			List<Long> allIdUserId = new ArrayList<>(userFriendId);
 			allIdUserId.addAll(listExpertId);
+			allIdUserId.addAll(userIds);
 			allIdUserId.add(userId);
 			
-			List<Long> allIdUserIdDistinct = allIdUserId.stream().distinct().collect(Collectors.toList());
+			List<Long> allIdUserIdDistinct = allIdUserId.stream()
+					.distinct().collect(Collectors.toList());
 			List<com.se1.postservice.domain.db.dto.PostDto> allPost = new ArrayList<>();
 			if(allIdUserIdDistinct != null && allIdUserIdDistinct.size() > 0) {
 				allPost = rPostMapper.findAllPostByUserId(
-						String.join(", ", allIdUserIdDistinct.stream().map(m -> m.toString()).collect(Collectors.toList())),
+						String.join(", ", allIdUserIdDistinct.stream()
+								.map(m -> m.toString())
+								.collect(Collectors.toList())),
 						offset, userId);
 			}else {
 				allPost = rPostMapper.findAll(
 						offset);
 			}
 			if(allPost!= null && allPost.size() > 0) {				
-				List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+				List<Long> postIds = allPost.stream()
+						.map(post->post.getId())
+						.collect(Collectors.toList());
 				doViewPost(postIds, userId);
 			}else {
 				allPost = rPostMapper.findAll(
 						offset);
-				List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+				List<Long> postIds = allPost.stream()
+						.map(post->post.getId())
+						.collect(Collectors.toList());
 				doViewPost(postIds, userId);
 			}
 			
@@ -264,7 +280,9 @@ public class PostServiceImpl implements PostService {
 	public void findAllPostByUserId(Long userId, ApiResponseEntity apiResponseEntity, int offset) {
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByUserId(userId.toString(),
 				offset, userId);
-		List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+		List<Long> postIds = allPost.stream()
+				.map(post->post.getId())
+				.collect(Collectors.toList());
 		doViewPost(postIds, userId);
 
 		apiResponseEntity.setData(getResponseList(allPost));
@@ -278,7 +296,9 @@ public class PostServiceImpl implements PostService {
 		Map<String, String> paramConvert = convertMapToQuery(param);
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByCondition(paramConvert,
 				offset, userId);
-		List<Long> postIds = allPost.stream().map(post->post.getId()).collect(Collectors.toList());
+		List<Long> postIds = allPost.stream()
+				.map(post->post.getId())
+				.collect(Collectors.toList());
 		doViewPost(postIds, userId);
 
 		apiResponseEntity.setData(getResponseList(allPost));

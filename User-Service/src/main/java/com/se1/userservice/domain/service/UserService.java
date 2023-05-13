@@ -1,5 +1,7 @@
 package com.se1.userservice.domain.service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -247,8 +249,28 @@ public class UserService {
 
 	public Object processFindByName(Long currentUserId, String name, Integer offset) {
 		List<User> users = repository.findByName(name, currentUserId);
-		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin))
-				.filter(u -> !u.getId().equals(currentUserId)).collect(Collectors.toList());
+		users = users.stream()
+				.filter(u -> !u.getRole().equals(UserRole.admin))
+				.filter(u -> !u.getId().equals(currentUserId))
+				.collect(Collectors.toList());
+		
+		Collections.sort(users, new Comparator<User>() {
+			
+			@Override
+			public int compare(User o1, User o2) {
+				
+				Integer u1Sort = o1.getIsExpert() != null ? 
+						(o1.getIsExpert() ? 0 : 1) 
+						: 1;
+				
+				Integer u2Sort = o2.getIsExpert() != null ? 
+						(o2.getIsExpert() ? 0 : 1) 
+						: 1;
+				
+				return u1Sort.compareTo(u2Sort);
+			};
+		});
+		
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
 					Double rating = 0.0;
@@ -417,6 +439,9 @@ public class UserService {
 	}
 
 	public Object findAllExpert(UserDetail userDetail, Integer offset) {
+		@SuppressWarnings("removal")
+		Long userDetailId = userDetail != null ? userDetail.getId() : Long.valueOf("0");
+		
 		List<User> users = repository.findAllByRole(UserRole.expert);
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
@@ -424,14 +449,14 @@ public class UserService {
 					Integer ratingCount = null;
 					Boolean isRate = false;
 					if (ul.getIsExpert()) {
-						rating = (Double) ratingService.getRatingByUserId(ul.getId(), userDetail.getId()).get("rating");
-						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetail.getId())
+						rating = (Double) ratingService.getRatingByUserId(ul.getId(), userDetailId).get("rating");
+						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetailId)
 								.get("count");
-						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetail.getId())
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetailId)
 								.get("isRate");
 					}
 					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating,
-							userDetail.getId(), ratingCount, isRate);
+							userDetailId, ratingCount, isRate);
 					return userResponseDto;
 				}).collect(Collectors.toList());
 

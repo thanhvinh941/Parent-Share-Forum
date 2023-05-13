@@ -21,6 +21,7 @@ import com.se1.postservice.domain.payload.ApiResponseEntity;
 import com.se1.postservice.domain.payload.ContactDto;
 import com.se1.postservice.domain.payload.GetPostResponseDto;
 import com.se1.postservice.domain.payload.SubscribeDto;
+import com.se1.postservice.domain.payload.UserDto;
 
 @Component
 public class UserServiceRestTemplateClient {
@@ -86,6 +87,26 @@ public class UserServiceRestTemplateClient {
                         ApiResponseEntity.class);
 		List<SubscribeDto> subscribeDtos = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), new TypeReference<List<SubscribeDto>>(){});
         return subscribeDtos;
+	}
+
+	public List<UserDto> getAllExpert() throws JsonMappingException, JsonProcessingException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("offset", "0");
+		
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+		
+		ResponseEntity<ApiResponseEntity> restExchange =
+                restTemplate.postForEntity(
+                        "http://localhost:8088/user/internal/findAllExpert",
+                        request,
+                        ApiResponseEntity.class);
+		
+		List<UserDto> userDtos = mapper.readValue(mapper.writeValueAsString(restExchange.getBody().getData()), new TypeReference<List<UserDto>>(){});
+
+		return userDtos;
 	}
 
 }
