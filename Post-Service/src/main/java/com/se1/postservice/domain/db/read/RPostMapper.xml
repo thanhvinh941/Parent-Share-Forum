@@ -16,8 +16,8 @@
 		<result column="image_list" jdbcType="VARCHAR" javaType="java.lang.String" property="imageList" />
 		<result column="hash_tag" jdbcType="VARCHAR" javaType="java.lang.String" property="hashTag" />
 		<result column="topic_tag_id" jdbcType="INTEGER" javaType="java.lang.Integer" property="topicTagId" />
-		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
-		<result column="update_at" jdbcType="DATE" javaType="java.util.Date" property="updateAt" />
+		<result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
+		<result column="update_at" jdbcType="TIMESTAMP" property="updateAt" />
 		<result column="like_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="likeCount" />
 		<result column="dislike_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="dislikeCount" />
 		<result column="comment_count" jdbcType="INTEGER" javaType="java.lang.Integer" property="commentCount" />

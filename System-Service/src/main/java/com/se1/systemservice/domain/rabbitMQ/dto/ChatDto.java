@@ -14,7 +14,7 @@ public class ChatDto {
 	private int status;
 	private String topicId;
 	private ChatDto chatParent;
-	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createAt;
 	private Long userDeleteId;
 	private Boolean isFile;
@@ -28,7 +28,7 @@ public class ChatDto {
 		private Boolean isExpert;
 		private Double rating = null;
 		private int status;
-		@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+		@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 		private Date lastTime = new Date();
 	}
 }

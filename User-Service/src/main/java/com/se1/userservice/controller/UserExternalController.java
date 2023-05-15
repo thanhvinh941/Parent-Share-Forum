@@ -85,12 +85,12 @@ public class UserExternalController {
 	}
 
 	@PostMapping("/report/{id}")
-	public ResponseEntity<?> report(@PathVariable("id") Long id, @RequestHeader("user_detail") String userDetailHeader)
+	public ResponseEntity<?> report(@PathVariable("id") Long id,@RequestParam(name = "reason", required = false) String reason, @RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
-			service.report(id, userDetail, apiResponseEntity);
+			service.report(id, userDetail, apiResponseEntity, reason);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));

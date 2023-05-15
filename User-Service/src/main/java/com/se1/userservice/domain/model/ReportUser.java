@@ -17,4 +17,6 @@ public class ReportUser {
 	private Long id;
 	
 	private Long userId;
+	
+	private String reason;
 }

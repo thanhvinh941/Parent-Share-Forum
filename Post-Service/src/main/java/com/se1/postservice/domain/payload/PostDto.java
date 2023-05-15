@@ -21,16 +21,16 @@ public class PostDto {
 	private String hashTag;
 	private PostTopicTag topic;
 	private List<String> imageList;
-	
+
 	@Data
 	public class PostTopicTag {
 		private Integer id;
 		private String topicTagName;
 		private String color;
 	}
-	
+
 	@Data
-	public static class PostUser{
+	public static class PostUser {
 		private Long id;
 		private String email;
 		private String name;
@@ -38,7 +38,7 @@ public class PostDto {
 		private boolean isExpert;
 		private Double rating;
 		private Byte status;
-		@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 		private Date lastTime = new Date();
 	}
 }

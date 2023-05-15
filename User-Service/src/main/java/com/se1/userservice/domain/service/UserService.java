@@ -29,6 +29,7 @@ import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.FindAllReportRequest;
+import com.se1.userservice.domain.payload.ReportUserResponseDto;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
@@ -375,14 +376,20 @@ public class UserService {
 
 	public void findAllReport(FindAllReportRequest request, UserDetail userDetail, Integer offset,
 			ApiResponseEntity apiResponseEntity) {
-		String nameQuery = !request.getName().isEmpty() ? " u.name like '% " + request.getName() + " %'" : "";
-		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '% " + request.getEmail() + " %'" : "";
+		String nameQuery = !request.getName().isEmpty() ? " u.name like '%" + request.getName() + "%'" : "";
+		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '%" + request.getEmail() +"%'" : "";
 
 		List<String> mergeQuery = List.of(nameQuery, emailQuery);
 
 		List<ReportUserDto> allUser = rUserMapper.findAllHaveReport(mergeQuery, offset);
-
-		apiResponseEntity.setData(allUser);
+		List<ReportUserResponseDto> responseDtos = allUser.stream().map(rp->{
+			ReportUserResponseDto dto = new ReportUserResponseDto();
+			BeanUtils.copyProperties(rp, dto);
+			dto.setReasons(List.of(rp.getReasons().split(",")));
+			return dto;
+		}).collect(Collectors.toList());
+		
+		apiResponseEntity.setData(responseDtos);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
 	}
@@ -471,10 +478,11 @@ public class UserService {
 		apiResponseEntity.setStatus(1);
 	}
 
-	public void report(Long id, UserDetail userDetail, ApiResponseEntity apiResponseEntity) {
+	public void report(Long id, UserDetail userDetail, ApiResponseEntity apiResponseEntity, String reason) {
 		ReportUser reportUser = new ReportUser();
 		reportUser.setUserId(id);
-
+		reportUser.setReason(reason);
+		
 		reportUserRepository.save(reportUser);
 		apiResponseEntity.setData(true);
 		apiResponseEntity.setErrorList(null);

@@ -1,14 +1,15 @@
-package com.se1.userservice.domain.db.dto;
+package com.se1.userservice.domain.payload;
+
+import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class ReportUserDto {
-
+public class ReportUserResponseDto {
 	private Long userId;
 	private Long report;
 	private String name;
     private String email;
     private String imageUrl;
-    private String reasons;
+    private List<String> reasons;
 }

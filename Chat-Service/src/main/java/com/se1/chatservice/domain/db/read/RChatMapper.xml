@@ -9,7 +9,7 @@
 		<result column="status" jdbcType="INTEGER" javaType="java.lang.Integer" property="status" />
 		<result column="topic_id" jdbcType="VARCHAR" javaType="java.lang.String" property="topicId" />
 		<result column="chat_parent" jdbcType="BIGINT" javaType="java.lang.Long" property="chatParent" />
-		<result column="create_at" jdbcType="DATE" javaType="java.util.Date" property="createAt" />
+		<result column="create_at" jdbcType="TIMESTAMP" property="createAt" />
 		<result column="user_delete_id" jdbcType="BIGINT" javaType="java.lang.Long" property="userDeleteId" />
 		<result column="is_file" jdbcType="INTEGER" javaType="java.lang.Integer" property="isFile" />
 	</resultMap>

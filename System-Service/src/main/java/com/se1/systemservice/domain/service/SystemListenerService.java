@@ -95,23 +95,28 @@ public class SystemListenerService {
 		
 		ApiResponseEntity apiResponseEntity = (ApiResponseEntity) restTemplateClient.getContactByTopicId(topicId);
 		ContactDto contact = objectMapper.convertValue(apiResponseEntity.getData(), ContactDto.class) ;
-		Long userReciverId = contact.getUserReciver().getId();
-		UserDetail userSendMessage = contact.getUserSender();
-		UserDetail userReciverMessage = contact.getUserReciver();
-		if(chatDto.getUser().getId().equals(userReciverId)) {
-			userReciverMessage = contact.getUserReciver();
-			userSendMessage = contact.getUserSender();
+		UserDetail user1 = contact.getUserSender();
+		UserDetail user2 = contact.getUserReciver();
+		UserDetail userReciverNotify = new UserDetail();
+		UserDetail userSendNotify = new UserDetail();
+		if(chatDto.getUser().getId().equals(user1.getId())) {
+			userReciverNotify = user2;
+			userSendNotify = user1;
+		}else {
+			userReciverNotify = user1;
+			userSendNotify = user2;
 		}
+		
 		NotifyDto notifyDto = new NotifyDto();
 		NotifyDto.User user = new NotifyDto.User();
-		BeanUtils.copyProperties(userSendMessage, user);
+		BeanUtils.copyProperties(userReciverNotify, user);
 		Map<String, Object> notifyValue = new HashMap<>();
-		notifyValue.put("user", objectMapper.writeValueAsString(userReciverMessage));
+		notifyValue.put("user", objectMapper.writeValueAsString(userSendNotify));
 		notifyValue.put("action", "new-message");
 		notifyDto.setUser(user);
 		notifyDto.setType("new-message");
 		notifyDto.setValue(objectMapper.writeValueAsString(notifyValue));
-		websocketService.sendUser(userReciverMessage.getTopicId(), notifyDto);
+		websocketService.sendUser(userReciverNotify.getTopicId(), notifyDto);
 	}
 
 	public void processActionSystemChatStatus(ChatStatusDto chatStatusDto) {

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -292,18 +293,30 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public void findAllPostByCondition(Long userId, Map<String, Object> param, ApiResponseEntity apiResponseEntity,
-			int offset) {
+			int offset, Integer topicTagId) {
 		Map<String, String> paramConvert = convertMapToQuery(param);
 		List<com.se1.postservice.domain.db.dto.PostDto> allPost = rPostMapper.findAllPostByCondition(paramConvert,
 				offset, userId);
-		List<Long> postIds = allPost.stream()
-				.map(post->post.getId())
-				.collect(Collectors.toList());
-		doViewPost(postIds, userId);
+		if(!Objects.isNull(topicTagId) && !topicTagId.equals(0)) {
+			allPost = allPost.stream()
+					.filter(p->p.getTopicTagId().equals(topicTagId))
+					.collect(Collectors.toList());
+		}
+		if(allPost != null && allPost.size() > 0) {
+			List<Long> postIds = allPost.stream()
+					.map(post->post.getId())
+					.collect(Collectors.toList());
+			doViewPost(postIds, userId);
 
-		apiResponseEntity.setData(getResponseList(allPost));
-		apiResponseEntity.setErrorList(null);
-		apiResponseEntity.setStatus(1);
+			apiResponseEntity.setData(getResponseList(allPost));
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}else {
+			apiResponseEntity.setData(List.of());
+			apiResponseEntity.setErrorList(null);
+			apiResponseEntity.setStatus(1);
+		}
+		
 	}
 
 	private Map<String, String> convertMapToQuery(Map<String, Object> param) {

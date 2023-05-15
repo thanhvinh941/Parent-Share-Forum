@@ -21,7 +21,7 @@ public class SubscribeDto {
 		private boolean isExpert;
 		private Double rating;
 		private Byte status;
-		@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+		@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 		private Date lastTime = new Date();
 	}
 }

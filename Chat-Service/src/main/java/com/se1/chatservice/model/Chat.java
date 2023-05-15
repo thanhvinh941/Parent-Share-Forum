@@ -40,7 +40,7 @@ public class Chat {
 	private Long chatParent;
 	
 	@Column(nullable = false)
-	@JsonFormat(pattern="yyyy-MM-dd hh:mm:ss")
+	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date createAt;
 	
 	private Long userDeleteId = SCMConstant.USER_DELETE_OFF;

@@ -28,6 +28,7 @@
 		<result column="name" jdbcType="VARCHAR" javaType="java.lang.String" property="name" />
 		<result column="email" jdbcType="VARCHAR" javaType="java.lang.String" property="email" />
 		<result column="image_url" jdbcType="VARCHAR" javaType="java.lang.String" property="imageUrl" />
+		<result column="reasons" jdbcType="VARCHAR" javaType="java.lang.String" property="reasons" />
 	</resultMap>
 
 	<select id="find" parameterType="String" resultMap="ResultMap">
@@ -57,6 +58,7 @@
 		    u.email AS email,
 		    u.name AS name,
 		    u.image_url AS image_url,
+		    GROUP_CONCAT(reason) AS reasons,
 		    COUNT(r.id) AS report
 		FROM db04.users u join db04.report_user r on u.id = r.user_id 
 		<where>

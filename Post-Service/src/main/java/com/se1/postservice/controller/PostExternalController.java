@@ -98,9 +98,15 @@ public class PostExternalController {
 	}
 
 	@PostMapping("/findByTitle")
-	public ResponseEntity<?> getByTitle(@RequestParam("title") String title, @RequestParam("offset") Integer offset,
+	public ResponseEntity<?> getByTitle(@RequestParam("title") String title, 
+			@RequestParam("offset") Integer offset,
+			@RequestParam(name = "topicTagId", required = false) Integer topicTagId,
 			@RequestHeader("user_detail") String userDetail) throws JsonMappingException, JsonProcessingException {
 
+		if(title == null || title.isEmpty()) {
+			title = " ";
+		}
+		
 		Map<String, Object> param = new HashMap<>();
 		param.put("title", title);
 		param.put("context", title);
@@ -109,7 +115,7 @@ public class PostExternalController {
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {
-			postService.findAllPostByCondition(detail.getId(), param, apiResponseEntity, offset);
+			postService.findAllPostByCondition(detail.getId(), param, apiResponseEntity, offset, topicTagId);
 		} catch (Exception e) {
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
