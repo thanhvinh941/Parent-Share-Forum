@@ -1,5 +1,6 @@
 package com.se1.userservice.domain.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -379,13 +380,22 @@ public class UserService {
 		String nameQuery = !request.getName().isEmpty() ? " u.name like '%" + request.getName() + "%'" : "";
 		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '%" + request.getEmail() +"%'" : "";
 
-		List<String> mergeQuery = List.of(nameQuery, emailQuery);
+		List<String> mergeQuery = new ArrayList<>();
+		if(!nameQuery.equals("")){
+			mergeQuery.add(nameQuery);
+		}
+	
+		if(!emailQuery.equals("")){
+			mergeQuery.add(emailQuery);
+		}
 
 		List<ReportUserDto> allUser = rUserMapper.findAllHaveReport(mergeQuery, offset);
 		List<ReportUserResponseDto> responseDtos = allUser.stream().map(rp->{
 			ReportUserResponseDto dto = new ReportUserResponseDto();
 			BeanUtils.copyProperties(rp, dto);
-			dto.setReasons(List.of(rp.getReasons().split(",")));
+			if(rp.getReasons() != null) {				
+				dto.setReasons(List.of(rp.getReasons().split(",")));
+			}
 			return dto;
 		}).collect(Collectors.toList());
 		

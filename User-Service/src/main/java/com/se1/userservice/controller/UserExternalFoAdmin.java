@@ -22,7 +22,9 @@ import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/user/external")
 @RequiredArgsConstructor
@@ -74,6 +76,7 @@ public class UserExternalFoAdmin {
 		try {
 			service.findAllReport(request, userDetail, offset, apiResponseEntity);
 		} catch (Exception e) {
+			log.error("Exception findAllReport {}", e);
 			apiResponseEntity.setData(null);
 			apiResponseEntity.setErrorList(List.of(e.getMessage()));
 			apiResponseEntity.setStatus(0);
