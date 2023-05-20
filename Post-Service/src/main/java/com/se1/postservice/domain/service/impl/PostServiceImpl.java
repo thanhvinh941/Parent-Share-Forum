@@ -93,8 +93,10 @@ public class PostServiceImpl implements PostService {
 			
 			if(detail.getIsExpert()) {
 				List<GetPostResponseDto.User> users = getUserSubscriber(postSave.getUserId());
-				for(GetPostResponseDto.User user : users) {
-					sendNotify(user, postSave);
+				if(users != null && users.size() > 0) {
+					for(GetPostResponseDto.User user : users) {
+						sendNotify(user, postSave);
+					}
 				}
 			}
 			
@@ -138,10 +140,10 @@ public class PostServiceImpl implements PostService {
 	
 	private List<GetPostResponseDto.User> getUserSubscriber(Long userId) {
 
-		MultiValueMap<String, String> request = new LinkedMultiValueMap<String, String>();
-		request.add("id", userId.toString());
+		MultiValueMap<String, Object> request = new LinkedMultiValueMap<String, Object>();
+		request.add("id", userId);
 
-		List<GetPostResponseDto.User> userChatParent = null;
+		List<GetPostResponseDto.User> userChatParent = new ArrayList();
 		try {
 			userChatParent = objectMapper.readValue(callApiService.callPostMenthodForParam(request,
 					CallApiService.USER_SERVICE, UrlConstant.SUBSCRIPER_GETALLSUB), new TypeReference<List<GetPostResponseDto.User>>() {});

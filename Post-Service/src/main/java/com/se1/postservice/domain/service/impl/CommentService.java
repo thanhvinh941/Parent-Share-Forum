@@ -123,8 +123,8 @@ public class CommentService {
 
 	private CreateCommentResponse.User getUSerComment(Long userId) {
 
-		MultiValueMap<String, String> request = new LinkedMultiValueMap<String, String>();
-		request.add("id", userId.toString());
+		MultiValueMap<String, Object> request = new LinkedMultiValueMap<String, Object>();
+		request.add("id", userId);
 
 		CreateCommentResponse.User userChatParent = null;
 		try {
