@@ -89,7 +89,8 @@ public class SystemListenerService {
 	public void processActionSystemChat(ChatDto chatDto) throws MalformedURLException, JsonProcessingException {
 		String topicId = chatDto.getTopicId();
 		Map<String, Object> mapChat = new HashMap<>();
-		mapChat.put("action", "");
+		mapChat.put("status", 1);
+		mapChat.put("error", null);
 		mapChat.put("data", chatDto);
 		websocketService.sendMessageChat(topicId, mapChat);
 		
