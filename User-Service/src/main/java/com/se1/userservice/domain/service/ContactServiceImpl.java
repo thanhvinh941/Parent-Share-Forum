@@ -22,7 +22,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.se1.userservice.domain.common.SCMConstant;
+import com.se1.userservice.domain.db.read.RChatBlockMapper;
 import com.se1.userservice.domain.db.read.RContactMapper;
+import com.se1.userservice.domain.model.ChatBlock;
 import com.se1.userservice.domain.model.Contact;
 import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
@@ -56,6 +58,8 @@ public class ContactServiceImpl {
 
 	private final RContactMapper contactMapper;
 
+	private final RChatBlockMapper chatBlockMapper;
+	
 	public void processCreate(Contact contactCreate, ApiResponseEntity apiResponseEntity) throws Exception {
 		User userReciver = userRepository.findById(contactCreate.getUserReciverId()).orElse(null);
 		if (userReciver == null) {
@@ -258,6 +262,19 @@ public class ContactServiceImpl {
 			});
 			Collections.reverse(chats);
 			contactDtoForChat.setChats(chats);
+			
+			String conditionUserBlockStr = String.format(" user_block_id = %d AND topic_id = '%s'", userId, cd.getTopicContactId());
+			ChatBlock userBlock = chatBlockMapper.selectByConditionStr(conditionUserBlockStr, null, null, null);
+			if(Objects.isNull(userBlock)) {
+				contactDtoForChat.setBlock(true);
+			}
+			
+			String conditionUserBlockedStr = String.format(" user_blocked_id = %d AND topic_id = '%s'", userId, cd.getTopicContactId());
+			ChatBlock userBlocked = chatBlockMapper.selectByConditionStr(conditionUserBlockedStr, null, null, null);
+			if(Objects.isNull(userBlocked)) {
+				contactDtoForChat.setBlocked(true);
+			}
+			
 			return contactDtoForChat;
 		}).filter(c -> c.getUserFriend() != null).collect(Collectors.toList());
 		Collections.sort(contactDtoForChats, new Comparator<ContactDtoForChat>() {

@@ -22,12 +22,12 @@ import lombok.RequiredArgsConstructor;
 public class NotifyController {
 
 	private final NotifyService notifyService;
-	private final ApiResponseEntity apiResponseEntity;
 	private final ObjectMapper objectMapper;
 	
 	
 	@PostMapping("/findByUserId")
 	public ResponseEntity<?> findById(@RequestHeader("user_detail") String userDetailHeader){
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -43,6 +43,7 @@ public class NotifyController {
 	
 	@PostMapping("/deleteAll")
 	public ResponseEntity<?> deleteAllByUserId(@RequestHeader("user_detail") String userDetailHeader){
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -58,6 +59,7 @@ public class NotifyController {
 	
 	@PostMapping("/updateAllStatus")
 	public ResponseEntity<?> updateAllByUserId(@RequestHeader("user_detail") String userDetailHeader){
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -73,6 +75,7 @@ public class NotifyController {
 	
 	@PostMapping("/updateStatus")
 	public ResponseEntity<?> updateAllByUserId(@RequestParam("notifyId") Long notifyId){
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			notifyService.processUpdate(notifyId, apiResponseEntity);
 		} catch (Exception e) {

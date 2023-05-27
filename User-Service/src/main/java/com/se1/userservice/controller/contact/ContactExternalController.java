@@ -18,26 +18,21 @@ import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.service.ContactServiceImpl;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/contact/external")
+@RequiredArgsConstructor
 public class ContactExternalController {
-
-	public ContactExternalController(ObjectMapper objectMapper, ContactServiceImpl contactService,
-			ApiResponseEntity apiResponseEntity) {
-		super();
-		this.objectMapper = objectMapper;
-		this.contactService = contactService;
-		this.apiResponseEntity = apiResponseEntity;
-	}
 
 	private final ObjectMapper objectMapper;
 	private final ContactServiceImpl contactService;
-	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/create")
 	public ResponseEntity<?> createContact(@RequestParam("reciver_id") long userReciverId,
 			@RequestParam(name = "action", required = false) String action,
 			@RequestHeader("user_detail") String userDetailHeader) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			int status = 0;
@@ -71,6 +66,7 @@ public class ContactExternalController {
 	public ResponseEntity<?> updateContact(@RequestParam("user_id") long userId,
 			@RequestParam(name = "action", required = false) String action,
 			@RequestHeader("user_detail") String userDetailHeader) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);

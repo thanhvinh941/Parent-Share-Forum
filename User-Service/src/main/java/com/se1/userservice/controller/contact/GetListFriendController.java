@@ -21,10 +21,10 @@ import lombok.RequiredArgsConstructor;
 public class GetListFriendController {
 	private final ObjectMapper objectMapper;
 	private final ContactServiceImpl contactService;
-	private final ApiResponseEntity apiResponseEntity;
 	
 	@PostMapping("/getListFriend")
 	public ResponseEntity<?> getListFriend(@RequestHeader("user_detail") String userDetailHeader) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);

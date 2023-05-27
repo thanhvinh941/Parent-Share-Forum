@@ -24,11 +24,11 @@ import lombok.RequiredArgsConstructor;
 public class UserNoAuthenController {
 	
 	private final UserService service;
-	private final ApiResponseEntity apiResponseEntity;
 	
 	@PostMapping("/findAllExpert")
 	public ResponseEntity<?> findAllExpert(
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = new UserDetail();
 		userDetail.setId(new Long(0));
 		try {

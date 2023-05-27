@@ -35,11 +35,11 @@ public class UserInternalController {
 
 	private final UserRepository repository;
 
-	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/findAllExpert")
 	public ResponseEntity<?> findAllExpert(@RequestParam("offset") Integer offset)
 			throws JsonMappingException, JsonProcessingException {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			Object response = service.findAllExpert(null, offset);
 			apiResponseEntity.setData(response);
@@ -71,7 +71,7 @@ public class UserInternalController {
 
 	@PostMapping("/findByEmail")
 	public ResponseEntity<?> findByEmail(@RequestParam("email") String email) throws Exception {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.processFindUserByEmail(email, apiResponseEntity);
 		} catch (Exception e) {
@@ -84,7 +84,7 @@ public class UserInternalController {
 
 	@PostMapping("/findById")
 	public ResponseEntity<?> findById(@RequestParam("id") Long id) throws Exception {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			Object response = service.processFindUserById(null, id);
 			apiResponseEntity.setData(response);
@@ -112,6 +112,7 @@ public class UserInternalController {
 
 	@PostMapping("/updateStatus")
 	public ResponseEntity<?> updateStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.processUpdateStatus(id, status, apiResponseEntity);
 		} catch (Exception e) {
@@ -124,6 +125,7 @@ public class UserInternalController {
 
 	@PostMapping("/updateEmailStatus")
 	public ResponseEntity<?> updateEmailStatus(@RequestParam("id") Long id) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			Object response = service.processUpdateEmailStatus(id);
 			apiResponseEntity.setData(response);
@@ -179,6 +181,7 @@ public class UserInternalController {
 	}
 
 	private ResponseEntity<?> badResponse(List<String> errorMessage) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		apiResponseEntity.setData(null);
 		apiResponseEntity.setErrorList(errorMessage);
 		apiResponseEntity.setStatus(0);
@@ -186,6 +189,7 @@ public class UserInternalController {
 	}
 
 	private ResponseEntity<?> okResponse(Object data, List<String> errorMessage) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		apiResponseEntity.setData(data);
 		apiResponseEntity.setErrorList(errorMessage);
 		apiResponseEntity.setStatus(1);

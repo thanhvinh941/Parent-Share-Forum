@@ -58,7 +58,6 @@ public class AuthController {
 	private final VerifyService verifyService;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenProvider tokenProvider;
-	private final ApiResponseEntity apiResponseEntity;
 	private final AuthenticationManager authenticationManager;
 
 	@Value("${front-end.url.login}")
@@ -66,6 +65,7 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+		
 		String email = loginRequest.getEmail();
 		try {
 
@@ -206,6 +206,7 @@ public class AuthController {
 	}
 
 	private ResponseEntity<?> badResponse(List<String> errorMessage) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		apiResponseEntity.setData(null);
 		apiResponseEntity.setErrorList(errorMessage);
 		apiResponseEntity.setStatus(0);
@@ -213,6 +214,7 @@ public class AuthController {
 	}
 
 	private ResponseEntity<?> okResponse(Object data) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		apiResponseEntity.setData(data);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);

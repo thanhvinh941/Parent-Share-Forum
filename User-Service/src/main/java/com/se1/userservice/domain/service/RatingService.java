@@ -5,16 +5,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.se1.userservice.domain.model.Rating;
 import com.se1.userservice.domain.model.User;
-import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.request.DoRatingRequest;
 import com.se1.userservice.domain.repository.RatingRepository;
@@ -29,7 +28,7 @@ public class RatingService {
 	private final RatingRepository ratingRepository;
 	private final UserRepository userRepository;
 	private final ObjectMapper objectMapper;
-
+	
 	Map<String, Object> getRatingByUserId(Long userId, Long currentId) {
 		List<Rating> expertRatings = ratingRepository.findByUserRatedId(userId);
 		if (expertRatings != null && expertRatings.size() > 0) {
@@ -88,7 +87,7 @@ public class RatingService {
 		List<Rating> ratings = ratingRepository.findByUserRatedId(expertid);
 		List<Long> userRatingIds = ratings.stream().map(m -> m.getUserRatingId()).collect(Collectors.toList());
 		Iterable<User> userRatings = userRepository.findAllById(userRatingIds);
-		List<Map<String, Object>> response = ImmutableList.copyOf(userRatings).stream().map(m -> {
+		List<Map<String, Object>> response = StreamSupport.stream(userRatings.spliterator(), false).map(m -> {
 			UserDetail detail = new UserDetail();
 			BeanUtils.copyProperties(m, detail);
 			Map<String, Object> map = objectMapper.convertValue(detail, new TypeReference<Map<String, Object>>() {

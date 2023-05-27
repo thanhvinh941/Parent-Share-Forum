@@ -27,13 +27,12 @@ import lombok.RequiredArgsConstructor;
 public class TopicTagInternalController {
 
 	private final TopicTagService topicTagService;
-	private final ApiResponseEntity apiResponseEntity;
 	private final ObjectMapper objectMapper;
 	
 	@RequestMapping("/create")
 	public ResponseEntity<?> savePropertyTag(@RequestBody CreateTopicTagRequest topicTagRequest,
 			@RequestHeader("user_detail") String userDetailHeader) throws JsonMappingException, JsonProcessingException{
-		
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -51,7 +50,7 @@ public class TopicTagInternalController {
 	@PostMapping("update")
 	public ResponseEntity<?> update(@RequestBody UpdateTopicTagRequest topicTagRequest,
 			@RequestHeader("user_detail") String userDetailHeader){
-		
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
@@ -69,6 +68,7 @@ public class TopicTagInternalController {
 	@RequestMapping("/getAllTopicTag")
 	public ResponseEntity<?> getAllTopicTag(@RequestParam("tag-name") String tagName,
 			@RequestHeader("user_detail") String userDetailHeader) throws JsonMappingException, JsonProcessingException{
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			topicTagService.processGetAllTopicTag(tagName, apiResponseEntity);
 		} catch (Exception e) {

@@ -22,12 +22,11 @@ import lombok.RequiredArgsConstructor;
 public class PostNoAuthenController {
 
 	private final PostService postService;
-	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/findAllPost")
 	public ResponseEntity<?> findAllPost(@RequestParam("offset") Integer offset)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			postService.findAllPost(null, apiResponseEntity, offset);
 		} catch (Exception e) {
@@ -42,7 +41,7 @@ public class PostNoAuthenController {
 	public ResponseEntity<?> findPostAllMost() throws JsonMappingException, JsonProcessingException {
 		UserDetail detail = new UserDetail();
 		detail.setId(new Long(0));
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			postService.findPostAllMost(detail.getId(), apiResponseEntity);
 		} catch (Exception e) {

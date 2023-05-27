@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubscribeExternalController {
 
-	private final ApiResponseEntity apiResponseEntity;
 
 	private final ObjectMapper objectMapper;
 
@@ -33,7 +32,7 @@ public class SubscribeExternalController {
 	public ResponseEntity<?> doSub(@RequestParam("expertId") Long expertid,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
@@ -51,7 +50,7 @@ public class SubscribeExternalController {
 	public ResponseEntity<?> getAllSub(
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {

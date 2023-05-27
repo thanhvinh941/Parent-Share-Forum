@@ -17,6 +17,8 @@ public class ContactDtoForChat {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date createAt;
     private List<Chat> chats;
+    private boolean isBlocked;
+    private boolean isBlock;
     
     @Data
     public static class Chat{

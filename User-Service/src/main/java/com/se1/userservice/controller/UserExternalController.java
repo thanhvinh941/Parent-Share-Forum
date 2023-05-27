@@ -25,13 +25,12 @@ import lombok.RequiredArgsConstructor;
 public class UserExternalController {
 
 	private final UserService service;
-	private final ApiResponseEntity apiResponseEntity;
 	private final ObjectMapper objectMapper;
 
 	@PostMapping("/findById")
 	public ResponseEntity<?> findById(@RequestHeader("user_detail") String userDetailHeader,
 			@RequestParam("id") Long id) throws Exception {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
@@ -51,7 +50,7 @@ public class UserExternalController {
 	public ResponseEntity<?> findByName(@RequestParam("name") String name, @RequestParam("offset") Integer offset,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
@@ -70,6 +69,7 @@ public class UserExternalController {
 	@PostMapping("/findAllExpert")
 	public ResponseEntity<?> findAllExpert(@RequestHeader("user_detail") String userDetailHeader,
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 		try {
 			Object response = service.findAllExpert(userDetail, offset);
@@ -87,6 +87,7 @@ public class UserExternalController {
 	@PostMapping("/report/{id}")
 	public ResponseEntity<?> report(@PathVariable("id") Long id,@RequestParam(name = "reason", required = false) String reason, @RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {

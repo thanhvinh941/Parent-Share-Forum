@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class UserExternalFoAdmin {
 	
 	private final UserService service;
-	private final ApiResponseEntity apiResponseEntity;
 	private final ObjectMapper objectMapper;
 	
 	@PostMapping("/create")
@@ -39,7 +38,7 @@ public class UserExternalFoAdmin {
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.processcreate(request, userDetail, apiResponseEntity);
 		} catch (Exception e) {
@@ -55,6 +54,7 @@ public class UserExternalFoAdmin {
 			@RequestHeader("user_detail") String userDetailHeader, @RequestParam("offset") Integer offset)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			Object response = service.findAll(request, userDetail, offset);
 			apiResponseEntity.setData(response);
@@ -73,6 +73,7 @@ public class UserExternalFoAdmin {
 			@RequestHeader("user_detail") String userDetailHeader, @RequestParam("offset") Integer offset)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.findAllReport(request, userDetail, offset, apiResponseEntity);
 		} catch (Exception e) {
@@ -89,7 +90,7 @@ public class UserExternalFoAdmin {
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.update(request, userDetail, apiResponseEntity);
 		} catch (Exception e) {
@@ -105,7 +106,7 @@ public class UserExternalFoAdmin {
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			service.delete(id, userDetail, apiResponseEntity);
 		} catch (Exception e) {

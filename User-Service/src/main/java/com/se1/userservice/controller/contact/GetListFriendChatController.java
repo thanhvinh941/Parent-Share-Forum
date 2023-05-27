@@ -21,10 +21,10 @@ import lombok.RequiredArgsConstructor;
 public class GetListFriendChatController {
 	private final ObjectMapper objectMapper;
 	private final ContactServiceImpl contactService;
-	private final ApiResponseEntity apiResponseEntity;
 	
 	@PostMapping("/getListFriendChat")
 	public ResponseEntity<?> getListFriendChat(@RequestHeader("user_detail") String userDetailHeader) {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail;
 		try {
 			userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);

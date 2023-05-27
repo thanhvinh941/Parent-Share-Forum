@@ -34,11 +34,11 @@ public class PostExternalController {
 
 	private final ObjectMapper objectMapper;
 	private final LikePostService likePostService;
-	private final ApiResponseEntity apiResponseEntity;
 
 	@PostMapping("/findAllPost")
 	public ResponseEntity<?> findAllPost(@RequestHeader("user_detail") String userDetail,
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {
@@ -54,7 +54,7 @@ public class PostExternalController {
 	@PostMapping("/findAllPostByUserId")
 	public ResponseEntity<?> findAllPostByUserId(@RequestParam("user-id") Long userId,
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			postService.findAllPostByUserId(userId, apiResponseEntity, offset);
 		} catch (Exception e) {
@@ -69,7 +69,7 @@ public class PostExternalController {
 	public ResponseEntity<?> getAllPost(@RequestHeader("user_detail") String userDetail,
 			@RequestParam("offset") Integer offset) throws JsonMappingException, JsonProcessingException {
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			postService.findAllPostByUserId(detail.getId(), apiResponseEntity, offset);
 		} catch (Exception e) {
@@ -85,7 +85,7 @@ public class PostExternalController {
 			throws JsonMappingException, JsonProcessingException {
 
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {
 			postService.processSavePost(postRequest, detail, apiResponseEntity);
 		} catch (Exception e) {
@@ -102,7 +102,7 @@ public class PostExternalController {
 			@RequestParam("offset") Integer offset,
 			@RequestParam(name = "topicTagId", required = false) Integer topicTagId,
 			@RequestHeader("user_detail") String userDetail) throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		if(title == null || title.isEmpty()) {
 			title = " ";
 		}
@@ -128,7 +128,7 @@ public class PostExternalController {
 	@PostMapping("/findById")
 	public ResponseEntity<?> findById(@RequestParam("postId") Long id, @RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {
@@ -145,7 +145,7 @@ public class PostExternalController {
 	@PostMapping("/findPostAllMost")
 	public ResponseEntity<?> findPostAllMost(@RequestHeader("user_detail") String userDetail)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {
@@ -162,7 +162,7 @@ public class PostExternalController {
 	@PostMapping("/{postId}/like")
 	public ResponseEntity<?> likePost(@PathVariable("postId") Long postId,
 			@RequestHeader("user_detail") String userDetail) throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 		try {
 			likePostService.likePost(postId, apiResponseEntity, detail);
@@ -178,7 +178,7 @@ public class PostExternalController {
 	@PostMapping("/{postId}/dislike")
 	public ResponseEntity<?> dislikePost(@PathVariable("postId") Long postId,
 			@RequestHeader("user_detail") String userDetail) throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 		try {
 			likePostService.dislikePost(postId, apiResponseEntity, detail);
@@ -194,7 +194,7 @@ public class PostExternalController {
 	@PostMapping("/update")
 	public ResponseEntity<?> update(@RequestHeader("user_detail") String userDetail, @RequestBody UpdatePostRequest postRequest)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {
@@ -211,7 +211,7 @@ public class PostExternalController {
 	@PostMapping("/delete")
 	public ResponseEntity<?> delete(@RequestHeader("user_detail") String userDetail, @RequestParam("postId") Long postId)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail detail = objectMapper.readValue(userDetail, UserDetail.class);
 
 		try {

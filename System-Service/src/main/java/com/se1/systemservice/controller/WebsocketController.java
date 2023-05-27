@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.se1.systemservice.config.MqConfig;
+import com.se1.systemservice.config.UrlConstant;
 import com.se1.systemservice.domain.common.utils.CommonUtils;
 import com.se1.systemservice.domain.payload.ApiRequestEntity;
 import com.se1.systemservice.domain.payload.ChatMqUpdateRequest;
@@ -54,11 +55,11 @@ public class WebsocketController {
 		ApiRequestEntity request = new ApiRequestEntity();
 		
 		StringBuffer conditionStr = new StringBuffer();
-		conditionStr.append(String.format(" topic_id = %d", topicId));
-		conditionStr.append(String.format(" AND user_blocked_id = %d", userId));
+		conditionStr.append(String.format(" topic_id = '%s'", topicId));
+		conditionStr.append(String.format(" AND user_blocked_id = %s", userId));
 		request.setConditionStr(conditionStr.toString());
 		
-		ChatBlockDto chatBlockDto = callApiService2.callPostMenthodForObject(request, topicId, userId, new TypeReference<ChatBlockDto>() {});
+		ChatBlockDto chatBlockDto = callApiService2.callPostMenthodForObject(request, CallApiService2.USER_SERVICE, UrlConstant.USER_GET_CHAT_BLOCK, new TypeReference<ChatBlockDto>() {});
 		if(Objects.isNull(chatBlockDto)) {
 			return true;
 		}

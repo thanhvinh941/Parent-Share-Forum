@@ -19,42 +19,45 @@ public class GatewayConfig {
 		return builder.routes()
 				.route("user-service",
 						r -> r.path("/user/**").filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("author-service",
 						r -> r.path("/author-item/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("group-role-service",
 						r -> r.path("/group-role/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("contact-service",
 						r -> r.path("/contact/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("rating-service",
 						r -> r.path("/rating/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("subscriber-service",
 						r -> r.path("/subscriber/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
+								.uri("http://localhost:8088"))
 				.route("verification-service",
 						r -> r.path("/verify/**")
 								.filters(f -> f.rewritePath("/(?<path>.*)", "/$\\{path}").filter(filter))
-								.uri("lb://user-service"))
-				.route("auth-service", r -> r.path("/auth/**").filters(f -> f.filter(filter)).uri("lb://auth-service"))
-				.route("post-service", r -> r.path("/post/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+								.uri("http://localhost:8088"))
+				.route("auth-service",
+						r -> r.path("/auth/**").filters(f -> f.filter(filter)).uri("http://localhost:8089"))
+				.route("post-service",
+						r -> r.path("/post/**").filters(f -> f.filter(filter)).uri("http://localhost:8082"))
 				.route("topic-tag-service",
-						r -> r.path("/topic-tag/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+						r -> r.path("/topic-tag/**").filters(f -> f.filter(filter)).uri("http://localhost:8082"))
 				.route("comment-service",
-						r -> r.path("/comment/**").filters(f -> f.filter(filter)).uri("lb://post-service"))
+						r -> r.path("/comment/**").filters(f -> f.filter(filter)).uri("http://localhost:8082"))
 				.route("system-service",
-						r -> r.path("/system/**").filters(f -> f.filter(filter)).uri("lb://system-service"))
+						r -> r.path("/system/**").filters(f -> f.filter(filter)).uri("http://localhost:8081"))
 				.route("notify-service",
-						r -> r.path("/notify/**").filters(f -> f.filter(filter)).uri("lb://notify-service"))
-				.route("chat-service", r -> r.path("/chat/**").filters(f -> f.filter(filter)).uri("lb://chat-service"))
+						r -> r.path("/notify/**").filters(f -> f.filter(filter)).uri("http://localhost:8083"))
+				.route("chat-service",
+						r -> r.path("/chat/**").filters(f -> f.filter(filter)).uri("http://localhost:8084"))
 				.build();
 	}
 

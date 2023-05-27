@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RatingExternalController {
 
-	private final ApiResponseEntity apiResponseEntity;
 	private final ObjectMapper objectMapper;
 	private final RatingService ratingService;
 	
@@ -33,7 +32,7 @@ public class RatingExternalController {
 	public ResponseEntity<?> doRating(@RequestBody DoRatingRequest request,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
@@ -54,7 +53,7 @@ public class RatingExternalController {
 	public ResponseEntity<?> getUesrRating(@RequestParam("expertId") Long expertid,
 			@RequestHeader("user_detail") String userDetailHeader)
 			throws JsonMappingException, JsonProcessingException {
-
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		UserDetail userDetail = objectMapper.readValue(userDetailHeader, UserDetail.class);
 
 		try {
