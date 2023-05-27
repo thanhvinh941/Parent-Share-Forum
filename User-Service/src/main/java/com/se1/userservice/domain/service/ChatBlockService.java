@@ -46,7 +46,7 @@ public class ChatBlockService {
 
 	public ChatBlock deleteChatBlock(ChatBlockRequest request, Long id) {
 		StringBuffer conditionStr = new StringBuffer();
-		conditionStr.append(String.format("topic_id = %s", request.getTopicId()));
+		conditionStr.append(String.format("topic_id = '%s'", request.getTopicId()));
 		conditionStr.append(String.format(" AND user_blocked_id = %d", request.getUserBlockedId()));
 		conditionStr.append(String.format(" AND user_block_id = %d", id));
 		

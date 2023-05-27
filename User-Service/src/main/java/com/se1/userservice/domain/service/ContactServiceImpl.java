@@ -265,13 +265,13 @@ public class ContactServiceImpl {
 			
 			String conditionUserBlockStr = String.format(" user_block_id = %d AND topic_id = '%s'", userId, cd.getTopicContactId());
 			ChatBlock userBlock = chatBlockMapper.selectByConditionStr(conditionUserBlockStr, null, null, null);
-			if(Objects.isNull(userBlock)) {
+			if(!Objects.isNull(userBlock)) {
 				contactDtoForChat.setBlock(true);
 			}
 			
 			String conditionUserBlockedStr = String.format(" user_blocked_id = %d AND topic_id = '%s'", userId, cd.getTopicContactId());
 			ChatBlock userBlocked = chatBlockMapper.selectByConditionStr(conditionUserBlockedStr, null, null, null);
-			if(Objects.isNull(userBlocked)) {
+			if(!Objects.isNull(userBlocked)) {
 				contactDtoForChat.setBlocked(true);
 			}
 			
