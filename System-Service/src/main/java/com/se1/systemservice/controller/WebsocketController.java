@@ -46,7 +46,7 @@ public class WebsocketController {
 			Map<String, Object> mapChat = new HashMap<>();
 			mapChat.put("status", 0);
 			mapChat.put("error", "chat-block");
-			mapChat.put("data", null);
+			mapChat.put("data", request.getUserId());
 			websocketService.sendMessageChat(topicId, mapChat);
 		}
 	}
