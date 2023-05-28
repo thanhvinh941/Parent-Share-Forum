@@ -1,5 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/db02
-    username: root
-    password: Zaq12wsx1234

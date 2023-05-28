@@ -47,8 +47,6 @@ public class MailService {
     		helper.setTo(mailRequest.getTo());
     		helper.setSubject(mail.getSubject());
     				
-        	
-            
             String body = mail.getBody();
             
             List<String> listKey = new ArrayList<String>(mailRequest.getData().keySet());
