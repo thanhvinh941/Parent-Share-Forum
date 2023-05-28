@@ -9,25 +9,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.se1.userservice.domain.model.ChatBlock;
+import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.payload.GetApiRequestEntity;
+import com.se1.userservice.domain.payload.UpdateApiRequestEntity;
+import com.se1.userservice.domain.payload.request.UpdateUserRequest;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
-import com.se1.userservice.domain.service.ChatBlockService;
+import com.se1.userservice.domain.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/contact/internal")
-public class GetChatBlockController {
+@RequestMapping("/user/internal")
+public class GetUserController {
 
-	private final ChatBlockService chatBlockService;
-
-	@PostMapping("/chat-block")
-	public ResponseEntity<ApiResponseEntity> getChatBlock(@RequestBody GetApiRequestEntity request){
+	private final UserService userService;
+	
+	@PostMapping("/getUser")
+	public ResponseEntity<ApiResponseEntity> getUser(@RequestBody GetApiRequestEntity request){
 		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
 		try {			
-			ChatBlock chatBlock = chatBlockService.getChatBlock(request);
-			return okResponse(chatBlock, apiResponseEntity);
+			List<User> user = userService.getUser(request);
+			return okResponse(user, apiResponseEntity);
+		} catch (Exception e) {
+			return badResponse(e.getMessage() ,apiResponseEntity);
+		}
+	}
+	
+	@PostMapping("/updateUser")
+	public ResponseEntity<ApiResponseEntity> updateUser(@RequestBody UpdateApiRequestEntity request){
+		ApiResponseEntity apiResponseEntity = new ApiResponseEntity();
+		try {			
+			Boolean isUpdate = userService.updateUser(request);
+			return okResponse(isUpdate, apiResponseEntity);
 		} catch (Exception e) {
 			return badResponse(e.getMessage() ,apiResponseEntity);
 		}

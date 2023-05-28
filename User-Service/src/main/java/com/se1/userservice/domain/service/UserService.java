@@ -16,6 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.se1.userservice.domain.common.SCMConstant;
 import com.se1.userservice.domain.db.dto.ReportUserDto;
@@ -30,7 +33,9 @@ import com.se1.userservice.domain.model.User;
 import com.se1.userservice.domain.model.UserRole;
 import com.se1.userservice.domain.payload.ApiResponseEntity;
 import com.se1.userservice.domain.payload.FindAllReportRequest;
+import com.se1.userservice.domain.payload.GetApiRequestEntity;
 import com.se1.userservice.domain.payload.ReportUserResponseDto;
+import com.se1.userservice.domain.payload.UpdateApiRequestEntity;
 import com.se1.userservice.domain.payload.UserDetail;
 import com.se1.userservice.domain.payload.UserResponseDto;
 import com.se1.userservice.domain.payload.request.CreateUserRequest;
@@ -44,7 +49,9 @@ import com.se1.userservice.domain.repository.UserRepository;
 import com.se1.userservice.domain.restClient.SystemServiceRestTemplateClient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -58,6 +65,7 @@ public class UserService {
 	private final ReportUserRepository reportUserRepository;
 	private final ContactRepository contactRepository;
 	private final SubscriberRepository subscriberRepository;
+	private final PlatformTransactionManager transactionManager;
 
 	public User save(User user) throws Exception {
 
@@ -251,28 +259,22 @@ public class UserService {
 
 	public Object processFindByName(Long currentUserId, String name, Integer offset) {
 		List<User> users = repository.findByName(name, currentUserId);
-		users = users.stream()
-				.filter(u -> !u.getRole().equals(UserRole.admin))
-				.filter(u -> !u.getId().equals(currentUserId))
-				.collect(Collectors.toList());
-		
+		users = users.stream().filter(u -> !u.getRole().equals(UserRole.admin))
+				.filter(u -> !u.getId().equals(currentUserId)).collect(Collectors.toList());
+
 		Collections.sort(users, new Comparator<User>() {
-			
+
 			@Override
 			public int compare(User o1, User o2) {
-				
-				Integer u1Sort = o1.getIsExpert() != null ? 
-						(o1.getIsExpert() ? 0 : 1) 
-						: 1;
-				
-				Integer u2Sort = o2.getIsExpert() != null ? 
-						(o2.getIsExpert() ? 0 : 1) 
-						: 1;
-				
+
+				Integer u1Sort = o1.getIsExpert() != null ? (o1.getIsExpert() ? 0 : 1) : 1;
+
+				Integer u2Sort = o2.getIsExpert() != null ? (o2.getIsExpert() ? 0 : 1) : 1;
+
 				return u1Sort.compareTo(u2Sort);
 			};
 		});
-		
+
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
 					Double rating = 0.0;
@@ -378,27 +380,27 @@ public class UserService {
 	public void findAllReport(FindAllReportRequest request, UserDetail userDetail, Integer offset,
 			ApiResponseEntity apiResponseEntity) {
 		String nameQuery = !request.getName().isEmpty() ? " u.name like '%" + request.getName() + "%'" : "";
-		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '%" + request.getEmail() +"%'" : "";
+		String emailQuery = !request.getEmail().isEmpty() ? " u.email like '%" + request.getEmail() + "%'" : "";
 
 		List<String> mergeQuery = new ArrayList<>();
-		if(!nameQuery.equals("")){
+		if (!nameQuery.equals("")) {
 			mergeQuery.add(nameQuery);
 		}
-	
-		if(!emailQuery.equals("")){
+
+		if (!emailQuery.equals("")) {
 			mergeQuery.add(emailQuery);
 		}
 
 		List<ReportUserDto> allUser = rUserMapper.findAllHaveReport(mergeQuery, offset);
-		List<ReportUserResponseDto> responseDtos = allUser.stream().map(rp->{
+		List<ReportUserResponseDto> responseDtos = allUser.stream().map(rp -> {
 			ReportUserResponseDto dto = new ReportUserResponseDto();
 			BeanUtils.copyProperties(rp, dto);
-			if(rp.getReasons() != null) {				
+			if (rp.getReasons() != null) {
 				dto.setReasons(List.of(rp.getReasons().split(",")));
 			}
 			return dto;
 		}).collect(Collectors.toList());
-		
+
 		apiResponseEntity.setData(responseDtos);
 		apiResponseEntity.setErrorList(null);
 		apiResponseEntity.setStatus(1);
@@ -458,7 +460,7 @@ public class UserService {
 	public Object findAllExpert(UserDetail userDetail, Integer offset) {
 		@SuppressWarnings("removal")
 		Long userDetailId = userDetail != null ? userDetail.getId() : Long.valueOf("0");
-		
+
 		List<User> users = repository.findAllByRole(UserRole.expert);
 		List<UserResponseForClient> responseList = users.stream().filter(ul -> ul.getEmailVerified() && !ul.getDelFlg())
 				.map(ul -> {
@@ -467,10 +469,8 @@ public class UserService {
 					Boolean isRate = false;
 					if (ul.getIsExpert()) {
 						rating = (Double) ratingService.getRatingByUserId(ul.getId(), userDetailId).get("rating");
-						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetailId)
-								.get("count");
-						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetailId)
-								.get("isRate");
+						ratingCount = (Integer) ratingService.getRatingByUserId(ul.getId(), userDetailId).get("count");
+						isRate = (Boolean) ratingService.getRatingByUserId(ul.getId(), userDetailId).get("isRate");
 					}
 					UserResponseForClient userResponseDto = convertUserEntityToUserResponseForClient(ul, rating,
 							userDetailId, ratingCount, isRate);
@@ -492,7 +492,7 @@ public class UserService {
 		ReportUser reportUser = new ReportUser();
 		reportUser.setUserId(id);
 		reportUser.setReason(reason);
-		
+
 		reportUserRepository.save(reportUser);
 		apiResponseEntity.setData(true);
 		apiResponseEntity.setErrorList(null);
@@ -523,6 +523,47 @@ public class UserService {
 
 	public Object processUpdateEmailStatus(Long id) {
 		wUserMapper.updateEmailStatus(id);
+		return true;
+	}
+
+	public List<User> getUser(GetApiRequestEntity request) throws Exception {
+		List<User> users = new ArrayList<>();
+		try {
+			users = rUserMapper.selectByConditionStr(request.getConditionStr(), request.getOrder(), request.getLimit(),
+					request.getOffset());
+		} catch (Exception e) {
+			log.error("Call Internal API ERROR getUser ", e);
+			throw new Exception(e.getMessage());
+		}
+
+		return users;
+	}
+
+	public Boolean updateUser(UpdateApiRequestEntity request) {
+		TransactionStatus txStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
+		try {
+			wUserMapper.updateUser(request.getRecordStr(), request.getConditionStr(), request.getOrder(),
+					request.getLimit(), request.getOffset());
+		} catch (Exception e) {
+			transactionManager.rollback(txStatus);
+			log.error("Call Internal API ERROR updateUser ", e);
+			throw e;
+		}
+		transactionManager.commit(txStatus);
+		return true;
+	}
+	
+	public Boolean insertUser(UpdateApiRequestEntity request) {
+		TransactionStatus txStatus = transactionManager.getTransaction(new DefaultTransactionDefinition());
+		try {
+			wUserMapper.insertUser(request.getRecordStr(), request.getConditionStr(), request.getOrder(),
+					request.getLimit(), request.getOffset());
+		} catch (Exception e) {
+			transactionManager.rollback(txStatus);
+			log.error("Call Internal API ERROR updateUser ", e);
+			throw e;
+		}
+		transactionManager.commit(txStatus);
 		return true;
 	}
 }

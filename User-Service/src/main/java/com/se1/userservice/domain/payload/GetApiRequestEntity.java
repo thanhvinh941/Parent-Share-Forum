@@ -1,11 +1,11 @@
-package com.se1.userservice.domain.model;
+package com.se1.userservice.domain.payload;
 
 import lombok.Data;
 
 @Data
-public class ApiRequestEntity {
+public class GetApiRequestEntity {
 	private String conditionStr;
 	private String order;
-	private Integer offet;
+	private Integer offset;
 	private Integer limit;
 }

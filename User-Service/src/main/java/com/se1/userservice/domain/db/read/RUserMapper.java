@@ -17,4 +17,7 @@ public interface RUserMapper {
 
 	List<ReportUserDto> findAllHaveReport(@Param("conditions") List<String> mapRequest, @Param("offset") Integer offset);
 
+	List<User> selectByConditionStr(@Param("conditionStr") String conditionStr, 
+			@Param("order") String order, @Param("limit") Integer limit, @Param("offset")  Integer offset);
+
 }

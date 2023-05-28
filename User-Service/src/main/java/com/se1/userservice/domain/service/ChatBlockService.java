@@ -4,8 +4,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.se1.userservice.domain.db.read.RChatBlockMapper;
-import com.se1.userservice.domain.model.ApiRequestEntity;
 import com.se1.userservice.domain.model.ChatBlock;
+import com.se1.userservice.domain.payload.GetApiRequestEntity;
 import com.se1.userservice.domain.payload.request.ChatBlockRequest;
 import com.se1.userservice.domain.repository.ChatBlockRepository;
 
@@ -20,11 +20,11 @@ public class ChatBlockService {
 	private final RChatBlockMapper rChatBlockMapper;
 	private final ChatBlockRepository chatBlockRepository;
 	
-	public ChatBlock getChatBlock(ApiRequestEntity request) throws Exception {
+	public ChatBlock getChatBlock(GetApiRequestEntity request) throws Exception {
 		ChatBlock chatBlock = null;
 		try {			
 			chatBlock = rChatBlockMapper.selectByConditionStr(request.getConditionStr(),
-					request.getOrder(), request.getLimit(), request.getOffet());
+					request.getOrder(), request.getLimit(), request.getOffset());
 		} catch (Exception e) {
 			log.error("Call Internal API ERROR getChatBlock ", e);
 			throw new Exception(e.getMessage());
@@ -34,7 +34,8 @@ public class ChatBlockService {
 
 	public ChatBlock createChatBlock(ChatBlockRequest request, Long id) {
 		ChatBlock chatBlockRequest = new ChatBlock();
-		BeanUtils.copyProperties(request, chatBlockRequest);
+		chatBlockRequest.setTopicId(request.getTopicId());
+		chatBlockRequest.setUserBlockedId(request.getUserBlockedId());
 		chatBlockRequest.setUserBlockId(id);
 		
 		try {

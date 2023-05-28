@@ -10,4 +10,16 @@ public interface WUserMapper {
 	
 	void updateEmailStatus(@Param("userId") Long userId);
 
+	void updateUser(@Param("recordStr") String recordStr,
+			@Param("conditionStr") String conditionStr,
+			@Param("order") String order, 
+			@Param("limit") Integer limit, 
+			@Param("offset") Integer offset);
+
+	void insertUser(@Param("recordStr") String recordStr,
+			@Param("conditionStr") String conditionStr,
+			@Param("order") String order, 
+			@Param("limit") Integer limit, 
+			@Param("offset") Integer offset);
+
 }

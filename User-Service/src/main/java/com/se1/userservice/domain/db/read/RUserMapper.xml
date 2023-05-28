@@ -70,4 +70,16 @@
 		Limit 10 Offset #{offset}
 	</select>
 
+	<select id="selectByConditionStr" resultType="com.se1.userservice.domain.model.User">
+		Select * from user where ${conditionStr}
+		<if test="order != null">
+			order by #{order}
+		</if>
+		<if test="limit != null">
+			Limit #{limit}
+		</if>
+		<if test="offset != null">
+			Offset #{offset}
+		</if>
+	</select>
 </mapper>

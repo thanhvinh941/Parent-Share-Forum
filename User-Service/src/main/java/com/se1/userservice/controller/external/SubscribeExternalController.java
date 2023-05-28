@@ -1,4 +1,4 @@
-package com.se1.userservice.controller;
+package com.se1.userservice.controller.external;
 
 import java.util.List;
 
