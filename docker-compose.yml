@@ -2,19 +2,25 @@ version: "3"
 services:
   mysql:
     image: mysql:latest
-    container_name: mysql-forum
+    container_name: mysql-network
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: Zaq12wsx1234
       MYSQL_ROOT_HOST: '%'
+      TZ: "Asia/Ho_Chi_Minh"
     volumes:
       - ./init:/docker-entrypoint-initdb.d
     networks:
-      - parent-share-forum
+      - parent-share-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.80'
+          memory: 384M
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: rabbitmq-forum
+    container_name: rabbitmq-network
     ports: 
       - 5672:5672
       - 15672:15672
@@ -22,8 +28,47 @@ services:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "Zaq12wsx1234"
     networks:
-      - parent-share-forum
+      - parent-share-network
+  elasticsearch:
+    container_name: elastic-network
+    image: elasticsearch:7.17.10
+    ports:
+      - 9200:9200
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    networks:
+      - parent-share-network
+  kibana:
+    container_name: kibana-network
+    image: kibana:7.17.10
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elastic-network:9200
+    networks:
+      - parent-share-network
+  redis:
+    container_name: redis-network
+    image: redis:latest
+    hostname: redis
+    networks:
+      - parent-share-network
+    environment:
+      TZ: "Asia/Ho_Chi_Minh"
+      REDIS_MASTER_PASSWORD: Zaq12wsx1234
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.80'
+          memory: 384M
 networks:
-  parent-share-forum:
+  parent-share-network:
     driver: bridge
   
